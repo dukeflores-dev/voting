@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elourdes Vote - Home</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="menu-button" type="button" onclick="toggleStudentMenu()" aria-label="Open menu">&#9776;</button>
+    <a class="brand" href="dashboard.html">
+      <img src="logo-transparent.png" alt="Elourdes Vote">
+    </a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="active" href="#home-content" onclick="showStudentHome(); return false;">Home</a>
+      <a href="#notifications" onclick="openNotifications(event)">Notifications</a>
+    </nav>
+
+    <div class="account-area">
+      <button class="student-profile-trigger" type="button" onclick="openStudentProfile()"><span class="account-name" id="account-name">Welcome<br><small>Voter</small></span></button>
+      <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <aside class="student-menu" id="student-menu" aria-label="Student menu">
+    <button class="student-menu-close" type="button" onclick="toggleStudentMenu()" aria-label="Close menu">&times;</button>
+    <a href="#" onclick="openStudentProfile(); toggleStudentMenu(); return false;">My Profile</a>
+    <a href="#candidates" onclick="showCandidates(); toggleStudentMenu(); return false;">Candidates</a>
+    <a href="#student-results" onclick="showElectionResults(); toggleStudentMenu(); return false;">Election Results</a>
+    <a href="#" onclick="showSupport(); toggleStudentMenu(); return false;">Help &amp; Support</a>
+  </aside>
+
+  <section class="candidates-page" id="candidates-page" hidden>
+    <div class="candidates-page-header">
+      <div>
+        <p class="eyebrow">STUDENT COUNCIL ELECTIONS 2026</p>
+        <h2>Meet the Candidates</h2>
+        <p>Review every candidate, their position, and their platform before voting.</p>
+      </div>
+      <button class="back-home-button" type="button" onclick="showStudentHome()">BACK TO HOME</button>
+    </div>
+    <div class="all-candidates-list" id="all-candidates-list"></div>
+  </section>
+
+  <main class="dashboard" id="home-content">
+    <section class="welcome-banner">
+      <div class="welcome-copy">
+        <p class="eyebrow">STUDENT COUNCIL ELECTIONS 2026</p>
+        <h1>Welcome to<br><strong>ELOURDES VOTE!</strong></h1>
+        <p>Your voice matters. Participate in the Our Lady of Lourdes College Student Council Elections and help shape the future of our student community.</p>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+    <aside class="status-card">
+      <h2>YOUR VOTING STATUS</h2>
+      <div class="countdown">Election Countdown<strong id="election-countdown">Loading current time...</strong></div>
+      <div class="status-alert" id="voting-status"><span class="status-icon">&#8987;</span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
+      <p class="detail"><span>&#128197;</span> Election: <span id="student-election-title">Student Council Election 2026</span></p>
+      <p class="detail"><span>&#9201;</span> Voting Period<br><b id="student-election-period-status">May 20, 2026 - May 23, 2026 | 11:59 PM</b></p>
+      <button class="primary-button full-button" id="cast-vote-button" type="button" onclick="startVoting()">CAST YOUR VOTE <span aria-hidden="true">&#8594;</span></button>
+    </aside>
+
+    <section class="candidates-card" id="candidates">
+      <div class="section-heading"><span class="section-icon">&#128101;</span><h2>MEET THE CANDIDATES</h2><button class="view-all-button" type="button" onclick="showAllCandidates()">View All Candidates &#8594;</button></div>
+      <div class="candidate-list" id="candidate-list"></div>
+    </section>
+
+    <aside class="reminders-card" id="about">
+      <div class="section-heading"><span class="section-icon">&#9888;</span><h2>REMINDERS</h2></div>
+      <ul class="reminders">
+        <li>Use your own student account.</li>
+        <li>Vote only once.</li>
+        <li>Review your choices before submitting.</li>
+        <li>Your vote is final and cannot be changed.</li>
+      </ul>
+    </aside>
+    </section>
+
+    <section class="election-card">
+      <div class="section-heading"><span class="section-icon">&#128203;</span><h2>CURRENT ELECTION</h2></div>
+      <div class="election-content">
+        <div class="election-symbol">&#128176;</div>
+        <div class="election-title"><span class="live-dot">ONGOING</span><h3 id="student-election-title-main">STUDENT COUNCIL ELECTION 2026</h3><p>Choose the leaders who will represent, serve, and inspire the OLLC student body.</p></div>
+        <div class="metric"><strong>Voting Period</strong><p id="student-election-period">May 20, 2026 -<br>May 23, 2026<br>11:59 PM</p></div>
+        <div class="metric"><strong>Eligible Voters</strong><p id="student-eligible-voters">All currently enrolled<br>OLLC students</p></div>
+      </div>
+    </section>
+
+    <section class="election-card student-results-card" id="student-results" hidden>
+      <div class="section-heading"><span class="section-icon">&#128202;</span><h2>ELECTION RESULTS</h2></div>
+      <p class="results-subtitle">The election has ended. Here are the final results.</p>
+      <div id="student-results-list" class="student-results-list"></div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="steps-card" id="guidelines">
+        <div class="section-heading"><span class="section-icon">&#9745;</span><h2>BEFORE YOU VOTE</h2></div>
+        <ol class="steps">
+          <li><strong>Review Candidates</strong><span>Get to know the candidates and their platforms.</span></li>
+          <li><strong>Choose Wisely</strong><span>Select your preferred candidate for each position.</span></li>
+          <li><strong>Review Your Ballot</strong><span>Check your selections before submitting.</span></li>
+          <li><strong>Submit Your Vote</strong><span>Once submitted, your vote is recorded securely.</span></li>
+        </ol>
+      </div>
+
+      <div class="candidates-card supplemental-candidates" id="notifications">
+        <div class="section-heading"><span class="section-icon">&#128276;</span><h2>NOTIFICATIONS</h2></div>
+        <p class="notification-text">Stay updated with election announcements and voting reminders.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal" id="ballot-modal" hidden>
+    <form class="ballot-form" onsubmit="submitVote(event)">
+      <button class="close-modal" type="button" onclick="closeBallot()" aria-label="Close">&times;</button>
+      <p class="eyebrow">STUDENT COUNCIL ELECTIONS 2026</p>
+      <h2>Cast Your Vote</h2>
+      <p class="ballot-note">Choose one candidate for each position. Your vote cannot be changed after submission.</p>
+      <div id="ballot-fields"></div>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeBallot()">CANCEL</button><button type="submit" class="save-button">SUBMIT VOTE</button></div>
+    </form>
+  </div>
+  <div class="modal" id="profile-modal" hidden>
+    <article class="profile-card">
+      <button class="close-modal" type="button" onclick="closeProfile()" aria-label="Close">&times;</button>
+      <div class="profile-avatar" id="profile-initials"></div>
+      <p class="eyebrow">CANDIDATE PROFILE</p>
+      <h2 id="profile-name"></h2>
+      <span class="profile-position" id="profile-position"></span>
+      <p class="profile-description" id="profile-description"></p>
+      <button class="primary-button profile-vote-button" type="button" onclick="closeProfile(); startVoting()">VOTE FOR THIS CANDIDATE</button>
+    </article>
+  </div>
+  <div class="modal" id="student-profile-modal" hidden>
+    <article class="student-profile-card">
+      <button class="close-modal" type="button" onclick="closeStudentProfile()" aria-label="Close">&times;</button>
+      <div class="student-profile-avatar">&#128100;</div>
+      <p class="eyebrow">MY PROFILE</p>
+      <h2 id="student-profile-name">Student Voter</h2>
+      <button class="edit-name-button" type="button" onclick="editStudentName()">EDIT NAME</button>
+      <form id="student-name-form" class="student-name-form" onsubmit="saveStudentName(event)" hidden>
+        <input type="text" id="student-name-input" placeholder="Enter your name" required>
+        <button class="save-name-button" type="submit">SAVE NAME</button>
+      </form>
+      <p class="student-profile-role">Registered Student Voter</p>
+      <div class="student-profile-details">
+        <p><strong>Student ID</strong><span id="student-profile-id">Not available</span></p>
+        <p><strong>Email</strong><span id="student-profile-email">Not available</span></p>
+        <p><strong>Voting status</strong><span id="student-profile-status">Not yet voted</span></p>
+      </div>
+    </article>
+  </div>
+  <div class="modal" id="notifications-modal" hidden>
+    <article class="notifications-card">
+      <button class="close-modal" type="button" onclick="closeNotifications()" aria-label="Close">&times;</button>
+      <p class="eyebrow">ELECTION UPDATES</p>
+      <h2>Notifications</h2>
+      <div id="notification-list" class="notification-list"></div>
+    </article>
+  </div>
+  <div class="modal" id="support-modal" hidden>
+    <article class="support-card">
+      <button class="close-modal" type="button" onclick="closeSupport()" aria-label="Close">&times;</button>
+      <p class="eyebrow">STUDENT SUPPORT</p>
+      <h2>Help &amp; Support</h2>
+      <p>If you have a problem with your account or voting, contact the election administrator.</p>
+      <p class="support-contact">Email: election.admin@elourdes.edu.ph<br>Office: Student Council Election Committee</p>
+    </article>
+  </div>
+  <script src="dashboard.js"></script>
+</body>
+</html>

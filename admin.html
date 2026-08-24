@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elourdes Vote - Admin Home</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="admin-topbar">
+    <a class="admin-brand" href="admin.html"><img src="logo-transparent.png" alt="Elourdes Vote"></a>
+    <div class="admin-heading"><span>ADMIN PORTAL</span><strong>Election Management</strong></div>
+    <div class="admin-account"><button class="profile-trigger" type="button" onclick="openAdminProfile()"><span id="admin-name">Administrator</span></button><button type="button" onclick="logoutAdmin()">LOGOUT</button></div>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-welcome">
+      <div><p class="eyebrow">ELECTION ADMINISTRATION</p><h1>Manage the student election.</h1><p>Update candidates, monitor the election, and keep voting information accurate for every student.</p></div>
+      <div class="admin-mark">&#9881;</div>
+    </section>
+
+    <section class="admin-stats">
+      <article><span class="stat-icon">&#128101;</span><div><strong id="candidate-count">0</strong><span>Registered Candidates</span></div></article>
+      <article><span class="stat-icon">&#128203;</span><div><strong>2026</strong><span>Current Election</span></div></article>
+      <article><span class="stat-icon">&#9989;</span><div><strong id="total-votes">0</strong><span>Total Votes Submitted</span></div></article>
+    </section>
+
+    <section class="admin-panel results-panel" id="results">
+      <div class="panel-header"><div><p class="eyebrow">LIVE MONITOR</p><h2>Automated Election Tally</h2><p id="tally-updated">Waiting for vote activity...</p></div><span class="live-indicator"><i></i> LIVE</span></div>
+      <div class="turnout-row"><strong id="turnout-percent">0%</strong><span>voter turnout</span><div class="turnout-track"><i id="turnout-bar"></i></div></div>
+      <div id="results-list" class="results-list"></div>
+    </section>
+
+    <section class="admin-panel" id="candidates">
+      <div class="panel-header"><div><p class="eyebrow">ELECTION CONTENT</p><h2>Manage Candidates</h2><p>Add new candidates or edit existing candidate information.</p></div><div class="candidate-controls"><button class="history-button" id="undo-button" type="button" onclick="undoCandidateChange()" disabled>UNDO</button><button class="history-button" id="redo-button" type="button" onclick="redoCandidateChange()" disabled>REDO</button><button class="add-button" type="button" onclick="openCandidateForm()">+ ADD CANDIDATE</button></div></div>
+      <div class="admin-candidate-list" id="admin-candidate-list"></div>
+    </section>
+
+    <section class="admin-panel election-settings">
+      <div class="panel-header"><div><p class="eyebrow">CURRENT ELECTION</p><h2 id="election-title">Student Council Election 2026</h2><p id="election-period">Voting period: May 20, 2026 - May 23, 2026 | 11:59 PM</p><p id="current-system-time" class="system-time"></p></div><div class="settings-actions"><button class="secondary-button" type="button" onclick="setActiveElectionPeriod()">SET ACTIVE PERIOD</button><button class="secondary-button" type="button" onclick="openElectionSettings()">EDIT SETTINGS</button></div></div>
+    </section>
+  </main>
+
+  <div class="toast" id="admin-toast" role="status"></div>
+  <div class="modal" id="admin-profile-modal" hidden>
+    <article class="admin-profile-card">
+      <button class="close-modal" type="button" onclick="closeAdminProfile()" aria-label="Close">&times;</button>
+      <div class="admin-profile-avatar">A</div>
+      <p class="eyebrow">MY PROFILE</p>
+      <h2 id="profile-admin-name">Administrator</h2>
+      <p class="profile-role">Election Administrator</p>
+      <div class="profile-details"><p><strong>Username</strong><span id="profile-admin-username">admin</span></p><p><strong>Access</strong><span>Candidate and election management</span></p></div>
+    </article>
+  </div>
+  <div class="modal" id="candidate-modal" hidden>
+    <form class="candidate-form" onsubmit="saveCandidate(event)">
+      <button class="close-modal" type="button" onclick="closeCandidateForm()" aria-label="Close">&times;</button>
+      <h2 id="candidate-form-title">Add Candidate</h2>
+      <input type="hidden" id="candidate-index">
+      <label>Full Name<input type="text" id="candidate-name" required></label>
+      <label>Position<input type="text" id="candidate-position" required></label>
+      <label>Initials<input type="text" id="candidate-initials" maxlength="3" required></label>
+      <label>Profile Picture<input type="file" id="candidate-picture" accept="image/*" onchange="previewCandidatePicture(event)"></label>
+      <img class="picture-preview" id="picture-preview" alt="" hidden>
+      <label>Candidate Description<textarea id="candidate-description" rows="4" placeholder="Write the candidate's platform and background..." required></textarea></label>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeCandidateForm()">CANCEL</button><button type="submit" class="save-button">SAVE CANDIDATE</button></div>
+    </form>
+  </div>
+  <div class="modal" id="election-settings-modal" hidden>
+    <form class="candidate-form" onsubmit="saveElectionSettings(event)">
+      <button class="close-modal" type="button" onclick="closeElectionSettings()" aria-label="Close">&times;</button>
+      <h2>Edit Election Settings</h2>
+      <label>Election Title<input type="text" id="settings-title" required></label>
+      <label>Start Date<input type="date" id="settings-start" required></label>
+      <label>End Date<input type="date" id="settings-end" required></label>
+      <label>Voting Deadline<input type="time" id="settings-deadline" required></label>
+      <label>Eligible Voters<input type="number" id="settings-voters" min="1" required></label>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeElectionSettings()">CANCEL</button><button type="submit" class="save-button">SAVE SETTINGS</button></div>
+    </form>
+  </div>
+  <script src="admin.js"></script>
+</body>
+</html>

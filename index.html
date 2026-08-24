@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Elourdes Vote - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="left">
+      <h1>The future begins with a choice.</h1> 
+    </div>
+    
+    <div class="right">
+      <div class="login-box">
+
+        <div class="brand-image" role="img" aria-label="Elourdes Student Council Elections"></div>
+
+        <div id="login-form">
+          <input type="text" id="username" placeholder="Username">
+          <input type="password" id="password" placeholder="Password">
+
+          <div class="options">
+            <label><input type="checkbox"> Remember me</label>
+            <a href="#" onclick="forgotPassword(event)">Forgot Password?</a>
+          </div>
+
+          <button onclick="login()">LOGIN</button>
+
+          <p class="signup">
+            Don’t have an account? <a href="#" onclick="showSignup(event)">Sign up</a>
+          </p>
+
+          <p id="message"></p>
+        </div>
+
+        <form id="forgot-form" class="forgot-form" onsubmit="resetPassword(event)" hidden>
+          <h2>Reset Password</h2>
+          <p class="form-help">Enter your registered Student ID or email, then create a new password.</p>
+          <input type="text" id="reset-identity" placeholder="Student ID or Email" required>
+          <input type="password" id="new-password" placeholder="New Password" required>
+          <input type="password" id="confirm-new-password" placeholder="Confirm New Password" required>
+          <button type="submit">RESET PASSWORD</button>
+          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
+          <p id="reset-message"></p>
+        </form>
+
+        <form id="signup-form" class="signup-form" onsubmit="createAccount(event)" hidden>
+          <input type="text" id="full-name" placeholder="Full Name" required>
+
+          <div class="form-row">
+            <input type="text" id="student-id" placeholder="Student ID" required>
+            <select id="year-level" required>
+              <option value="" disabled selected>Year &amp; Level</option>
+              <option>Grade 7</option>
+              <option>Grade 8</option>
+              <option>Grade 9</option>
+              <option>Grade 10</option>
+              <option>Grade 11</option>
+              <option>Grade 12</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <select id="gender" required>
+              <option value="" disabled selected>Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+          </div>
+
+          <label class="agreement"><input type="checkbox" required> I confirm that the information I provided is accurate.</label>
+          <label class="agreement"><input type="checkbox" required> I agree to the ELOURDES VOTE election guidelines.</label>
+
+          <button type="submit">CREATE ACCOUNT</button>
+          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
+          <p id="signup-message"></p>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

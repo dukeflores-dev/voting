@@ -12,6 +12,9 @@
   --pale: #f5faff;
 }
 
+.icon { display: block; width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-lg { width: 2rem; height: 2rem; }
+
 /* Compact student home layout */
 .topbar {
   min-height: 52px;
@@ -272,6 +275,8 @@ body {
 }
 
 .status-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
   font-size: 24px;
 }
 
@@ -297,6 +302,16 @@ body {
   color: var(--blue);
 }
 
+.detail > span:first-child,
+.section-icon,
+.view-all-button > .icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.detail > span:first-child .icon { width: 1em; height: 1em; }
+
 .full-button {
   display: flex;
   margin: 18px;
@@ -319,6 +334,7 @@ body {
 }
 
 .section-icon {
+  display: inline-flex;
   font-size: 18px;
 }
 
@@ -336,6 +352,7 @@ body {
   height: 72px;
   border-radius: 50%;
   background: #ecf7ff;
+  color: var(--blue);
   font-size: 30px;
 }
 
@@ -438,6 +455,8 @@ body {
   margin-left: auto;
   font-size: 11px;
 }
+
+.view-all-button > .icon { margin-left: 5px; }
 
 .candidate-toolbar {
   display: flex;

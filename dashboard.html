@@ -8,7 +8,7 @@
 </head>
 <body>
   <header class="topbar">
-    <button class="menu-button" type="button" onclick="toggleStudentMenu()" aria-label="Open menu">&#9776;</button>
+    <button class="menu-button" type="button" onclick="toggleStudentMenu()" aria-label="Open menu"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <a class="brand" href="dashboard.html">
       <img src="logo-transparent.png" alt="Elourdes Vote">
     </a>
@@ -57,19 +57,19 @@
     <aside class="status-card">
       <h2>YOUR VOTING STATUS</h2>
       <div class="countdown">Election Countdown<strong id="election-countdown">Loading current time...</strong></div>
-      <div class="status-alert" id="voting-status"><span class="status-icon">&#8987;</span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
-      <p class="detail"><span>&#128197;</span> Election: <span id="student-election-title">Student Council Election 2026</span></p>
-      <p class="detail"><span>&#9201;</span> Voting Period<br><b id="student-election-period-status">May 20, 2026 - May 23, 2026 | 11:59 PM</b></p>
-      <button class="primary-button full-button" id="cast-vote-button" type="button" onclick="startVoting()">CAST YOUR VOTE <span aria-hidden="true">&#8594;</span></button>
+      <div class="status-alert" id="voting-status"><span class="status-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
+      <p class="detail"><span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span> Election: <span id="student-election-title">Student Council Election 2026</span></p>
+      <p class="detail"><span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> Voting Period<br><b id="student-election-period-status">May 20, 2026 - May 23, 2026 | 11:59 PM</b></p>
+      <button class="primary-button full-button" id="cast-vote-button" type="button" onclick="startVoting()">CAST YOUR VOTE <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
     </aside>
 
     <section class="candidates-card" id="candidates">
-      <div class="section-heading"><span class="section-icon">&#128101;</span><h2>MEET THE CANDIDATES</h2><button class="view-all-button" type="button" onclick="showAllCandidates()">View All Candidates &#8594;</button></div>
+      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2><button class="view-all-button" type="button" onclick="showAllCandidates()">View All Candidates <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       <div class="candidate-list" id="candidate-list"></div>
     </section>
 
     <aside class="reminders-card" id="about">
-      <div class="section-heading"><span class="section-icon">&#9888;</span><h2>REMINDERS</h2></div>
+      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="m10.3 2.9-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span><h2>REMINDERS</h2></div>
       <ul class="reminders">
         <li>Use your own student account.</li>
         <li>Vote only once.</li>
@@ -80,9 +80,9 @@
     </section>
 
     <section class="election-card">
-      <div class="section-heading"><span class="section-icon">&#128203;</span><h2>CURRENT ELECTION</h2></div>
+      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 11h8M8 15h6"/></svg></span><h2>CURRENT ELECTION</h2></div>
       <div class="election-content">
-        <div class="election-symbol">&#128176;</div>
+        <div class="election-symbol" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M16 8c-.8-.7-2-1-3.5-1-1.9 0-3 .8-3 2s1.1 2 3 2 3 .8 3 2-1.1 2-3 2c-1.5 0-2.7-.3-3.5-1M12 5v14"/></svg></div>
         <div class="election-title"><span class="live-dot">ONGOING</span><h3 id="student-election-title-main">STUDENT COUNCIL ELECTION 2026</h3><p>Choose the leaders who will represent, serve, and inspire the OLLC student body.</p></div>
         <div class="metric"><strong>Voting Period</strong><p id="student-election-period">May 20, 2026 -<br>May 23, 2026<br>11:59 PM</p></div>
         <div class="metric"><strong>Eligible Voters</strong><p id="student-eligible-voters">All currently enrolled<br>OLLC students</p></div>
@@ -90,14 +90,14 @@
     </section>
 
     <section class="election-card student-results-card" id="student-results" hidden>
-      <div class="section-heading"><span class="section-icon">&#128202;</span><h2>ELECTION RESULTS</h2></div>
+      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></svg></span><h2>ELECTION RESULTS</h2></div>
       <p class="results-subtitle">The election has ended. Here are the final results.</p>
       <div id="student-results-list" class="student-results-list"></div>
     </section>
 
     <section class="lower-grid">
       <div class="steps-card" id="guidelines">
-        <div class="section-heading"><span class="section-icon">&#9745;</span><h2>BEFORE YOU VOTE</h2></div>
+        <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7 12 3 3 7-7"/></svg></span><h2>BEFORE YOU VOTE</h2></div>
         <ol class="steps">
           <li><strong>Review Candidates</strong><span>Get to know the candidates and their platforms.</span></li>
           <li><strong>Choose Wisely</strong><span>Select your preferred candidate for each position.</span></li>
@@ -107,7 +107,7 @@
       </div>
 
       <div class="candidates-card supplemental-candidates" id="notifications">
-        <div class="section-heading"><span class="section-icon">&#128276;</span><h2>NOTIFICATIONS</h2></div>
+        <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span><h2>NOTIFICATIONS</h2></div>
         <p class="notification-text">Stay updated with election announcements and voting reminders.</p>
       </div>
     </section>
@@ -138,7 +138,7 @@
   <div class="modal" id="student-profile-modal" hidden>
     <article class="student-profile-card">
       <button class="close-modal" type="button" onclick="closeStudentProfile()" aria-label="Close">&times;</button>
-      <div class="student-profile-avatar">&#128100;</div>
+      <div class="student-profile-avatar" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
       <p class="eyebrow">MY PROFILE</p>
       <h2 id="student-profile-name">Student Voter</h2>
       <button class="edit-name-button" type="button" onclick="editStudentName()">EDIT NAME</button>

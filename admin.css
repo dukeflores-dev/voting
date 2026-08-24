@@ -1,5 +1,7 @@
 * { box-sizing: border-box; margin: 0; }
 :root { --blue: #06439a; --deep: #062e68; --ink: #18324c; --line: #dfe8f0; }
+.icon { display: block; width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-xl { width: 2.6rem; height: 2.6rem; }
 body { min-height: 100vh; background: #f3f7fb; color: var(--ink); font-family: Arial, sans-serif; }
 .admin-topbar { min-height: 76px; display: flex; align-items: center; gap: 28px; padding: 10px 36px; background: white; border-bottom: 1px solid var(--line); box-shadow: 0 2px 9px #113a5d12; }
 .admin-brand img { width: 220px; height: 54px; object-fit: contain; }
@@ -30,10 +32,10 @@ body { min-height: 100vh; background: #f3f7fb; color: var(--ink); font-family: A
 .admin-welcome { display: flex; align-items: center; justify-content: space-between; padding: 34px 42px; border-radius: 10px; background: linear-gradient(110deg, #fff, #eaf6ff); border: 1px solid var(--line); }
 .admin-welcome h1 { margin: 8px 0; color: var(--deep); font-size: 32px; }
 .admin-welcome p:not(.eyebrow) { max-width: 580px; color: #596a7c; font-size: 14px; line-height: 1.5; }
-.admin-mark { display: grid; place-items: center; width: 100px; height: 100px; border-radius: 50%; background: #d8efff; color: var(--blue); font-size: 55px; }
+.admin-mark { display: grid; place-items: center; width: 100px; height: 100px; border-radius: 50%; background: #d8efff; color: var(--blue); }
 .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
 .admin-stats article { display: flex; align-items: center; gap: 16px; padding: 20px; background: white; border: 1px solid var(--line); border-radius: 8px; }
-.stat-icon { color: var(--blue); font-size: 28px; }
+.stat-icon { display: inline-flex; color: var(--blue); font-size: 28px; }
 .admin-stats strong, .admin-stats span { display: block; }
 .admin-stats strong { color: var(--blue); font-size: 22px; }
 .admin-stats span { margin-top: 4px; color: #687789; font-size: 12px; }

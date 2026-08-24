@@ -1,30 +1,30 @@
-function login() {
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
+async function login() {
+  const email = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
   const message = document.getElementById("message");
-  const savedAccount = JSON.parse(localStorage.getItem("elourdesAccount") || "null");
-  const isAdmin = user === "admin" && pass === "1234";
-  const isRegisteredUser = savedAccount &&
-    (user === savedAccount.studentId || user === savedAccount.email) &&
-    pass === savedAccount.password;
 
-  if (isAdmin || isRegisteredUser) {
-    message.style.color = "green";
-    message.textContent = "Login successful!";
-    localStorage.setItem("elourdesCurrentUser", JSON.stringify({
-      name: isAdmin ? "Administrator" : savedAccount.fullName,
-      username: user
-    }));
+  message.textContent = "Signing in...";
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-    setTimeout(() => {
-      window.location.href = isAdmin ? "admin.html" : "dashboard.html";
-    }, 500);
-
-  } else {
+  if (error) {
     message.style.color = "red";
-    message.textContent = "Invalid username or password";
+    message.textContent = error.message;
+    return;
   }
+
+  message.style.color = "green";
+  message.textContent = "Login successful!";
+  const user = data.user;
+  const isAdmin = user.app_metadata?.role === "admin";
+  localStorage.setItem("elourdesCurrentUser", JSON.stringify({
+    id: user.id,
+    name: user.user_metadata?.full_name || user.email,
+    username: user.email,
+    role: isAdmin ? "admin" : "voter"
+  }));
+  window.setTimeout(() => {
+    window.location.href = isAdmin ? "admin.html" : "dashboard.html";
+  }, 500);
 }
 
 function showSignup(event) {
@@ -47,35 +47,27 @@ function forgotPassword(event) {
   document.getElementById("forgot-form").hidden = false;
 }
 
-function resetPassword(event) {
+async function resetPassword(event) {
   event.preventDefault();
 
-  const account = JSON.parse(localStorage.getItem("elourdesAccount") || "null");
   const identity = document.getElementById("reset-identity").value.trim();
-  const newPassword = document.getElementById("new-password").value;
-  const confirmPassword = document.getElementById("confirm-new-password").value;
   const message = document.getElementById("reset-message");
 
-  if (!account || (identity !== account.studentId && identity !== account.email)) {
+  if (!identity.includes("@")) {
     message.style.color = "red";
-    message.textContent = "Student ID or email was not found.";
+    message.textContent = "Enter your registered email address.";
     return;
   }
 
-  if (newPassword !== confirmPassword) {
-    message.style.color = "red";
-    message.textContent = "Passwords do not match.";
-    return;
-  }
-
-  account.password = newPassword;
-  localStorage.setItem("elourdesAccount", JSON.stringify(account));
-  message.style.color = "green";
-  message.textContent = "Password updated. You can now log in.";
-  event.target.reset();
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(identity, {
+    redirectTo: `${window.location.origin}${window.location.pathname}`
+  });
+  message.style.color = error ? "red" : "green";
+  message.textContent = error ? error.message : "Check your email for a secure password reset link.";
+  if (!error) event.target.reset();
 }
 
-function createAccount(event) {
+async function createAccount(event) {
   event.preventDefault();
 
   const password = document.getElementById("signup-password").value;
@@ -88,13 +80,29 @@ function createAccount(event) {
     return;
   }
 
-  localStorage.setItem("elourdesAccount", JSON.stringify({
-    fullName: document.getElementById("full-name").value,
-    studentId: document.getElementById("student-id").value,
-    email: document.getElementById("email").value,
-    password
-  }));
+  const email = document.getElementById("email").value.trim();
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: document.getElementById("full-name").value.trim(),
+        student_id: document.getElementById("student-id").value.trim(),
+        year_level: document.getElementById("year-level").value,
+        gender: document.getElementById("gender").value
+      }
+    }
+  });
+
+  if (error) {
+    message.style.color = "red";
+    message.textContent = error.message;
+    return;
+  }
 
   message.style.color = "green";
-  message.textContent = "Account created successfully!";
+  message.textContent = data.session
+    ? "Account created successfully!"
+    : "Account created. Check your email to confirm your account.";
+  event.target.reset();
 }

@@ -1,4 +1,4 @@
-const adminUser = JSON.parse(localStorage.getItem("elourdesCurrentUser") || "null");
+let adminUser = null;
 const adminName = document.getElementById("admin-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart." },
@@ -6,14 +6,7 @@ const defaultCandidates = [
   { name: "Ana Reyes", position: "SECRETARY", initials: "AR", description: "Organized today, empowered tomorrow." }
 ];
 
-if (adminUser?.name) adminName.textContent = adminUser.name;
-document.getElementById("profile-admin-name").textContent = adminUser?.name || "Administrator";
-document.getElementById("profile-admin-username").textContent = adminUser?.username || "admin";
-if (adminUser?.username !== "admin") {
-  window.location.href = "dashboard.html";
-}
-
-let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
+let candidates = [];
 let candidateUndoStack = [];
 let candidateRedoStack = [];
 const defaultElection = {
@@ -23,15 +16,56 @@ const defaultElection = {
   deadline: "23:59",
   eligibleVoters: 100
 };
-let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") || defaultElection;
-renderCandidates();
-updateHistoryButtons();
-renderElectionSettings();
-updateResults();
-updateSystemTime();
+let election = null;
+let electionId = 1;
+let totalVotes = 0;
+initializeAdmin();
 window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
-window.addEventListener("storage", updateResults);
+
+async function initializeAdmin() {
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error || !data.user || data.user.app_metadata?.role !== "admin") {
+    window.location.replace("dashboard.html");
+    return;
+  }
+  adminUser = data.user;
+  adminName.textContent = adminUser.user_metadata?.full_name || adminUser.email;
+  document.getElementById("profile-admin-name").textContent = adminUser.user_metadata?.full_name || "Administrator";
+  document.getElementById("profile-admin-username").textContent = adminUser.email;
+  await loadElection();
+  await loadCandidates();
+  renderCandidates();
+  updateHistoryButtons();
+  renderElectionSettings();
+  await updateResults();
+}
+
+async function loadElection() {
+  const { data, error } = await supabaseClient.from("elections").select("*").eq("id", electionId).single();
+  if (error) {
+    showAdminToast("Election data could not be loaded.");
+    return;
+  }
+  election = {
+    ...data,
+    startDate: data.start_date,
+    endDate: data.end_date,
+    eligibleVoters: data.eligible_voters
+  };
+}
+
+async function loadCandidates() {
+  const { data, error } = await supabaseClient.from("candidates").select("*").eq("election_id", electionId).order("id");
+  if (error) {
+    showAdminToast("Candidate data could not be loaded.");
+    return;
+  }
+  candidates = (data || []).map(candidate => ({
+    ...candidate,
+    picture: candidate.image_url || ""
+  }));
+}
 
 function renderCandidates() {
   document.getElementById("candidate-count").textContent = candidates.length;
@@ -67,7 +101,7 @@ function closeCandidateForm() {
   document.getElementById("candidate-modal").hidden = true;
 }
 
-function saveCandidate(event) {
+async function saveCandidate(event) {
   event.preventDefault();
   const index = Number(document.getElementById("candidate-index").value);
   const existingPicture = index < 0 ? "" : (candidates[index].picture || "");
@@ -80,11 +114,25 @@ function saveCandidate(event) {
     picture: existingPicture
   };
 
-  const finishSave = () => {
+  const finishSave = async () => {
     saveCandidateHistory();
-    if (index < 0) candidates.push(candidate);
-    else candidates[index] = candidate;
-    localStorage.setItem("elourdesCandidates", JSON.stringify(candidates));
+    const payload = {
+      election_id: electionId,
+      name: candidate.name,
+      position: candidate.position,
+      initials: candidate.initials,
+      description: candidate.description,
+      image_url: candidate.picture || null
+    };
+    const result = index < 0
+      ? await supabaseClient.from("candidates").insert(payload).select().single()
+      : await supabaseClient.from("candidates").update(payload).eq("id", candidates[index].id).select().single();
+    if (result.error) {
+      showAdminToast("Candidate could not be saved.");
+      return;
+    }
+    if (index < 0) candidates.push(result.data);
+    else candidates[index] = result.data;
     renderCandidates();
     updateResults();
     closeCandidateForm();
@@ -142,18 +190,16 @@ function resizePicture(file) {
   });
 }
 
-function deleteCandidate(index) {
+async function deleteCandidate(index) {
   if (!window.confirm(`Delete ${candidates[index].name}?`)) return;
   saveCandidateHistory();
-  const removed = candidates.splice(index, 1)[0];
-  localStorage.setItem("elourdesCandidates", JSON.stringify(candidates));
-  const notifications = JSON.parse(localStorage.getItem("elourdesNotifications") || "[]");
-  notifications.unshift({
-    type: "candidate-removed",
-    message: `${removed.name} was removed from the candidate list.`,
-    date: new Date().toISOString()
-  });
-  localStorage.setItem("elourdesNotifications", JSON.stringify(notifications.slice(0, 20)));
+  const removed = candidates[index];
+  const { error } = await supabaseClient.from("candidates").delete().eq("id", removed.id);
+  if (error) {
+    showAdminToast("Candidate could not be removed.");
+    return;
+  }
+  candidates.splice(index, 1);
   renderCandidates();
   updateResults();
   showAdminToast(`${removed.name} was removed.`);
@@ -167,7 +213,6 @@ function saveCandidateHistory() {
 
 function restoreCandidateList(nextCandidates) {
   candidates = JSON.parse(nextCandidates);
-  localStorage.setItem("elourdesCandidates", JSON.stringify(candidates));
   renderCandidates();
   updateResults();
   updateHistoryButtons();
@@ -192,9 +237,9 @@ function updateHistoryButtons() {
   document.getElementById("redo-button").disabled = candidateRedoStack.length === 0;
 }
 
-function logoutAdmin() {
-  localStorage.removeItem("elourdesCurrentUser");
-  window.location.href = "index.html";
+async function logoutAdmin() {
+  await supabaseClient.auth.signOut();
+  window.location.replace("index.html");
 }
 
 function openAdminProfile() {
@@ -218,13 +263,21 @@ function closeElectionSettings() {
   document.getElementById("election-settings-modal").hidden = true;
 }
 
-function setActiveElectionPeriod() {
+async function setActiveElectionPeriod() {
   const now = new Date();
   const end = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  election.startDate = toDateInputValue(now);
-  election.endDate = toDateInputValue(end);
-  election.deadline = `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`;
-  localStorage.setItem("elourdesElection", JSON.stringify(election));
+  const updates = {
+    start_date: toDateInputValue(now),
+    end_date: toDateInputValue(end),
+    deadline: `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`,
+    status: "active"
+  };
+  const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
+  if (error) {
+    showAdminToast("Election period could not be updated.");
+    return;
+  }
+  election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
   renderElectionSettings();
   showAdminToast("Election is active now and will close after 24 hours.");
 }
@@ -238,7 +291,7 @@ function updateSystemTime() {
   if (time) time.textContent = `Current system time: ${new Date().toLocaleString()}`;
 }
 
-function saveElectionSettings(event) {
+async function saveElectionSettings(event) {
   event.preventDefault();
   const startDate = document.getElementById("settings-start").value;
   const endDate = document.getElementById("settings-end").value;
@@ -248,14 +301,19 @@ function saveElectionSettings(event) {
     return;
   }
 
-  election = {
+  const updates = {
     title: document.getElementById("settings-title").value.trim(),
-    startDate,
-    endDate,
+    start_date: startDate,
+    end_date: endDate,
     deadline: document.getElementById("settings-deadline").value,
-    eligibleVoters: Number(document.getElementById("settings-voters").value)
+    eligible_voters: Number(document.getElementById("settings-voters").value)
   };
-  localStorage.setItem("elourdesElection", JSON.stringify(election));
+  const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
+  if (error) {
+    showAdminToast("Election settings could not be updated.");
+    return;
+  }
+  election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
   renderElectionSettings();
   closeElectionSettings();
   showAdminToast("Election settings updated successfully.");
@@ -284,13 +342,12 @@ function showAdminToast(message) {
   showAdminToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2600);
 }
 
-function updateResults() {
-  candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
-  const voteRecords = Object.keys(localStorage)
-    .filter(key => key.startsWith("elourdesVote-"))
-    .map(key => JSON.parse(localStorage.getItem(key)))
-    .filter(Boolean);
-  const totalVotes = voteRecords.length;
+async function updateResults() {
+  if (!election) return;
+  const { data: result, error } = await supabaseClient
+    .rpc("get_admin_results", { requested_election_id: electionId });
+  if (error) return;
+  const totalVotes = Number(result?.total_votes || 0);
   const eligibleVoters = Number(election.eligibleVoters || 100);
   const turnout = Math.min(100, Math.round((totalVotes / Math.max(eligibleVoters, 1)) * 100));
   const tally = {};
@@ -300,11 +357,9 @@ function updateResults() {
     tally[candidate.position].push({ name: candidate.name, votes: 0 });
   });
 
-  voteRecords.forEach(record => {
-    Object.entries(record.selections || {}).forEach(([position, name]) => {
-      const candidate = tally[position]?.find(item => item.name === name);
-      if (candidate) candidate.votes += 1;
-    });
+  (result?.rows || []).forEach(record => {
+    const candidate = tally[record.candidate_position]?.find(item => item.name === record.candidate_name);
+    if (candidate) candidate.votes += Number(record.vote_count);
   });
 
   document.getElementById("total-votes").textContent = totalVotes;

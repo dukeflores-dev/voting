@@ -1,5 +1,7 @@
-const account = JSON.parse(localStorage.getItem("elourdesAccount") || "null");
-const currentUser = JSON.parse(localStorage.getItem("elourdesCurrentUser") || "null");
+let account = null;
+let currentUser = null;
+let authUser = null;
+let hasVoted = false;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart." },
@@ -15,25 +17,8 @@ const defaultElection = {
 };
 let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") || defaultElection;
 
-if (currentUser?.name) {
-  accountName.textContent = `Welcome, ${currentUser.name}`;
-} else if (account?.fullName) {
-  accountName.textContent = `Welcome, ${account.fullName}`;
-}
-
 let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
-const voterKey = currentUser?.username || account?.studentId || account?.email || "guest";
-const voteStorageKey = `elourdesVote-${voterKey}`;
-
-if (currentUser?.username === "admin") {
-  window.location.href = "admin.html";
-}
-
-renderCandidates();
-renderElectionDetails();
-updateVotingStatus();
-updateCountdown();
-updateElectionState();
+initializeDashboard();
 window.setInterval(() => {
   updateCountdown();
   refreshElectionSettings();
@@ -41,8 +26,76 @@ window.setInterval(() => {
 }, 1000);
 window.addEventListener("storage", refreshElectionSettings);
 
-function logout() {
-  window.location.href = "index.html";
+async function initializeDashboard() {
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error || !data.user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  authUser = data.user;
+  currentUser = {
+    id: authUser.id,
+    name: authUser.user_metadata?.full_name || authUser.email,
+    username: authUser.email,
+    role: authUser.app_metadata?.role || "voter"
+  };
+  account = {
+    fullName: currentUser.name,
+    studentId: authUser.user_metadata?.student_id || "Not available",
+    email: authUser.email
+  };
+
+  if (currentUser.role === "admin") {
+    window.location.replace("admin.html");
+    return;
+  }
+
+  const { data: electionData } = await supabaseClient
+    .from("elections")
+    .select("*")
+    .eq("id", 1)
+    .single();
+  if (electionData) {
+    election = {
+      ...electionData,
+      startDate: electionData.start_date || election.startDate,
+      endDate: electionData.end_date || election.endDate,
+      deadline: electionData.deadline || election.deadline,
+      eligibleVoters: electionData.eligible_voters || election.eligibleVoters
+    };
+  }
+
+  const { data: candidateData } = await supabaseClient
+    .from("candidates")
+    .select("*")
+    .eq("election_id", 1)
+    .order("id");
+  if (candidateData) {
+    candidates = candidateData.map(candidate => ({
+      ...candidate,
+      picture: candidate.image_url || ""
+    }));
+  }
+
+  const { data: ballot } = await supabaseClient
+    .from("vote_ballots")
+    .select("id")
+    .eq("election_id", 1)
+    .eq("voter_id", authUser.id)
+    .maybeSingle();
+  hasVoted = Boolean(ballot);
+  accountName.textContent = `Welcome, ${currentUser.name}`;
+  renderCandidates();
+  renderElectionDetails();
+  updateVotingStatus();
+  updateCountdown();
+  updateElectionState();
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  window.location.replace("index.html");
 }
 
 function toggleStudentMenu() {
@@ -87,7 +140,7 @@ function showElectionResults() {
     showToast("Election results will be available after the countdown ends.");
     return;
   }
-  if (!localStorage.getItem(voteStorageKey)) {
+  if (!hasVoted) {
     showToast("Results are available after you submit your vote and the election ends.");
     return;
   }
@@ -186,7 +239,6 @@ function electionHasStarted() {
 function updateElectionState() {
   const ended = electionHasEnded();
   const started = electionHasStarted();
-  const hasVoted = Boolean(localStorage.getItem(voteStorageKey));
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");
   const buttons = document.querySelectorAll("[onclick*='startVoting']");
@@ -220,13 +272,15 @@ function updateElectionState() {
   }
 }
 
-function renderStudentResults() {
+async function renderStudentResults() {
   const resultsCard = document.getElementById("student-results");
   const resultsList = document.getElementById("student-results-list");
-  const records = Object.keys(localStorage)
-    .filter(key => key.startsWith("elourdesVote-"))
-    .map(key => JSON.parse(localStorage.getItem(key)))
-    .filter(Boolean);
+  const { data: ballots, error } = await supabaseClient
+    .rpc("get_election_results", { requested_election_id: 1 });
+  if (error) {
+    showToast("Results could not be loaded.");
+    return;
+  }
   const tally = {};
 
   candidates.forEach(candidate => {
@@ -234,10 +288,10 @@ function renderStudentResults() {
     tally[candidate.position].push({ name: candidate.name, votes: 0 });
   });
 
-  records.forEach(record => Object.entries(record.selections || {}).forEach(([position, name]) => {
-    const candidate = tally[position]?.find(item => item.name === name);
-    if (candidate) candidate.votes += 1;
-  }));
+  (ballots || []).forEach(record => {
+    const candidate = tally[record.candidate_position]?.find(item => item.name === record.candidate_name);
+    if (candidate) candidate.votes += Number(record.vote_count);
+  });
 
   resultsList.innerHTML = Object.entries(tally).map(([position, entries]) => {
     entries.sort((first, second) => second.votes - first.votes || first.name.localeCompare(second.name));
@@ -264,7 +318,7 @@ function openStudentProfile() {
   document.getElementById("student-profile-name").textContent = account?.fullName || currentUser?.name || "Student Voter";
   document.getElementById("student-profile-id").textContent = account?.studentId || currentUser?.username || "Not available";
   document.getElementById("student-profile-email").textContent = account?.email || "Not available";
-  document.getElementById("student-profile-status").textContent = localStorage.getItem(voteStorageKey) ? "Voted" : "Not yet voted";
+  document.getElementById("student-profile-status").textContent = hasVoted ? "Voted" : "Not yet voted";
   document.getElementById("student-profile-modal").hidden = false;
 }
 
@@ -279,20 +333,18 @@ function editStudentName() {
   nameInput.focus();
 }
 
-function saveStudentName(event) {
+async function saveStudentName(event) {
   event.preventDefault();
   const newName = document.getElementById("student-name-input").value.trim();
   if (!newName) return;
 
-  if (account) {
-    account.fullName = newName;
-    localStorage.setItem("elourdesAccount", JSON.stringify(account));
+  const { error } = await supabaseClient.auth.updateUser({ data: { full_name: newName } });
+  if (error) {
+    showToast("Your name could not be updated.");
+    return;
   }
-
-  if (currentUser) {
-    currentUser.name = newName;
-    localStorage.setItem("elourdesCurrentUser", JSON.stringify(currentUser));
-  }
+  account.fullName = newName;
+  currentUser.name = newName;
 
   document.getElementById("student-profile-name").textContent = newName;
   accountName.innerHTML = `Welcome<br><small>${escapeHtml(newName)}</small>`;
@@ -351,7 +403,7 @@ function startVoting() {
     return;
   }
 
-  if (localStorage.getItem(voteStorageKey)) {
+  if (hasVoted) {
     showToast("You have already submitted your vote.");
     return;
   }
@@ -372,7 +424,7 @@ function closeBallot() {
   document.getElementById("ballot-modal").hidden = true;
 }
 
-function submitVote(event) {
+async function submitVote(event) {
   event.preventDefault();
   if (electionHasEnded()) {
     closeBallot();
@@ -382,14 +434,22 @@ function submitVote(event) {
   }
   const formData = new FormData(event.target);
   const selections = Object.fromEntries(formData.entries());
-  localStorage.setItem(voteStorageKey, JSON.stringify({ selections, submittedAt: new Date().toISOString() }));
+  const { error } = await supabaseClient.from("vote_ballots").insert({
+    election_id: 1,
+    voter_id: authUser.id,
+    selections
+  });
+  if (error) {
+    showToast(error.code === "23505" ? "You have already submitted your vote." : "Your vote could not be submitted.");
+    return;
+  }
+  hasVoted = true;
   closeBallot();
   updateVotingStatus();
   showToast("Your vote was submitted successfully.");
 }
 
 function updateVotingStatus() {
-  const hasVoted = Boolean(localStorage.getItem(voteStorageKey));
   if (electionHasEnded() || !electionHasStarted()) return;
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");

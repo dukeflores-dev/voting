@@ -43,28 +43,14 @@ async function initializeAdmin() {
 
 async function loadElection() {
   const { data, error } = await supabaseClient.from("elections").select("*").eq("id", electionId).single();
-  if (error) {
-    showAdminToast("Election data could not be loaded.");
-    return;
-  }
-  election = {
-    ...data,
-    startDate: data.start_date,
-    endDate: data.end_date,
-    eligibleVoters: data.eligible_voters
-  };
+  if (error) { showAdminToast("Election data could not be loaded."); return; }
+  election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
 }
 
 async function loadCandidates() {
   const { data, error } = await supabaseClient.from("candidates").select("*").eq("election_id", electionId).order("id");
-  if (error) {
-    showAdminToast("Candidate data could not be loaded.");
-    return;
-  }
-  candidates = (data || []).map(candidate => ({
-    ...candidate,
-    picture: candidate.image_url || ""
-  }));
+  if (error) { showAdminToast("Candidate data could not be loaded."); return; }
+  candidates = (data || []).map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
 }
 
 function renderCandidates() {
@@ -125,14 +111,11 @@ async function saveCandidate(event) {
       image_url: candidate.picture || null
     };
     const result = index < 0
-      ? await supabaseClient.from("candidates").insert(payload).select().single()
+      ? await supabaseClient.from("candidates").insert({ ...payload }).select().single()
       : await supabaseClient.from("candidates").update(payload).eq("id", candidates[index].id).select().single();
-    if (result.error) {
-      showAdminToast("Candidate could not be saved.");
-      return;
-    }
-    if (index < 0) candidates.push(result.data);
-    else candidates[index] = result.data;
+    if (result.error) { showAdminToast("Candidate could not be saved."); return; }
+    if (index < 0) candidates.push({ ...result.data, picture: result.data.image_url || "" });
+    else candidates[index] = { ...result.data, picture: result.data.image_url || "" };
     renderCandidates();
     updateResults();
     closeCandidateForm();
@@ -195,10 +178,7 @@ async function deleteCandidate(index) {
   saveCandidateHistory();
   const removed = candidates[index];
   const { error } = await supabaseClient.from("candidates").delete().eq("id", removed.id);
-  if (error) {
-    showAdminToast("Candidate could not be removed.");
-    return;
-  }
+  if (error) { showAdminToast("Candidate could not be removed."); return; }
   candidates.splice(index, 1);
   renderCandidates();
   updateResults();
@@ -273,10 +253,7 @@ async function setActiveElectionPeriod() {
     status: "active"
   };
   const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
-  if (error) {
-    showAdminToast("Election period could not be updated.");
-    return;
-  }
+  if (error) { showAdminToast("Election period could not be updated."); return; }
   election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
   renderElectionSettings();
   showAdminToast("Election is active now and will close after 24 hours.");
@@ -309,10 +286,7 @@ async function saveElectionSettings(event) {
     eligible_voters: Number(document.getElementById("settings-voters").value)
   };
   const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
-  if (error) {
-    showAdminToast("Election settings could not be updated.");
-    return;
-  }
+  if (error) { showAdminToast("Election settings could not be updated."); return; }
   election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
   renderElectionSettings();
   closeElectionSettings();
@@ -344,8 +318,7 @@ function showAdminToast(message) {
 
 async function updateResults() {
   if (!election) return;
-  const { data: result, error } = await supabaseClient
-    .rpc("get_admin_results", { requested_election_id: electionId });
+  const { data: result, error } = await supabaseClient.rpc("get_admin_results", { requested_election_id: electionId });
   if (error) return;
   const totalVotes = Number(result?.total_votes || 0);
   const eligibleVoters = Number(election.eligibleVoters || 100);

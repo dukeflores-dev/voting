@@ -51,39 +51,13 @@ async function initializeDashboard() {
     return;
   }
 
-  const { data: electionData } = await supabaseClient
-    .from("elections")
-    .select("*")
-    .eq("id", 1)
-    .single();
-  if (electionData) {
-    election = {
-      ...electionData,
-      startDate: electionData.start_date || election.startDate,
-      endDate: electionData.end_date || election.endDate,
-      deadline: electionData.deadline || election.deadline,
-      eligibleVoters: electionData.eligible_voters || election.eligibleVoters
-    };
-  }
+  const { data: electionData } = await supabaseClient.from("elections").select("*").eq("id", 1).single();
+  if (electionData) election = { ...electionData, startDate: electionData.start_date || election.startDate, endDate: electionData.end_date || election.endDate, deadline: electionData.deadline || election.deadline, eligibleVoters: electionData.eligible_voters || election.eligibleVoters };
 
-  const { data: candidateData } = await supabaseClient
-    .from("candidates")
-    .select("*")
-    .eq("election_id", 1)
-    .order("id");
-  if (candidateData) {
-    candidates = candidateData.map(candidate => ({
-      ...candidate,
-      picture: candidate.image_url || ""
-    }));
-  }
+  const { data: candidateData } = await supabaseClient.from("candidates").select("*").eq("election_id", 1).order("id");
+  if (candidateData) candidates = candidateData.map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
 
-  const { data: ballot } = await supabaseClient
-    .from("vote_ballots")
-    .select("id")
-    .eq("election_id", 1)
-    .eq("voter_id", authUser.id)
-    .maybeSingle();
+  const { data: ballot } = await supabaseClient.from("vote_ballots").select("id").eq("election_id", 1).eq("voter_id", authUser.id).maybeSingle();
   hasVoted = Boolean(ballot);
   accountName.textContent = `Welcome, ${currentUser.name}`;
   renderCandidates();
@@ -275,12 +249,8 @@ function updateElectionState() {
 async function renderStudentResults() {
   const resultsCard = document.getElementById("student-results");
   const resultsList = document.getElementById("student-results-list");
-  const { data: ballots, error } = await supabaseClient
-    .rpc("get_election_results", { requested_election_id: 1 });
-  if (error) {
-    showToast("Results could not be loaded.");
-    return;
-  }
+  const { data: ballots, error } = await supabaseClient.rpc("get_election_results", { requested_election_id: 1 });
+  if (error) { showToast("Results could not be loaded."); return; }
   const tally = {};
 
   candidates.forEach(candidate => {
@@ -339,10 +309,7 @@ async function saveStudentName(event) {
   if (!newName) return;
 
   const { error } = await supabaseClient.auth.updateUser({ data: { full_name: newName } });
-  if (error) {
-    showToast("Your name could not be updated.");
-    return;
-  }
+  if (error) { showToast("Your name could not be updated."); return; }
   account.fullName = newName;
   currentUser.name = newName;
 
@@ -434,11 +401,7 @@ async function submitVote(event) {
   }
   const formData = new FormData(event.target);
   const selections = Object.fromEntries(formData.entries());
-  const { error } = await supabaseClient.from("vote_ballots").insert({
-    election_id: 1,
-    voter_id: authUser.id,
-    selections
-  });
+  const { error } = await supabaseClient.from("vote_ballots").insert({ election_id: 1, voter_id: authUser.id, selections });
   if (error) {
     showToast(error.code === "23505" ? "You have already submitted your vote." : "Your vote could not be submitted.");
     return;

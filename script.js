@@ -99,7 +99,6 @@ async function createAccount(event) {
     message.textContent = error.message;
     return;
   }
-
   message.style.color = "green";
   message.textContent = data.session
     ? "Account created successfully!"

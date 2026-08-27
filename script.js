@@ -4,7 +4,15 @@ async function login() {
   const message = document.getElementById("message");
 
   message.textContent = "Signing in...";
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  let result;
+  try {
+    result = await supabaseClient.auth.signInWithPassword({ email, password });
+  } catch (error) {
+    message.style.color = "red";
+    message.textContent = "Unable to reach Supabase. Check your internet connection and GitHub Pages settings.";
+    return;
+  }
+  const { data, error } = result;
 
   if (error) {
     message.style.color = "red";
@@ -81,18 +89,26 @@ async function createAccount(event) {
   }
 
   const email = document.getElementById("email").value.trim();
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: document.getElementById("full-name").value.trim(),
-        student_id: document.getElementById("student-id").value.trim(),
-        year_level: document.getElementById("year-level").value,
-        gender: document.getElementById("gender").value
+  let result;
+  try {
+    result = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: document.getElementById("full-name").value.trim(),
+          student_id: document.getElementById("student-id").value.trim(),
+          year_level: document.getElementById("year-level").value,
+          gender: document.getElementById("gender").value
+        }
       }
-    }
-  });
+    });
+  } catch (error) {
+    message.style.color = "red";
+    message.textContent = "Unable to reach Supabase. Check your internet connection and GitHub Pages settings.";
+    return;
+  }
+  const { data, error } = result;
 
   if (error) {
     message.style.color = "red";

@@ -10,6 +10,42 @@ body {
   overflow: hidden;
   position: relative;
   background: #173d64;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -6px;
+  z-index: 0;
+  background: url("school-background.jpg") center/cover no-repeat;
+  filter: blur(3px);
+}
+
+.container {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  min-height: 520px;
+  background: rgba(7, 36, 65, 0.28);
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 35, 70, 0.48);
+}
+
+.left h1 {
+  max-width: 300px;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1.08;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
   opacity: 0;
   transform: translateY(24px);

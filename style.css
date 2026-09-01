@@ -10,6 +10,7 @@ body {
   overflow: hidden;
   position: relative;
   background: #173d64;
+  font-size: 14px;
 }
 
 body::before {
@@ -91,21 +92,23 @@ body::before {
 
 input {
   width: 100%;
-  padding: 9px 10px;
-  margin: 5px 0;
+  padding: 10px 12px;
+  margin: 6px 0;
   border: 1px solid #d5dce2;
   border-radius: 0;
   background: #f1f6f8;
+  font-size: 14px;
 }
 
 select {
   width: 100%;
-  padding: 9px 10px;
-  margin: 5px 0;
+  padding: 10px 12px;
+  margin: 6px 0;
   border: 1px solid #d5dce2;
   border-radius: 0;
   background: #f1f6f8;
   color: #777;
+  font-size: 14px;
 }
 
 .form-row {
@@ -131,7 +134,7 @@ select {
 .form-help {
   margin-bottom: 12px;
   color: #687789;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.4;
 }
 
@@ -142,7 +145,7 @@ select {
 #reset-message {
   margin-top: 10px;
   color: red;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .back-button {
@@ -156,7 +159,7 @@ select {
 .agreement {
   display: block;
   margin-top: 6px;
-  font-size: 8px;
+  font-size: 12px;
   text-align: left;
   color: #555;
 }
@@ -170,14 +173,14 @@ select {
 
 #signup-message {
   margin-top: 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 9px;
+  font-size: 12px;
   margin: 7px 0 11px;
 }
 
@@ -205,7 +208,7 @@ button:hover {
 
 .signup {
   margin-top: 11px;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .signup a,
@@ -216,7 +219,7 @@ button:hover {
 
 #message {
   margin-top: 8px;
-  font-size: 10px;
+  font-size: 12px;
   color: red;
 }
 

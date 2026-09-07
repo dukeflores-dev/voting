@@ -1291,11 +1291,20 @@ body > * {
 
 .student-profile-trigger { padding: 7px 11px; border: 1px solid #b9cfe0; border-radius: 6px; background: #f3f9fd; color: #111; cursor: pointer; text-align: left; }
 .student-profile-trigger:hover, .student-profile-trigger:focus-visible { border-color: #06439a; background: #e5f3ff; outline: none; }
-.student-menu { position: fixed; top: 0; left: 0; z-index: 20; display: flex; width: 260px; height: 100vh; padding: 84px 24px 30px; flex-direction: column; gap: 22px; background: #acd0e8; box-shadow: 8px 0 20px rgba(0, 0, 0, .18); transform: translateX(-105%); transition: transform .2s ease; }
+.menu-button { display: none; place-items: center; width: 42px; height: 42px; padding: 0; border: 1px solid #c5d8e7; border-radius: 8px; background: #f3f9fd; color: var(--blue); cursor: pointer; transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.menu-button:hover, .menu-button:focus-visible { background: #e5f3ff; box-shadow: 0 5px 12px rgba(6, 67, 154, .15); outline: none; transform: translateY(-2px); }
+.menu-button .icon { width: 22px; height: 22px; }
+.student-menu { position: fixed; top: 0; left: 0; z-index: 20; display: flex; width: min(320px, 86vw); height: 100vh; padding: 96px 24px 30px; flex-direction: column; gap: 10px; background: #fff; box-shadow: 12px 0 30px rgba(7, 39, 79, .2); transform: translateX(-105%); transition: transform .3s cubic-bezier(.22, 1, .36, 1); }
 .student-menu.open { transform: translateX(0); }
-.student-menu a { color: #111; font-size: 18px; text-decoration: underline; }
-.student-menu a:hover { color: #06439a; }
-.student-menu-close { position: absolute; top: 20px; right: 18px; border: 0; background: transparent; color: #111; cursor: pointer; font-size: 28px; }
+.student-menu::before { content: "STUDENT MENU"; position: absolute; top: 32px; left: 24px; color: #6381a3; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; }
+.student-menu::after { content: ""; position: fixed; top: 0; left: 100%; width: 100vw; height: 100vh; background: rgba(7, 39, 79, .28); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.student-menu.open::after { opacity: 1; pointer-events: auto; }
+.student-menu a { position: relative; z-index: 1; display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 8px; color: #18324c; font-size: 16px; font-weight: 700; text-decoration: none; transition: background-color .2s ease, color .2s ease, padding-left .2s ease; }
+.student-menu a::before { content: ""; width: 6px; height: 6px; margin-right: 12px; border-radius: 50%; background: #8bb9d8; transition: background-color .2s ease, transform .2s ease; }
+.student-menu a:hover, .student-menu a:focus-visible { padding-left: 18px; background: #eaf5fc; color: #06439a; outline: none; }
+.student-menu a:hover::before, .student-menu a:focus-visible::before { background: #06439a; transform: scale(1.4); }
+.student-menu-close { position: absolute; top: 20px; right: 18px; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid #c5d8e7; border-radius: 8px; background: #f3f9fd; color: #18324c; cursor: pointer; font-size: 25px; line-height: 1; transition: background-color .2s ease, color .2s ease, transform .2s ease; }
+.student-menu-close:hover, .student-menu-close:focus-visible { background: #06439a; color: white; outline: none; transform: rotate(90deg); }
 .candidates-only-view .candidates-page { max-width: 1180px; margin: 0 auto; padding-top: 28px; }
 .support-card { position: relative; width: min(470px, 100%); padding: 32px; border-radius: 8px; background: white; box-shadow: 0 18px 50px rgba(7, 39, 79, .25); }
 .support-card h2 { margin: 8px 0 18px; color: #06439a; font-size: 26px; }

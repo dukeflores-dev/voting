@@ -1303,6 +1303,10 @@ body > * {
 .student-menu a::before { content: ""; width: 6px; height: 6px; margin-right: 12px; border-radius: 50%; background: #8bb9d8; transition: background-color .2s ease, transform .2s ease; }
 .student-menu a:hover, .student-menu a:focus-visible { padding-left: 18px; background: #eaf5fc; color: #06439a; outline: none; }
 .student-menu a:hover::before, .student-menu a:focus-visible::before { background: #06439a; transform: scale(1.4); }
+.student-menu-vote { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 18px; padding: 14px 16px; border: 0; border-radius: 8px; background: #06439a; color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 800; letter-spacing: .3px; transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.student-menu-vote span { font-size: 20px; line-height: 1; transition: transform .2s ease; }
+.student-menu-vote:hover, .student-menu-vote:focus-visible { background: #052f73; box-shadow: 0 8px 16px rgba(5, 47, 115, .22); outline: none; transform: translateY(-2px); }
+.student-menu-vote:hover span, .student-menu-vote:focus-visible span { transform: translateX(4px); }
 .student-menu-close { position: absolute; top: 20px; right: 18px; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid #c5d8e7; border-radius: 8px; background: #f3f9fd; color: #18324c; cursor: pointer; font-size: 25px; line-height: 1; transition: background-color .2s ease, color .2s ease, transform .2s ease; }
 .student-menu-close:hover, .student-menu-close:focus-visible { background: #06439a; color: white; outline: none; transform: rotate(90deg); }
 .candidates-only-view .candidates-page { max-width: 1180px; margin: 0 auto; padding-top: 28px; }

@@ -152,7 +152,7 @@ body {
 .welcome-copy p:not(.eyebrow) {
   max-width: 390px;
   margin: 12px 0 18px;
-  color: #536273;
+  color: #000;
   font-size: 13px;
   line-height: 1.45;
 }
@@ -1353,7 +1353,7 @@ body {
   display: block;
   max-width: 430px;
   margin: 14px 0 19px;
-  color: #405c75;
+  color: #000;
   font-size: 14px;
   line-height: 1.45;
 }

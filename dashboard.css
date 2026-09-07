@@ -28,6 +28,10 @@ body {
   font-family: Arial, sans-serif;
 }
 
+body > * {
+  animation: pageFadeIn .6s ease-out both;
+}
+
 .topbar {
   min-height: 76px;
   display: flex;
@@ -62,12 +66,14 @@ body {
   font-weight: 700;
   text-decoration: none;
   border-bottom: 3px solid transparent;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
 .main-nav a.active,
 .main-nav a:hover {
   color: var(--blue);
   border-color: var(--blue);
+  transform: translateY(-2px);
 }
 
 .account-area {
@@ -114,6 +120,18 @@ body {
   border: 1px solid var(--line);
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(30, 69, 108, .06);
+  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+  animation: panelRise .7s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.status-card:hover,
+.election-card:hover,
+.steps-card:hover,
+.candidates-card:hover,
+.reminders-card:hover {
+  border-color: #c6ddec;
+  box-shadow: 0 12px 26px rgba(30, 69, 108, .12);
+  transform: translateY(-4px);
 }
 
 .welcome-banner {
@@ -171,6 +189,7 @@ body {
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 .primary-button {
@@ -180,6 +199,15 @@ body {
 .primary-button:hover,
 .guideline-button:hover {
   background: #052f73;
+  box-shadow: 0 8px 16px rgba(5, 47, 115, .2);
+  transform: translateY(-2px);
+}
+
+.primary-button:active,
+.guideline-button:active,
+.logout-button:active,
+.candidate button:active {
+  transform: translateY(0);
 }
 
 .primary-button:disabled {
@@ -192,6 +220,7 @@ body {
   width: 355px;
   height: 210px;
   margin-right: 12px;
+  animation: illustrationFloat 5s ease-in-out 1s infinite;
 }
 
 .laptop {
@@ -1423,6 +1452,32 @@ body {
 .notification-item strong { color: #18324c; font-size: 15px; line-height: 1.4; }
 .notification-item span { margin-top: 6px; color: #687789; font-size: 13px; }
 .empty-notification { color: #687789; font-size: 15px; }
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes panelRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes illustrationFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
 .edit-name-button { padding: 8px 13px; border: 0; border-radius: 4px; background: #e9f5ff; color: #06439a; cursor: pointer; font-size: 12px; font-weight: 800; }
 .student-name-form { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
 .student-name-form input { width: 190px; margin: 0; padding: 9px; border: 1px solid #cbd9e6; background: #f7fbfe; font-size: 14px; }

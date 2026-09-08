@@ -1514,6 +1514,136 @@ body > * {
   transform: none;
 }
 
+/* Final section-view formatting */
+.dashboard-view-status .dashboard,
+.dashboard-view-candidates .dashboard,
+.dashboard-view-election .dashboard,
+.dashboard-view-guidelines .dashboard,
+.dashboard-view-notifications .dashboard,
+.dashboard-view-results .dashboard {
+  width: min(1180px, calc(100% - 48px));
+  margin: 28px auto;
+  padding: 0;
+}
+
+.dashboard-view-status .status-card,
+.dashboard-view-candidates .candidates-card,
+.dashboard-view-election .dashboard > .election-card,
+.dashboard-view-guidelines .steps-card,
+.dashboard-view-notifications .supplemental-candidates,
+.dashboard-view-results .student-results-card {
+  min-height: 0;
+  padding: 28px;
+  border: 1px solid #d8e5ef;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(30, 69, 108, .08);
+}
+
+.dashboard-view-status .status-card h2 {
+  margin: -28px -28px 24px;
+  padding: 16px 22px;
+  border-radius: 12px 12px 0 0;
+  font-size: 15px;
+}
+
+.dashboard-view-status .countdown {
+  margin: 0 0 20px;
+  font-size: 18px;
+}
+
+.dashboard-view-status .countdown strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.dashboard-view-status .status-alert {
+  margin: 0 0 22px;
+  padding: 20px;
+}
+
+.dashboard-view-status .status-alert strong {
+  font-size: 18px;
+}
+
+.dashboard-view-status .status-alert p,
+.dashboard-view-status .detail {
+  font-size: 14px;
+}
+
+.dashboard-view-status .full-button {
+  width: fit-content;
+  margin: 24px 0 0;
+  padding: 14px 22px;
+}
+
+.dashboard-view-candidates .candidate-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dashboard-view-candidates .candidate {
+  min-height: 300px;
+  padding: 24px 18px;
+}
+
+.dashboard-view-election .election-content {
+  grid-template-columns: 90px 1.5fr 1fr 1fr;
+  gap: 24px;
+  min-height: 220px;
+}
+
+.dashboard-view-guidelines .steps,
+.dashboard-view-notifications .reminders {
+  max-width: 760px;
+}
+
+@media (max-width: 700px) {
+  .dashboard-view-status .dashboard,
+  .dashboard-view-candidates .dashboard,
+  .dashboard-view-election .dashboard,
+  .dashboard-view-guidelines .dashboard,
+  .dashboard-view-notifications .dashboard,
+  .dashboard-view-results .dashboard {
+    width: calc(100% - 24px);
+    margin: 16px auto;
+  }
+
+  .dashboard-view-status .status-card,
+  .dashboard-view-candidates .candidates-card,
+  .dashboard-view-election .dashboard > .election-card,
+  .dashboard-view-guidelines .steps-card,
+  .dashboard-view-notifications .supplemental-candidates,
+  .dashboard-view-results .student-results-card {
+    padding: 20px;
+  }
+
+  .dashboard-view-status .status-card h2 {
+    margin: -20px -20px 18px;
+  }
+
+  .dashboard-view-candidates .candidate-list {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-view-candidates .candidate {
+    min-height: 0;
+  }
+
+  .dashboard-view-election .election-content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dashboard-view-election .metric {
+    padding: 14px 0 0;
+    border-top: 1px solid #d6e0ea;
+    border-left: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .welcome-banner {
     min-height: 270px;

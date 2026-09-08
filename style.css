@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'DM Sans', sans-serif;
   box-sizing: border-box;
 }
 
@@ -77,8 +79,9 @@ body::before {
   width: min(460px, 100%);
   padding: 24px 28px 20px;
   background: rgba(255, 255, 255, 0.97);
-  border-radius: 2px;
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(103, 137, 157, .32);
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(19, 47, 64, .28);
   text-align: center;
   animation: loginBoxEntrance .8s cubic-bezier(.22, 1, .36, 1) .15s both;
 }
@@ -113,8 +116,8 @@ input {
   width: 100%;
   padding: 10px 12px;
   margin: 6px 0;
-  border: 1px solid #d5dce2;
-  border-radius: 0;
+  border: 1px solid #9bb4c2;
+  border-radius: 6px;
   background: #f1f6f8;
   font-size: 14px;
   transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease, transform .2s ease;
@@ -122,9 +125,9 @@ input {
 
 input:focus,
 select:focus {
-  border-color: #1a4ed8;
+  border-color: #3c7f9e;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(26, 78, 216, .14);
+  box-shadow: 0 0 0 3px rgba(60, 127, 158, .16);
   outline: none;
   transform: translateY(-1px);
 }
@@ -133,8 +136,8 @@ select {
   width: 100%;
   padding: 10px 12px;
   margin: 6px 0;
-  border: 1px solid #d5dce2;
-  border-radius: 0;
+  border: 1px solid #9bb4c2;
+  border-radius: 6px;
   background: #f1f6f8;
   color: #777;
   font-size: 14px;
@@ -154,7 +157,8 @@ select {
 .signup-form h2 {
   margin-bottom: 20px;
   color: #000;
-  font-size: 26px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
   font-weight: 800;
 }
 
@@ -168,7 +172,8 @@ select {
 
 .signup-grid label {
   display: block;
-  color: #111;
+  color: #263b47;
+  font-weight: 500;
   font-size: 18px;
   line-height: 1.2;
 }
@@ -178,8 +183,8 @@ select {
   height: 27px;
   margin: 3px 0 5px;
   padding: 2px 10px;
-  border: 2px solid #777;
-  border-radius: 0;
+  border: 1px solid #7895a5;
+  border-radius: 5px;
   background: #e8f2f7;
   font-size: 17px;
 }
@@ -205,7 +210,7 @@ select {
   height: 27px;
   margin: 0;
   padding: 0;
-  color: #111;
+  color: #3f687b;
   background: transparent;
   font-size: 22px;
   line-height: 20px;
@@ -213,7 +218,7 @@ select {
 }
 
 .password-toggle:hover {
-  color: #111;
+  color: #1e5068;
   background: transparent;
   box-shadow: none;
   transform: none;
@@ -224,15 +229,18 @@ select {
   width: 230px;
   margin: 28px auto 0;
   padding: 5px;
-  color: #111;
-  background: #c7ddea;
-  border: 1px solid #9eabb3;
-  font-size: 20px;
+  color: #fff;
+  background: linear-gradient(135deg, #3d7894, #285c78);
+  border: 1px solid #285c78;
+  border-radius: 7px;
+  box-shadow: 0 5px 12px rgba(40, 92, 120, .22);
+  font-size: 18px;
+  letter-spacing: .02em;
 }
 
 .signup-form > button[type="submit"]:hover {
-  background: #b5d1e1;
-  box-shadow: none;
+  background: linear-gradient(135deg, #4b89a5, #316b89);
+  box-shadow: 0 8px 16px rgba(40, 92, 120, .28);
 }
 
 .signup-form .back-button {
@@ -263,11 +271,14 @@ select {
 }
 
 .back-button {
-  background: #8798a8;
+  background: #8299a8;
+  border: 1px solid #6e8797;
+  border-radius: 6px;
+  letter-spacing: .04em;
 }
 
 .back-button:hover {
-  background: #6e8091;
+  background: #6a8393;
 }
 
 .agreement {
@@ -308,18 +319,19 @@ select {
 button {
   width: 100%;
   padding: 9px;
-  background: #1a4ed8;
+  background: linear-gradient(135deg, #3d7894, #285c78);
   color: white;
-  border: none;
-  border-radius: 0;
+  border: 1px solid #285c78;
+  border-radius: 7px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  letter-spacing: .03em;
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 button:hover {
-  background: #0f3bb5;
-  box-shadow: 0 6px 14px rgba(15, 59, 181, .22);
+  background: linear-gradient(135deg, #4b89a5, #316b89);
+  box-shadow: 0 6px 14px rgba(40, 92, 120, .24);
   transform: translateY(-2px);
 }
 
@@ -335,14 +347,14 @@ button:active {
 
 .signup a,
 .options a {
-  color: #1a4ed8;
+  color: #2e718f;
   text-decoration: none;
   transition: color .2s ease, opacity .2s ease;
 }
 
 .signup a:hover,
 .options a:hover {
-  color: #0f3bb5;
+  color: #1e5068;
   opacity: .78;
 }
 

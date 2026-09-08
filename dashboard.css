@@ -51,7 +51,7 @@ body > * {
 
 .main-nav {
   display: flex;
-  gap: 30px;
+  gap: 24px;
   flex: 1;
   align-self: stretch;
   align-items: center;
@@ -62,7 +62,7 @@ body > * {
   display: flex;
   align-items: center;
   color: #425167;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   text-decoration: none;
   border-bottom: 3px solid transparent;
@@ -74,6 +74,94 @@ body > * {
   color: var(--blue);
   border-color: var(--blue);
   transform: translateY(-2px);
+}
+
+.dashboard-view-status .welcome-banner,
+.dashboard-view-status .election-card,
+.dashboard-view-status .lower-grid,
+.dashboard-view-status .candidates-card,
+.dashboard-view-status .reminders-card,
+.dashboard-view-candidates .welcome-banner,
+.dashboard-view-candidates .election-card,
+.dashboard-view-candidates .lower-grid,
+.dashboard-view-candidates .status-card,
+.dashboard-view-candidates .reminders-card,
+.dashboard-view-election .welcome-banner,
+.dashboard-view-election .summary-grid,
+.dashboard-view-election .lower-grid,
+.dashboard-view-guidelines .welcome-banner,
+.dashboard-view-guidelines .summary-grid,
+.dashboard-view-guidelines .election-card,
+.dashboard-view-guidelines .supplemental-candidates,
+.dashboard-view-notifications .welcome-banner,
+.dashboard-view-notifications .summary-grid,
+.dashboard-view-notifications .election-card,
+.dashboard-view-notifications .steps-card {
+  display: none;
+}
+
+.dashboard-view-results .welcome-banner,
+.dashboard-view-results .summary-grid,
+.dashboard-view-results .election-card:not(.student-results-card),
+.dashboard-view-results .lower-grid {
+  display: none;
+}
+
+.dashboard-view-status .dashboard,
+.dashboard-view-candidates .dashboard,
+.dashboard-view-election .dashboard,
+.dashboard-view-guidelines .dashboard,
+.dashboard-view-notifications .dashboard {
+  display: block;
+  max-width: 1180px;
+}
+
+.dashboard-view-status .status-card,
+.dashboard-view-candidates .candidates-card,
+.dashboard-view-election .dashboard > .election-card,
+.dashboard-view-guidelines .steps-card,
+.dashboard-view-notifications .supplemental-candidates {
+  display: block;
+  min-height: 360px;
+}
+
+.dashboard-view-status .status-card {
+  width: 100%;
+  min-height: 500px;
+  margin: 0;
+}
+
+.dashboard-view-candidates .candidates-card,
+.dashboard-view-notifications .supplemental-candidates,
+.dashboard-view-election .dashboard > .election-card,
+.dashboard-view-guidelines .steps-card,
+.dashboard-view-results .student-results-card {
+  width: 100%;
+  min-height: 500px;
+}
+
+.dashboard-view-candidates .candidate-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dashboard-view-candidates .candidate {
+  min-height: 310px;
+  padding: 24px 18px;
+}
+
+.dashboard-view-guidelines .dashboard > .lower-grid,
+.dashboard-view-notifications .dashboard > .lower-grid {
+  grid-template-columns: 1fr;
+}
+
+.dashboard-view-guidelines .steps-card,
+.dashboard-view-notifications .supplemental-candidates {
+  min-height: 500px;
+}
+
+.dashboard-view-results .student-results-card {
+  display: block;
 }
 
 .account-area {
@@ -903,9 +991,8 @@ body > * {
   .topbar { min-height: 52px; gap: 18px; padding: 6px 18px; box-shadow: none; }
   .menu-button { display: block; border: 0; background: transparent; color: #111; cursor: pointer; font-size: 25px; }
   .brand { display: none; }
-  .main-nav { display: flex; flex: 0 0 auto; gap: 22px; }
-  .main-nav a { display: none; height: 30px; color: #111; font-size: 16px; font-weight: 400; border: 0; }
-  .main-nav a:nth-child(1), .main-nav a:nth-child(2) { display: flex; }
+  .main-nav { display: flex; flex: 1 1 auto; min-width: 0; gap: 18px; overflow-x: auto; }
+  .main-nav a { display: flex; flex: 0 0 auto; height: 30px; color: #111; font-size: 13px; font-weight: 400; border: 0; }
   .main-nav a.active { padding: 0 14px; border-radius: 18px; background: #090997; color: white; }
   .account-area { margin-left: auto; gap: 14px; }
   .account-name { color: #111; font-size: 16px; font-weight: 400; line-height: 1.05; }
@@ -1272,6 +1359,11 @@ body > * {
 .dashboard > .election-card,
 .dashboard > .lower-grid {
   display: none;
+}
+
+.dashboard-view-guidelines .dashboard > .lower-grid,
+.dashboard-view-notifications .dashboard > .lower-grid {
+  display: grid;
 }
 
 .student-results-card[hidden] { display: none; }

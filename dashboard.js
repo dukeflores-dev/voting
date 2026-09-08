@@ -76,6 +76,35 @@ function toggleStudentMenu() {
   document.getElementById("student-menu").classList.toggle("open");
 }
 
+function showDashboardView(view) {
+  document.body.classList.remove("candidates-only-view");
+  document.body.classList.remove("dashboard-view-status", "dashboard-view-candidates", "dashboard-view-election", "dashboard-view-guidelines", "dashboard-view-notifications", "dashboard-view-results");
+  if (view !== "home") document.body.classList.add(`dashboard-view-${view}`);
+
+  document.querySelectorAll(".main-nav a[data-view]").forEach(link => {
+    link.classList.toggle("active", link.dataset.view === view);
+  });
+  document.getElementById("home-content").hidden = false;
+  document.getElementById("candidates-page").hidden = true;
+  document.getElementById("student-menu").classList.remove("open");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function showDashboardResults() {
+  if (!electionHasEnded()) {
+    showToast("Election results will be available after the election ends.");
+    return;
+  }
+  if (!hasVoted) {
+    showToast("Results are available after you submit your vote.");
+    return;
+  }
+
+  showDashboardView("results");
+  await renderStudentResults();
+  document.getElementById("student-results").hidden = false;
+}
+
 function showCandidates() {
   renderAllCandidates();
   document.body.classList.add("candidates-only-view");
@@ -86,9 +115,9 @@ function showCandidates() {
 
 function showStudentHome() {
   document.body.classList.remove("candidates-only-view");
+  showDashboardView("home");
   document.getElementById("candidates-page").hidden = true;
   document.getElementById("home-content").hidden = false;
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderAllCandidates() {
@@ -178,6 +207,10 @@ function updateCountdown() {
   const start = getElectionStart();
   const end = getElectionEnd();
   const now = new Date();
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    countdown.textContent = "Schedule unavailable";
+    return;
+  }
   const target = now < start ? start : end;
   const difference = Math.max(0, target.getTime() - now.getTime());
 

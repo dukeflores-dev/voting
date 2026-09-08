@@ -14,8 +14,13 @@
     </a>
 
     <nav class="main-nav" aria-label="Main navigation">
-      <a class="active" href="#home-content" onclick="showStudentHome(); return false;">Home</a>
-      <a href="#notifications" onclick="openNotifications(event)">Notifications</a>
+      <a class="active" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
+      <a data-view="status" href="#voting-status" onclick="showDashboardView('status'); return false;">Voting Status</a>
+      <a data-view="candidates" href="#candidates" onclick="showDashboardView('candidates'); return false;">Candidates</a>
+      <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
+      <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Guidelines</a>
+      <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
+      <a data-view="results" href="#student-results" onclick="showDashboardResults(); return false;">Results</a>
     </nav>
 
     <div class="account-area">
@@ -80,7 +85,7 @@
     </aside>
     </section>
 
-    <section class="election-card">
+    <section class="election-card" id="current-election">
       <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 11h8M8 15h6"/></svg></span><h2>CURRENT ELECTION</h2></div>
       <div class="election-content">
         <div class="election-symbol" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M16 8c-.8-.7-2-1-3.5-1-1.9 0-3 .8-3 2s1.1 2 3 2 3 .8 3 2-1.1 2-3 2c-1.5 0-2.7-.3-3.5-1M12 5v14"/></svg></div>

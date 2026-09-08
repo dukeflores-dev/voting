@@ -83,6 +83,23 @@ body::before {
   animation: loginBoxEntrance .8s cubic-bezier(.22, 1, .36, 1) .15s both;
 }
 
+.container.signup-active .left {
+  display: none;
+}
+
+.container.signup-active .right {
+  flex: 1;
+}
+
+.container.signup-active .login-box {
+  width: min(636px, 100%);
+  padding: 32px 60px 24px;
+}
+
+.container.signup-active .brand-image {
+  display: none;
+}
+
 .brand-image {
   width: 100%;
   height: 180px;
@@ -134,8 +151,92 @@ select {
   min-width: 0;
 }
 
-.signup-form button {
-  margin-top: 7px;
+.signup-form h2 {
+  margin-bottom: 20px;
+  color: #000;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.signup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 50px;
+  row-gap: 2px;
+  text-align: left;
+}
+
+.signup-grid label {
+  display: block;
+  color: #111;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.signup-grid input,
+.signup-grid select {
+  height: 27px;
+  margin: 3px 0 5px;
+  padding: 2px 10px;
+  border: 2px solid #777;
+  border-radius: 0;
+  background: #e8f2f7;
+  font-size: 17px;
+}
+
+.signup-grid .full-field {
+  grid-column: 1 / -1;
+}
+
+.password-field {
+  position: relative;
+  display: block;
+}
+
+.password-field input {
+  padding-right: 42px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  width: 40px;
+  height: 27px;
+  margin: 0;
+  padding: 0;
+  color: #111;
+  background: transparent;
+  font-size: 22px;
+  line-height: 20px;
+  box-shadow: none;
+}
+
+.password-toggle:hover {
+  color: #111;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.signup-form > button[type="submit"] {
+  display: block;
+  width: 230px;
+  margin: 28px auto 0;
+  padding: 5px;
+  color: #111;
+  background: #c7ddea;
+  border: 1px solid #9eabb3;
+  font-size: 20px;
+}
+
+.signup-form > button[type="submit"]:hover {
+  background: #b5d1e1;
+  box-shadow: none;
+}
+
+.signup-form .back-button {
+  margin-top: 8px;
 }
 
 .forgot-form h2 {
@@ -171,9 +272,9 @@ select {
 
 .agreement {
   display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  text-align: left;
+  margin-top: 24px;
+  font-size: 16px;
+  text-align: center;
   color: #555;
 }
 
@@ -306,6 +407,23 @@ button:active {
   .login-box {
     width: min(100%, 420px);
     padding: 18px 16px 16px;
+  }
+
+  .container.signup-active .login-box {
+    padding: 24px 18px 20px;
+  }
+
+  .signup-grid {
+    column-gap: 12px;
+  }
+
+  .signup-grid label {
+    font-size: 15px;
+  }
+
+  .signup-grid input,
+  .signup-grid select {
+    font-size: 14px;
   }
 
   .brand-image {

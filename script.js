@@ -37,15 +37,24 @@ async function login() {
 
 function showSignup(event) {
   event.preventDefault();
+  document.querySelector(".container").classList.add("signup-active");
   document.getElementById("login-form").hidden = true;
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("signup-form").hidden = false;
 }
 
 function showLogin() {
+  document.querySelector(".container").classList.remove("signup-active");
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("signup-form").hidden = true;
   document.getElementById("login-form").hidden = false;
+}
+
+function togglePassword(inputId, button) {
+  const input = document.getElementById(inputId);
+  const isVisible = input.type === "text";
+  input.type = isVisible ? "password" : "text";
+  button.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
 }
 
 function forgotPassword(event) {

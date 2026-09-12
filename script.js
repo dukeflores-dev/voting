@@ -1,4 +1,6 @@
-async function login() {
+async function login(event) {
+  if (event) event.preventDefault();
+
   const email = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
   const message = document.getElementById("message");

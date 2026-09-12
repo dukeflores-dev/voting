@@ -25,10 +25,16 @@ window.setInterval(updateSystemTime, 1000);
 
 async function initializeAdmin() {
   const { data, error } = await supabaseClient.auth.getUser();
-  if (error || !data.user || data.user.app_metadata?.role !== "admin") {
+  if (error || !data.user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  if (data.user.app_metadata?.role !== "admin") {
     window.location.replace("dashboard.html");
     return;
   }
+
   adminUser = data.user;
   adminName.textContent = adminUser.user_metadata?.full_name || adminUser.email;
   document.getElementById("profile-admin-name").textContent = adminUser.user_metadata?.full_name || "Administrator";

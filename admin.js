@@ -30,7 +30,8 @@ async function initializeAdmin() {
     return;
   }
 
-  if (data.user.app_metadata?.role !== "admin") {
+  const userRole = data.user.app_metadata?.role || data.user.user_metadata?.role || "voter";
+  if (userRole !== "admin") {
     window.location.replace("dashboard.html");
     return;
   }

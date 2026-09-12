@@ -1,3 +1,7 @@
+function resolveUserRole(user) {
+  return user?.app_metadata?.role || user?.user_metadata?.role || "voter";
+}
+
 async function login(event) {
   if (event) event.preventDefault();
 
@@ -25,12 +29,13 @@ async function login(event) {
   message.style.color = "green";
   message.textContent = "Login successful!";
   const user = data.user;
-  const isAdmin = user.app_metadata?.role === "admin";
+  const userRole = resolveUserRole(user);
+  const isAdmin = userRole === "admin";
   localStorage.setItem("elourdesCurrentUser", JSON.stringify({
     id: user.id,
     name: user.user_metadata?.full_name || user.email,
     username: user.email,
-    role: isAdmin ? "admin" : "voter"
+    role: userRole
   }));
   window.setTimeout(() => {
     window.location.href = isAdmin ? "admin.html" : "dashboard.html";

@@ -34,11 +34,12 @@ async function initializeDashboard() {
   }
 
   authUser = data.user;
+  const resolvedRole = authUser.app_metadata?.role || authUser.user_metadata?.role || "voter";
   currentUser = {
     id: authUser.id,
     name: authUser.user_metadata?.full_name || authUser.email,
     username: authUser.email,
-    role: authUser.app_metadata?.role || "voter"
+    role: resolvedRole
   };
   account = {
     fullName: currentUser.name,

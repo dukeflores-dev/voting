@@ -68,6 +68,9 @@ async function initializeDashboard() {
 }
 
 async function logout() {
+  const confirmed = window.confirm("Are you sure you want to log out?");
+  if (!confirmed) return;
+
   await supabaseClient.auth.signOut();
   window.location.replace("index.html");
 }

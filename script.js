@@ -2,6 +2,15 @@ function resolveUserRole(user) {
   return user?.app_metadata?.role || user?.user_metadata?.role || "voter";
 }
 
+function getStoredUserRole() {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("elourdesCurrentUser") || "null");
+    return storedUser?.role || "voter";
+  } catch {
+    return "voter";
+  }
+}
+
 async function login(event) {
   if (event) event.preventDefault();
 

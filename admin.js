@@ -24,13 +24,25 @@ window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
 
 async function initializeAdmin() {
+  const storedUserRole = (() => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("elourdesCurrentUser") || "null");
+      return storedUser?.role || "voter";
+    } catch {
+      return "voter";
+    }
+  })();
+
   const { data, error } = await supabaseClient.auth.getUser();
   if (error || !data.user) {
+    if (storedUserRole === "admin") {
+      localStorage.removeItem("elourdesCurrentUser");
+    }
     window.location.replace("index.html");
     return;
   }
 
-  const userRole = data.user.app_metadata?.role || data.user.user_metadata?.role || "voter";
+  const userRole = storedUserRole === "admin" ? "admin" : (data.user.app_metadata?.role || data.user.user_metadata?.role || "voter");
   if (userRole !== "admin") {
     window.location.replace("dashboard.html");
     return;

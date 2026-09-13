@@ -36,13 +36,23 @@
           <p id="message"></p>
         </form>
 
-        <form id="forgot-form" class="forgot-form" onsubmit="resetPassword(event)" hidden>
+        <form id="forgot-form" class="forgot-form" onsubmit="resetPassword(event)" novalidate hidden>
           <h2>Reset Password</h2>
           <p class="form-help">Enter your registered email and we will send you a secure password reset link.</p>
-          <input type="email" id="reset-identity" placeholder="Email Address" required>
+          <input type="email" id="reset-identity" placeholder="Email Address" inputmode="email" autocomplete="email" required>
           <button type="submit">RESET PASSWORD</button>
           <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
           <p id="reset-message"></p>
+        </form>
+
+        <form id="new-password-form" class="forgot-form" onsubmit="updatePassword(event)" hidden>
+          <h2>Set New Password</h2>
+          <p class="form-help">Choose a new password for your account.</p>
+          <input type="password" id="new-password" placeholder="New Password" required>
+          <input type="password" id="confirm-new-password" placeholder="Confirm New Password" required>
+          <button type="submit">UPDATE PASSWORD</button>
+          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
+          <p id="new-password-message"></p>
         </form>
 
         <form id="signup-form" class="signup-form" onsubmit="createAccount(event)" hidden>
@@ -107,6 +117,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-flow.js"></script>
   <script>
     const SUPABASE_URL = 'https://ilwixrwknjywonoahmof.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_PFN0Iyati_Na8JZxeZAUEQ_lvNI_WmE';

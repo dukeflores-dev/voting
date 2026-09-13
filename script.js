@@ -35,7 +35,8 @@ async function login(event) {
     return;
   }
 
-  message.style.color = "green";
+  message.className = "success-notice";
+  message.style.color = "#0d7d3a";
   message.textContent = "Login successful!";
   const user = data.user;
   const userRole = resolveUserRole(user);
@@ -83,6 +84,24 @@ function togglePassword(inputId, button) {
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validateStudentId(studentId) {
+  const normalized = (studentId || "").trim();
+  return /^\d{8}$|^\d{4}-\d{4}$/.test(normalized);
+}
+
+function getStudentIdFormatMessage() {
+  return "Student ID format: enter 8 digits or use YYYY-#### (example: 2024-1234).";
+}
+
+function validatePassword(password) {
+  const value = (password || "").trim();
+  if (value.length < 8) return false;
+  if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) return false;
+  if (!/\d/.test(value)) return false;
+  if (!/[^A-Za-z0-9]/.test(value)) return false;
+  return true;
 }
 
 function forgotPassword(event) {
@@ -201,6 +220,26 @@ async function createAccount(event) {
   const password = document.getElementById("signup-password").value;
   const confirmPassword = document.getElementById("confirm-password").value;
   const message = document.getElementById("signup-message");
+  const email = document.getElementById("email").value.trim();
+  const studentId = document.getElementById("student-id").value.trim();
+
+  if (!isValidEmail(email)) {
+    message.style.color = "red";
+    message.textContent = "Use a valid email address. School or personal email is accepted.";
+    return;
+  }
+
+  if (!validateStudentId(studentId)) {
+    message.style.color = "red";
+    message.textContent = getStudentIdFormatMessage();
+    return;
+  }
+
+  if (!validatePassword(password)) {
+    message.style.color = "red";
+    message.textContent = "Password must be 8+ characters with uppercase, lowercase, number, and special character.";
+    return;
+  }
 
   if (password !== confirmPassword) {
     message.style.color = "red";
@@ -208,7 +247,6 @@ async function createAccount(event) {
     return;
   }
 
-  const email = document.getElementById("email").value.trim();
   let result;
   try {
     result = await supabaseClient.auth.signUp({
@@ -217,7 +255,7 @@ async function createAccount(event) {
       options: {
         data: {
           full_name: document.getElementById("full-name").value.trim(),
-          student_id: document.getElementById("student-id").value.trim(),
+          student_id: studentId,
           year_level: document.getElementById("year-level").value,
           gender: document.getElementById("gender").value
         }
@@ -235,10 +273,21 @@ async function createAccount(event) {
     message.textContent = error.message;
     return;
   }
-  message.style.color = "green";
-  message.textContent = data.session
-    ? "Account created successfully!"
-    : "Account created. Check your email to confirm your account.";
+
+  const successMessage = data.session
+    ? "Account created successfully! You can sign in and begin voting."
+    : "Account created successfully. Check your email to confirm your account before signing in.";
+
+  message.className = "success-notice";
+  message.style.color = "#0d7d3a";
+  message.textContent = successMessage;
+  message.style.padding = "12px 14px";
+  message.style.border = "1px solid rgba(13, 125, 58, 0.22)";
+  message.style.background = "rgba(18, 181, 90, 0.08)";
+  message.style.borderRadius = "8px";
+  message.style.display = "block";
+  message.style.fontSize = "15px";
+  message.style.fontWeight = "700";
   event.target.reset();
 }
 
@@ -246,4 +295,13 @@ if (typeof window !== 'undefined') {
   window.addEventListener('load', () => {
     applyPasswordRecoverySession();
   });
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    validateStudentId,
+    validatePassword,
+    getStudentIdFormatMessage,
+    isValidEmail
+  };
 }

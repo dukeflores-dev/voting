@@ -63,7 +63,8 @@
               <input type="text" id="full-name" required>
             </label>
             <label>Student ID
-              <input type="text" id="student-id" required>
+              <input type="text" id="student-id" required aria-describedby="student-id-help">
+              <small id="student-id-help" class="field-help">Use 8 digits or YYYY-#### format (example: 2024-1234).</small>
             </label>
 
             <label>Year &amp; Level
@@ -87,19 +88,21 @@
             </label>
 
             <label class="full-field">Email Address
-              <input type="email" id="email" required>
+              <input type="email" id="email" required placeholder="studentname@lourdes.edu.ph or personal email">
+              <small class="field-help">School email is preferred, but a valid personal email is accepted if your account is registered.</small>
             </label>
 
             <label>Password
               <span class="password-field">
-                <input type="password" id="signup-password" required>
-                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('signup-password', this)">◉</button>
+                <input type="password" id="signup-password" required aria-describedby="password-help">
+                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('signup-password', this)"><span aria-hidden="true">👁</span></button>
               </span>
+              <small id="password-help" class="field-help">8+ characters with uppercase, lowercase, number, and special character.</small>
             </label>
             <label>Confirm Password
               <span class="password-field">
                 <input type="password" id="confirm-password" required>
-                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('confirm-password', this)">◉</button>
+                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('confirm-password', this)"><span aria-hidden="true">👁</span></button>
               </span>
             </label>
           </div>

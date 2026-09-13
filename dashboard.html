@@ -15,8 +15,6 @@
 
     <nav class="main-nav" aria-label="Main navigation">
       <a class="active" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
-      <a data-view="status" href="#voting-status" onclick="showDashboardView('status'); return false;">Voting Status</a>
-      <a data-view="candidates" href="#candidates" onclick="showDashboardView('candidates'); return false;">Candidates</a>
       <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
       <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Guidelines</a>
       <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
@@ -32,7 +30,6 @@
   <aside class="student-menu" id="student-menu" aria-label="Student menu">
     <button class="student-menu-close" type="button" onclick="toggleStudentMenu()" aria-label="Close menu">&times;</button>
     <a href="#" onclick="openStudentProfile(); toggleStudentMenu(); return false;">My Profile</a>
-    <a href="#candidates" onclick="showCandidates(); toggleStudentMenu(); return false;">Candidates</a>
     <a href="#student-results" onclick="showElectionResults(); toggleStudentMenu(); return false;">Election Results</a>
     <a href="#" onclick="showSupport(); toggleStudentMenu(); return false;">Help &amp; Support</a>
     <button class="student-menu-vote" type="button" onclick="startVoting(); toggleStudentMenu();">CAST YOUR VOTE <span aria-hidden="true">&rarr;</span></button>
@@ -56,6 +53,7 @@
         <p class="eyebrow">STUDENT COUNCIL ELECTIONS 2026</p>
         <h1>Welcome to<br><strong>ELOURDES VOTE!</strong></h1>
         <p>Your voice matters. Participate in the Our Lady of Lourdes College Student Council Elections and help shape the future of our student community.</p>
+        <button class="guideline-button quick-guide-button" type="button" onclick="openQuickGuide()">VIEW ELECTION GUIDE</button>
       </div>
     </section>
 
@@ -89,7 +87,7 @@
       <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 11h8M8 15h6"/></svg></span><h2>CURRENT ELECTION</h2></div>
       <div class="election-content">
         <div class="election-symbol" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M16 8c-.8-.7-2-1-3.5-1-1.9 0-3 .8-3 2s1.1 2 3 2 3 .8 3 2-1.1 2-3 2c-1.5 0-2.7-.3-3.5-1M12 5v14"/></svg></div>
-        <div class="election-title"><span class="live-dot">ONGOING</span><h3 id="student-election-title-main">STUDENT COUNCIL ELECTION 2026</h3><p>Choose the leaders who will represent, serve, and inspire the OLLC student body.</p></div>
+        <div class="election-title"><span class="live-dot" id="election-status-badge">ONGOING</span><h3 id="student-election-title-main">STUDENT COUNCIL ELECTION 2026</h3><p>Choose the leaders who will represent, serve, and inspire the OLLC student body.</p></div>
         <div class="metric"><strong>Voting Period</strong><p id="student-election-period">May 20, 2026 -<br>May 23, 2026<br>11:59 PM</p></div>
         <div class="metric"><strong>Eligible Voters</strong><p id="student-eligible-voters">All currently enrolled<br>OLLC students</p></div>
       </div>
@@ -125,20 +123,67 @@
       <button class="close-modal" type="button" onclick="closeBallot()" aria-label="Close">&times;</button>
       <p class="eyebrow">STUDENT COUNCIL ELECTIONS 2026</p>
       <h2>Cast Your Vote</h2>
-      <p class="ballot-note">Choose one candidate for each position. Your vote cannot be changed after submission.</p>
+      <p class="ballot-note">Choose one candidate for each position. Review your selections before final submission.</p>
       <div id="ballot-fields"></div>
-      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeBallot()">CANCEL</button><button type="submit" class="save-button">SUBMIT VOTE</button></div>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeBallot()">CANCEL</button><button type="button" class="save-button" onclick="reviewBallotBeforeSubmit()">REVIEW BALLOT</button></div>
+    </form>
+  </div>
+  <div class="modal" id="ballot-review-modal" hidden>
+    <form class="ballot-form" onsubmit="confirmVoteSubmission(event)">
+      <button class="close-modal" type="button" onclick="closeBallotReview()" aria-label="Close">&times;</button>
+      <p class="eyebrow">REVIEW YOUR VOTE</p>
+      <h2>Confirm Ballot</h2>
+      <p class="ballot-note">Please confirm your selections before submitting. Once submitted, your vote cannot be changed.</p>
+      <div id="ballot-review-list" class="ballot-review-list"></div>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeBallotReview()">EDIT</button><button type="submit" class="save-button">SUBMIT VOTE</button></div>
     </form>
   </div>
   <div class="modal" id="profile-modal" hidden>
     <article class="profile-card">
       <button class="close-modal" type="button" onclick="closeProfile()" aria-label="Close">&times;</button>
-      <div class="profile-avatar" id="profile-initials"></div>
+      <button class="profile-avatar-button" id="profile-image-button" type="button" aria-label="View candidate image" onclick="openCandidateImage(document.getElementById('profile-image-button').dataset.image || '')">
+        <div class="profile-avatar" id="profile-initials"></div>
+      </button>
       <p class="eyebrow">CANDIDATE PROFILE</p>
       <h2 id="profile-name"></h2>
       <span class="profile-position" id="profile-position"></span>
       <p class="profile-description" id="profile-description"></p>
       <button class="primary-button profile-vote-button" type="button" onclick="closeProfile(); startVoting()">VOTE FOR THIS CANDIDATE</button>
+    </article>
+  </div>
+  <div class="modal" id="candidate-image-modal" hidden>
+    <article class="candidate-image-card">
+      <button class="close-modal" type="button" onclick="closeCandidateImage()" aria-label="Close">&times;</button>
+      <img id="candidate-image-large" src="" alt="Candidate profile" />
+    </article>
+  </div>
+  <div class="modal" id="vote-guidelines-modal" hidden>
+    <article class="guidelines-modal-card">
+      <button class="close-modal" type="button" onclick="closeVotingGuidelines()" aria-label="Close">&times;</button>
+      <p class="eyebrow">IMPORTANT NOTICE</p>
+      <h2>Before you vote</h2>
+      <ul class="guidelines-modal-list">
+        <li>Review each candidate carefully before final submission.</li>
+        <li>You may only submit one ballot for this election.</li>
+        <li>Once submitted, your vote is final and cannot be changed.</li>
+      </ul>
+      <label class="guidelines-confirmation"><input type="checkbox" id="guidelines-confirm-checkbox"> I confirm that I have reviewed the voting guidelines.</label>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeVotingGuidelines()">CANCEL</button><button type="button" class="save-button" onclick="continueVotingFromGuidelines()">CONTINUE TO BALLOT</button></div>
+    </article>
+  </div>
+  <div class="modal" id="quick-guide-modal" hidden>
+    <article class="guidelines-modal-card quick-guide-card">
+      <button class="close-modal" type="button" onclick="closeQuickGuide()" aria-label="Close">&times;</button>
+      <p class="eyebrow">ELECTION GUIDE</p>
+      <h2>How voting works</h2>
+      <ul class="guidelines-modal-list">
+        <li>Log in with your registered student account.</li>
+        <li>Review the candidates and their platforms before voting.</li>
+        <li>Select one option for each elected position on the ballot.</li>
+        <li>Check your choices in the review screen before submitting.</li>
+        <li>Once submitted, your ballot is final and recorded securely.</li>
+      </ul>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeQuickGuide()">CLOSE</button><button type="button" class="save-button" onclick="closeQuickGuide(); startVoting();">START VOTING</button></div>
     </article>
   </div>
   <div class="modal" id="student-profile-modal" hidden>

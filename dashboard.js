@@ -138,19 +138,31 @@ function showStudentHome() {
 
 function renderAllCandidates() {
   const list = document.getElementById("all-candidates-list");
-  list.innerHTML = candidates.map((candidate, index) => `
-    <article class="full-candidate-card">
-      ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}">${escapeHtml(candidate.initials)}</div>`}
-      <div class="full-candidate-info">
-        <h3>${escapeHtml(candidate.name)}</h3>
-        <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
-        <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
-        <div class="full-candidate-actions">
-          <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-          <button type="button" onclick="startVoting()">VOTE</button>
-        </div>
+  const grouped = candidates.reduce((groups, candidate) => {
+    (groups[candidate.position] ||= []).push(candidate);
+    return groups;
+  }, {});
+
+  list.innerHTML = Object.entries(grouped).map(([position, positionCandidates]) => `
+    <section class="position-group">
+      <h3>${escapeHtml(position)}</h3>
+      <div class="position-group-grid">
+        ${positionCandidates.map((candidate, index) => `
+          <article class="full-candidate-card">
+            ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}" onclick="openCandidateImage('')">${escapeHtml(candidate.initials)}</div>`}
+            <div class="full-candidate-info">
+              <h3>${escapeHtml(candidate.name)}</h3>
+              <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
+              <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
+              <div class="full-candidate-actions">
+                <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
+                <button type="button" onclick="startVoting()">VOTE</button>
+              </div>
+            </div>
+          </article>
+        `).join("")}
       </div>
-    </article>
+    </section>
   `).join("");
 }
 
@@ -264,6 +276,7 @@ function updateElectionState() {
   const started = electionHasStarted();
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");
+  const badge = document.getElementById("election-status-badge");
   const buttons = document.querySelectorAll("[onclick*='startVoting']");
   buttons.forEach(button => {
     button.disabled = ended || !started;
@@ -271,6 +284,12 @@ function updateElectionState() {
     if (!started && button.id !== "cast-vote-button") button.textContent = "VOTING NOT STARTED";
     if (started && !ended && button.id !== "cast-vote-button") button.textContent = "VOTE";
   });
+
+  if (badge) {
+    badge.textContent = ended ? "CLOSED" : started ? "ONGOING" : "UPCOMING";
+    badge.classList.toggle("is-closed", ended);
+    badge.classList.toggle("is-live", started && !ended);
+  }
 
   const castButton = document.getElementById("cast-vote-button");
   if (ended) {
@@ -373,13 +392,30 @@ function selectCandidate(name) {
   if (!candidate) return;
 
   const profileAvatar = document.getElementById("profile-initials");
+  const imageButton = document.getElementById("profile-image-button");
   profileAvatar.textContent = candidate.picture ? "" : candidate.initials;
   profileAvatar.style.backgroundImage = candidate.picture ? `url("${candidate.picture}")` : "";
   profileAvatar.classList.toggle("has-picture", Boolean(candidate.picture));
+  imageButton.dataset.image = candidate.picture || "";
   document.getElementById("profile-name").textContent = candidate.name;
   document.getElementById("profile-position").textContent = candidate.position;
   document.getElementById("profile-description").textContent = candidate.description || candidate.platform || "No description available yet.";
   document.getElementById("profile-modal").hidden = false;
+}
+
+function openCandidateImage(imageUrl) {
+  const largeImage = document.getElementById("candidate-image-large");
+  const imageModal = document.getElementById("candidate-image-modal");
+  const resolvedUrl = imageUrl || document.getElementById("profile-image-button")?.dataset?.image || "";
+  if (!resolvedUrl) {
+    return;
+  }
+  largeImage.src = resolvedUrl;
+  imageModal.hidden = false;
+}
+
+function closeCandidateImage() {
+  document.getElementById("candidate-image-modal").hidden = true;
 }
 
 function closeProfile() {
@@ -407,6 +443,42 @@ function showAllCandidates() {
   showToast(`${candidates.length} candidate${candidates.length === 1 ? "" : "s"} available.`);
 }
 
+function showVotingGuidelines() {
+  document.getElementById("vote-guidelines-modal").hidden = false;
+  document.getElementById("guidelines-confirm-checkbox").checked = false;
+}
+
+function openQuickGuide() {
+  document.getElementById("quick-guide-modal").hidden = false;
+}
+
+function closeQuickGuide() {
+  document.getElementById("quick-guide-modal").hidden = true;
+}
+
+function closeVotingGuidelines() {
+  document.getElementById("vote-guidelines-modal").hidden = true;
+}
+
+function continueVotingFromGuidelines() {
+  const checkbox = document.getElementById("guidelines-confirm-checkbox");
+  if (!checkbox.checked) {
+    showToast("Please confirm that you reviewed the voting guidelines before continuing.");
+    return;
+  }
+  closeVotingGuidelines();
+  const positions = [...new Set(candidates.map(candidate => candidate.position))];
+  document.getElementById("ballot-fields").innerHTML = positions.map(position => `
+    <fieldset class="ballot-position">
+      <legend>${escapeHtml(position)}</legend>
+      ${candidates.filter(candidate => candidate.position === position).map(candidate => `
+        <label class="ballot-option"><input type="radio" name="${escapeHtml(position)}" value="${escapeHtml(candidate.name)}" required><span>${escapeHtml(candidate.name)}</span></label>
+      `).join("")}
+    </fieldset>
+  `).join("");
+  document.getElementById("ballot-modal").hidden = false;
+}
+
 function startVoting() {
   if (!electionHasStarted()) {
     showToast(`Voting opens on ${formatDate(election.startDate)}.`);
@@ -424,31 +496,58 @@ function startVoting() {
     return;
   }
 
-  const positions = [...new Set(candidates.map(candidate => candidate.position))];
-  document.getElementById("ballot-fields").innerHTML = positions.map(position => `
-    <fieldset class="ballot-position">
-      <legend>${escapeHtml(position)}</legend>
-      ${candidates.filter(candidate => candidate.position === position).map(candidate => `
-        <label class="ballot-option"><input type="radio" name="${escapeHtml(position)}" value="${escapeHtml(candidate.name)}" required><span>${escapeHtml(candidate.name)}</span></label>
-      `).join("")}
-    </fieldset>
-  `).join("");
-  document.getElementById("ballot-modal").hidden = false;
+  showVotingGuidelines();
 }
 
 function closeBallot() {
   document.getElementById("ballot-modal").hidden = true;
 }
 
+function reviewBallotBeforeSubmit() {
+  const ballotModal = document.getElementById("ballot-modal");
+  const reviewModal = document.getElementById("ballot-review-modal");
+  const form = ballotModal.querySelector("form");
+  if (!form) return;
+
+  const formData = new FormData(form);
+  const selections = Object.fromEntries(formData.entries());
+  const positions = [...new Set(candidates.map(candidate => candidate.position))];
+
+  const incomplete = positions.some(position => !selections[position]);
+  if (incomplete) {
+    showToast("Please select a candidate for each position before reviewing your ballot.");
+    return;
+  }
+
+  const reviewList = document.getElementById("ballot-review-list");
+  reviewList.innerHTML = positions.map(position => `
+    <div class="review-row">
+      <input type="hidden" name="${escapeHtml(position)}" value="${escapeHtml(selections[position])}">
+      <strong>${escapeHtml(position)}</strong>
+      <span>${escapeHtml(selections[position])}</span>
+    </div>
+  `).join("");
+
+  ballotModal.hidden = true;
+  reviewModal.hidden = false;
+}
+
+function closeBallotReview() {
+  document.getElementById("ballot-review-modal").hidden = true;
+  document.getElementById("ballot-modal").hidden = false;
+}
+
 async function submitVote(event) {
   event.preventDefault();
   if (electionHasEnded()) {
     closeBallot();
+    closeBallotReview();
     updateElectionState();
     showToast("Voting is closed. Your vote was not submitted.");
     return;
   }
-  const formData = new FormData(event.target);
+  const ballotReview = document.getElementById("ballot-review-modal");
+  const formData = new FormData(ballotReview.querySelector("form"));
   const selections = Object.fromEntries(formData.entries());
   const { error } = await supabaseClient.from("vote_ballots").insert({ election_id: 1, voter_id: authUser.id, selections });
   if (error) {
@@ -456,9 +555,45 @@ async function submitVote(event) {
     return;
   }
   hasVoted = true;
+  addVoteConfirmationNotification();
   closeBallot();
+  closeBallotReview();
   updateVotingStatus();
   showToast("Your vote was submitted successfully.");
+}
+
+function addVoteConfirmationNotification() {
+  const notifications = JSON.parse(localStorage.getItem("elourdesNotifications") || "[]");
+  notifications.unshift({
+    message: "Vote submitted successfully. Your ballot has been recorded.",
+    date: new Date().toISOString()
+  });
+  localStorage.setItem("elourdesNotifications", JSON.stringify(notifications.slice(0, 10)));
+}
+
+async function confirmVoteSubmission(event) {
+  event.preventDefault();
+  const reviewForm = event.target;
+  const formData = new FormData(reviewForm);
+  const selections = Object.fromEntries(formData.entries());
+  const positionNames = [...new Set(candidates.map(candidate => candidate.position))];
+  const missingSelection = positionNames.some(position => !selections[position]);
+  if (missingSelection) {
+    showToast("Please complete all selections before submitting your vote.");
+    return;
+  }
+
+  const { error } = await supabaseClient.from("vote_ballots").insert({ election_id: 1, voter_id: authUser.id, selections });
+  if (error) {
+    showToast(error.code === "23505" ? "You have already submitted your vote." : "Your vote could not be submitted.");
+    return;
+  }
+
+  hasVoted = true;
+  addVoteConfirmationNotification();
+  closeBallotReview();
+  updateVotingStatus();
+  showToast("Vote submitted successfully. A confirmation receipt has been recorded.");
 }
 
 function updateVotingStatus() {

@@ -68,7 +68,7 @@
     </aside>
 
     <section class="candidates-card" id="candidates">
-      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2><button class="view-all-button" type="button" onclick="showAllCandidates()">View All Candidates <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="section-heading candidates-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2><div class="candidate-search"><label class="sr-only" for="candidate-search-input">Search candidates</label><svg class="candidate-search-icon icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="candidate-search-input" type="search" placeholder="Search candidates" autocomplete="off" oninput="searchCandidates(event)" onfocus="searchCandidates(event)"><div class="candidate-autocomplete" id="candidate-autocomplete" role="listbox" hidden></div></div></div>
       <div class="candidate-list" id="candidate-list"></div>
     </section>
 

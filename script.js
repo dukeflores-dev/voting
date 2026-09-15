@@ -14,15 +14,22 @@ function getStoredUserRole() {
 async function login(event) {
   if (event) event.preventDefault();
 
-  const email = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
+  const emailInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const email = emailInput.value.trim().toLowerCase();
+  emailInput.value = email;
+  const password = passwordInput.value;
   const message = document.getElementById("message");
+  const loginButton = document.querySelector("#login-form button[type='submit']");
 
   message.textContent = "Signing in...";
+  message.className = "";
+  loginButton.disabled = true;
   let result;
   try {
     result = await supabaseClient.auth.signInWithPassword({ email, password });
   } catch (error) {
+    loginButton.disabled = false;
     message.style.color = "red";
     message.textContent = "Unable to reach Supabase. Check your internet connection and GitHub Pages settings.";
     return;
@@ -30,8 +37,11 @@ async function login(event) {
   const { data, error } = result;
 
   if (error) {
+    loginButton.disabled = false;
     message.style.color = "red";
-    message.textContent = error.message;
+    message.textContent = error.message === "Invalid login credentials"
+      ? "Email or password is incorrect. Check both fields or use Forgot Password."
+      : error.message;
     return;
   }
 
@@ -58,12 +68,14 @@ function showSignup(event) {
   document.getElementById("login-form").hidden = true;
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("signup-form").hidden = false;
+  document.getElementById("signup-guidelines-modal").hidden = true;
 }
 
 function showLogin() {
   document.querySelector(".container").classList.remove("signup-active");
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("signup-form").hidden = true;
+  document.getElementById("signup-guidelines-modal").hidden = true;
   document.getElementById("new-password-form").hidden = true;
   document.getElementById("login-form").hidden = false;
 }
@@ -247,6 +259,30 @@ async function createAccount(event) {
     return;
   }
 
+  document.getElementById("signup-guidelines-confirm").checked = false;
+  document.getElementById("signup-guidelines-error").textContent = "";
+  document.getElementById("signup-form").hidden = true;
+  document.getElementById("signup-guidelines-modal").hidden = false;
+}
+
+function closeSignupGuidelines() {
+  document.getElementById("signup-guidelines-modal").hidden = true;
+  document.getElementById("signup-form").hidden = false;
+}
+
+async function confirmSignupGuidelines() {
+  const confirmation = document.getElementById("signup-guidelines-confirm");
+  const errorMessage = document.getElementById("signup-guidelines-error");
+  if (!confirmation.checked) {
+    errorMessage.textContent = "Please confirm that you have read the registration guidelines.";
+    return;
+  }
+
+  const message = document.getElementById("signup-message");
+  const password = document.getElementById("signup-password").value;
+  const email = document.getElementById("email").value.trim();
+  const studentId = document.getElementById("student-id").value.trim();
+
   let result;
   try {
     result = await supabaseClient.auth.signUp({
@@ -257,7 +293,8 @@ async function createAccount(event) {
           full_name: document.getElementById("full-name").value.trim(),
           student_id: studentId,
           year_level: document.getElementById("year-level").value,
-          gender: document.getElementById("gender").value
+          gender: document.getElementById("gender").value,
+          guidelines_accepted: true
         }
       }
     });
@@ -288,7 +325,14 @@ async function createAccount(event) {
   message.style.display = "block";
   message.style.fontSize = "15px";
   message.style.fontWeight = "700";
-  event.target.reset();
+  document.getElementById("signup-form").reset();
+  closeSignupGuidelines();
+  showLogin();
+  document.getElementById("message").className = "success-notice";
+  document.getElementById("message").style.color = "#0d7d3a";
+  document.getElementById("message").textContent = data.session
+    ? "Account created successfully. You can now log in."
+    : "Account created. Check your email, then log in after confirming it.";
 }
 
 if (typeof window !== 'undefined') {

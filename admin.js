@@ -92,6 +92,7 @@ function openCandidateForm(index = -1) {
   document.getElementById("candidate-form-title").textContent = index < 0 ? "Add Candidate" : "Edit Candidate";
   document.getElementById("candidate-index").value = index;
   document.getElementById("candidate-name").value = index < 0 ? "" : candidates[index].name;
+  document.getElementById("candidate-group").value = index < 0 ? "" : (candidates[index].group_name || candidates[index].group || candidates[index].team || candidates[index].party || "");
   document.getElementById("candidate-position").value = index < 0 ? "" : candidates[index].position;
   document.getElementById("candidate-initials").value = index < 0 ? "" : candidates[index].initials;
   document.getElementById("candidate-description").value = index < 0 ? "" : (candidates[index].description || candidates[index].platform || "");
@@ -113,6 +114,7 @@ async function saveCandidate(event) {
   const pictureFile = document.getElementById("candidate-picture").files[0];
   const candidate = {
     name: document.getElementById("candidate-name").value.trim(),
+    group_name: document.getElementById("candidate-group").value.trim(),
     position: document.getElementById("candidate-position").value.trim().toUpperCase(),
     initials: document.getElementById("candidate-initials").value.trim().toUpperCase(),
     description: document.getElementById("candidate-description").value.trim(),
@@ -124,6 +126,7 @@ async function saveCandidate(event) {
     const payload = {
       election_id: electionId,
       name: candidate.name,
+      group_name: candidate.group_name,
       position: candidate.position,
       initials: candidate.initials,
       description: candidate.description,

@@ -4,9 +4,9 @@ let authUser = null;
 let hasVoted = false;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
-  { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart." },
-  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", initials: "JD", description: "Together, we can build a better OLLC." },
-  { name: "Ana Reyes", position: "SECRETARY", initials: "AR", description: "Organized today, empowered tomorrow." }
+  { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart." },
+  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", group_name: "Uniteam", initials: "JD", description: "Together, we can build a better OLLC." },
+  { name: "Ana Reyes", position: "SECRETARY", group_name: "Uniteam", initials: "AR", description: "Organized today, empowered tomorrow." }
 ];
 const defaultElection = {
   title: "Student Council Election 2026",
@@ -136,32 +136,59 @@ function showStudentHome() {
   document.getElementById("home-content").hidden = false;
 }
 
-function renderAllCandidates() {
-  const list = document.getElementById("all-candidates-list");
-  const grouped = candidates.reduce((groups, candidate) => {
-    (groups[candidate.position] ||= []).push(candidate);
+const candidatePositionOrder = ["PRESIDENT", "VICE PRESIDENT", "SECRETARY", "TREASURER", "AUDITOR", "PUBLIC INFORMATION OFFICER", "PEACE OFFICER"];
+
+function getCandidateGroup(candidate) {
+  return (candidate.group_name || candidate.group || candidate.team || candidate.party || "Independent").trim() || "Independent";
+}
+
+function groupCandidatesByGroup(candidateList = candidates) {
+  const grouped = candidateList.reduce((groups, candidate) => {
+    const group = getCandidateGroup(candidate);
+    (groups[group] ||= []).push(candidate);
     return groups;
   }, {});
 
-  list.innerHTML = Object.entries(grouped).map(([position, positionCandidates]) => `
+  return Object.entries(grouped).sort(([first], [second]) => first.localeCompare(second));
+}
+
+function sortCandidatesByPosition(groupCandidates) {
+  return groupCandidates.sort((first, second) => {
+    const firstPosition = (first.position || "Other").trim();
+    const secondPosition = (second.position || "Other").trim();
+    const firstIndex = candidatePositionOrder.indexOf(firstPosition.toUpperCase());
+    const secondIndex = candidatePositionOrder.indexOf(secondPosition.toUpperCase());
+    const positionDifference = (firstIndex === -1 ? candidatePositionOrder.length : firstIndex) - (secondIndex === -1 ? candidatePositionOrder.length : secondIndex);
+    return positionDifference || firstPosition.localeCompare(secondPosition) || first.name.localeCompare(second.name);
+  });
+}
+
+function renderAllCandidates() {
+  const list = document.getElementById("all-candidates-list");
+  list.innerHTML = groupCandidatesByGroup().map(([group, groupCandidates]) => `
     <section class="position-group">
-      <h3>${escapeHtml(position)}</h3>
-      <div class="position-group-grid">
-        ${positionCandidates.map((candidate, index) => `
-          <article class="full-candidate-card">
-            ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}" onclick="openCandidateImage('')">${escapeHtml(candidate.initials)}</div>`}
-            <div class="full-candidate-info">
-              <h3>${escapeHtml(candidate.name)}</h3>
-              <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
-              <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
-              <div class="full-candidate-actions">
-                <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-                <button type="button" onclick="startVoting()">VOTE</button>
-              </div>
-            </div>
-          </article>
-        `).join("")}
-      </div>
+      <h3 class="group-heading">${escapeHtml(group)}</h3>
+      ${[...new Set(sortCandidatesByPosition(groupCandidates).map(candidate => candidate.position || "Other"))].map(position => `
+        <div class="position-group">
+          <h4>${escapeHtml(position)}</h4>
+          <div class="position-group-grid">
+            ${groupCandidates.filter(candidate => (candidate.position || "Other") === position).sort((first, second) => first.name.localeCompare(second.name)).map((candidate, index) => `
+              <article class="full-candidate-card">
+                ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}" onclick="openCandidateImage('')">${escapeHtml(candidate.initials)}</div>`}
+                <div class="full-candidate-info">
+                  <h3>${escapeHtml(candidate.name)}</h3>
+                  <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
+                  <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
+                  <div class="full-candidate-actions">
+                    <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
+                    <button type="button" onclick="startVoting()">VOTE</button>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
     </section>
   `).join("");
 }
@@ -423,24 +450,63 @@ function closeProfile() {
 }
 
 function renderCandidates() {
+  renderCandidateGroups([]);
+}
+
+function renderCandidateGroups(candidateList) {
   const list = document.getElementById("candidate-list");
-  list.innerHTML = candidates.map((candidate, index) => `
-    <article class="candidate">
-      ${candidate.picture ? `<img class="avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}">` : `<div class="avatar avatar-${index % 3 + 1}">${escapeHtml(candidate.initials)}</div>`}
-      <h3>${escapeHtml(candidate.name)}</h3>
-      <small>${escapeHtml(candidate.position)}</small>
-      <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
-      <div class="candidate-actions">
-        <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-        <button type="button" onclick="startVoting()">VOTE</button>
+  if (!candidateList.length) {
+    list.innerHTML = '<p class="candidate-search-empty">Type a candidate name to view the matching candidate.</p>';
+    list.classList.add("candidate-list-empty");
+    return;
+  }
+  list.classList.remove("candidate-list-empty");
+  list.innerHTML = groupCandidatesByGroup(candidateList).map(([group, groupCandidates]) => `
+    <section class="candidate-group">
+      <h3 class="candidate-group-title">${escapeHtml(group)}</h3>
+      <div class="candidate-group-list">
+        ${sortCandidatesByPosition(groupCandidates).map((candidate, index) => `
+          <article class="candidate">
+            ${candidate.picture ? `<img class="avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}">` : `<div class="avatar avatar-${index % 3 + 1}">${escapeHtml(candidate.initials)}</div>`}
+            <h3>${escapeHtml(candidate.name)}</h3>
+            <small>${escapeHtml(candidate.position)}</small>
+            <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
+            <div class="candidate-actions">
+              <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
+              <button type="button" onclick="startVoting()">VOTE</button>
+            </div>
+          </article>
+        `).join("")}
       </div>
-    </article>
+    </section>
   `).join("");
 }
 
-function showAllCandidates() {
-  document.getElementById("candidates").scrollIntoView({ behavior: "smooth" });
-  showToast(`${candidates.length} candidate${candidates.length === 1 ? "" : "s"} available.`);
+function searchCandidates(event) {
+  const query = event.target.value.trim().toLowerCase();
+  const autocomplete = document.getElementById("candidate-autocomplete");
+  const matches = query
+    ? candidates.filter(candidate => [candidate.name, candidate.position, getCandidateGroup(candidate)].some(value => value?.toLowerCase().includes(query))).slice(0, 8)
+    : [];
+
+  autocomplete.innerHTML = matches.length
+    ? matches.map(candidate => `<button type="button" class="candidate-suggestion" role="option" onclick="selectCandidateSearchResult('${escapeJs(candidate.name)}')"><strong>${escapeHtml(candidate.name)}</strong><span>${escapeHtml(getCandidateGroup(candidate))} - ${escapeHtml(candidate.position)}</span></button>`).join("")
+    : (query ? '<p class="candidate-no-results">No candidates found.</p>' : "");
+  autocomplete.hidden = !query;
+
+  renderCandidateGroups(query
+    ? candidates.filter(candidate => [candidate.name, candidate.position, getCandidateGroup(candidate)].some(value => value?.toLowerCase().includes(query)))
+    : []);
+}
+
+function selectCandidateSearchResult(candidateName) {
+  const candidate = candidates.find(item => item.name === candidateName);
+  const input = document.getElementById("candidate-search-input");
+  const autocomplete = document.getElementById("candidate-autocomplete");
+  if (!candidate) return;
+  input.value = candidate.name;
+  autocomplete.hidden = true;
+  selectCandidate(candidate.name);
 }
 
 function showVotingGuidelines() {

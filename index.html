@@ -1,131 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elourdes Vote - Login</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elourdes Vote</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <div class="container">
-    <div class="left">
-      <h1>Your voice<br>shapes Our<br>Lourdes.</h1>
-    </div>
+  <div class="page-shell">
+    <header class="topbar">
+      <button class="menu-button" type="button" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-    <div class="right">
-      <div class="login-box">
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="active" href="#">Home</a>
+        <a href="#">Notifications</a>
 
-        <div class="brand-image" role="img" aria-label="Elourdes Student Council Elections"></div>
+        <div class="nav-identity" aria-label="User greeting">
+          <span class="welcome-label">Welcome,</span>
+          <span class="user-name">Hadi</span>
+        </div>
 
-        <form id="login-form" onsubmit="login(event)">
-          <input type="email" id="username" placeholder="Email" required>
-          <input type="password" id="password" placeholder="Password" required>
+        <button class="logout-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <path d="M16 17l5-5-5-5"/>
+            <path d="M21 12H9"/>
+          </svg>
+          Log out
+        </button>
+      </nav>
+    </header>
 
-          <div class="options">
-            <label><input type="checkbox"> Remember me</label>
-            <a href="#" onclick="forgotPassword(event)">Forgot Password?</a>
+    <main class="dashboard-page">
+      <section class="hero-banner" aria-label="Welcome banner">
+        <div class="hero-text">
+          <h1>Welcome to<br />Elourdes Vote!</h1>
+        </div>
+
+        <div class="hero-figure" aria-hidden="true">
+          <svg viewBox="0 0 480 220" role="img">
+            <path d="M0 150L120 90L210 150L482 70V220H0Z" fill="#e4eaf8" opacity="0.25"/>
+            <path d="M140 150L260 80L380 150L480 110V220H0V140L140 150Z" fill="#0f2d6c" opacity="0.9"/>
+            <path d="M55 142L120 100L185 142" fill="none" stroke="#f2f5fb" stroke-width="7" stroke-linecap="round"/>
+            <path d="M215 142L280 100L345 142" fill="none" stroke="#f2f5fb" stroke-width="7" stroke-linecap="round"/>
+            <path d="M335 132L394 98L455 138" fill="none" stroke="#f2f5fb" stroke-width="7" stroke-linecap="round"/>
+            <path d="M75 95h52v52H75z" fill="#f9f9fb" opacity="0.8"/>
+            <path d="M215 95h52v52h-52z" fill="#f3f5f9" opacity="0.8"/>
+            <path d="M355 95h52v52h-52z" fill="#f5f7fb" opacity="0.8"/>
+            <path d="M300 96c0-16 13-30 30-30s30 14 30 30" fill="none" stroke="#dfe7f4" stroke-width="10"/>
+            <path d="M365 94c0 30-24 54-54 54s-54-24-54-54H365Z" fill="#d5dfef" opacity="0.5"/>
+            <path d="M355 66h70l-25 55h-52l7-55Z" fill="#f4f7fb" opacity="0.9"/>
+            <path d="M190 42c30 0 54 24 54 54v28h-62V92c0-27 8-50 8-50Z" fill="#0c316c" opacity="0.68"/>
+            <path d="M97 153c28-18 52-28 80-30 54-3 99 23 128 52H97v-22Z" fill="#d9e4f6" opacity="0.6"/>
+            <path d="M224 98l52 20 52-20 28 48-80 52-80-52 28-48Z" fill="#4b6bb6" opacity="0.32"/>
+            <path d="M200 135c18-24 38-36 62-36 28 0 52 14 70 42" fill="none" stroke="#eff3fb" stroke-width="9" stroke-linecap="round"/>
+            <path d="M365 170c10-18 24-34 42-46 14-10 31-18 49-20" fill="none" stroke="#fbfcff" stroke-width="12" stroke-linecap="round"/>
+            <path d="M288 140c10-32 38-60 75-64 23-2 45 4 62 18l-38 46c-20-6-42-3-61 12l-38-12Z" fill="#f5f8ff" opacity="0.9"/>
+            <path d="M333 138l28-22 52 31-14 74-66 18-13-57 13-44Z" fill="#d5dff1" opacity="0.64"/>
+            <path d="M330 138l42-36 38 24-18 72-62 18-22-33 22-45Z" fill="#0a2d68" opacity="0.96"/>
+            <path d="M345 120l38-30 25 18-44 33-19-21Z" fill="#dfe7f6" opacity="0.9"/>
+            <path d="M345 125h40v10h-40z" fill="#f7f9ff"/>
+            <path d="M379 135h20v42h-20z" fill="#f7f9ff"/>
+            <path d="M350 144h18v35h-18z" fill="#f7f9ff"/>
+            <path d="M415 142l18-11 15 14-11 28-24 7-14-22 16-16Z" fill="#fff" opacity="0.78"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="info-grid">
+        <article class="panel countdown-panel">
+          <h2>Election Countdown</h2>
+          <p class="countdown-text">2 Days : 08 Hours : 35 Minutes</p>
+          <ul>
+            <li>Voting Period: August 20-23, 2027</li>
+            <li>Eligible Voters: Currently enrolled OLLC students</li>
+            <li>Your Status: <span>Not Yet Voted</span></li>
+          </ul>
+        </article>
+
+        <article class="panel candidates-panel">
+          <div class="panel-topline">
+            <div class="icon-wrap people-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="10" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h2>Meet the Candidates</h2>
+            <a href="#">View all Candidates</a>
           </div>
 
-          <button type="submit">LOGIN</button>
-
-          <p class="signup">
-            Don’t have an account? <a href="#" onclick="showSignup(event)">Sign up</a>
-          </p>
-
-          <p id="message"></p>
-        </form>
-
-        <form id="forgot-form" class="forgot-form" onsubmit="resetPassword(event)" novalidate hidden>
-          <h2>Reset Password</h2>
-          <p class="form-help">Enter your registered email and we will send you a secure password reset link.</p>
-          <input type="email" id="reset-identity" placeholder="Email Address" inputmode="email" autocomplete="email" required>
-          <button type="submit">RESET PASSWORD</button>
-          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
-          <p id="reset-message"></p>
-        </form>
-
-        <form id="new-password-form" class="forgot-form" onsubmit="updatePassword(event)" hidden>
-          <h2>Set New Password</h2>
-          <p class="form-help">Choose a new password for your account.</p>
-          <input type="password" id="new-password" placeholder="New Password" required>
-          <input type="password" id="confirm-new-password" placeholder="Confirm New Password" required>
-          <button type="submit">UPDATE PASSWORD</button>
-          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
-          <p id="new-password-message"></p>
-        </form>
-
-        <form id="signup-form" class="signup-form" onsubmit="createAccount(event)" hidden>
-          <h2>Registration Form</h2>
-
-          <div class="signup-grid">
-            <label>Full Name
-              <input type="text" id="full-name" required>
-            </label>
-            <label>Student ID
-              <input type="text" id="student-id" required aria-describedby="student-id-help">
-              <small id="student-id-help" class="field-help">Use 8 digits or YYYY-#### format (example: 2024-1234).</small>
-            </label>
-
-            <label>Year &amp; Level
-              <select id="year-level" required>
-                <option value="" disabled selected>Please Select</option>
-                <option>Grade 7</option>
-                <option>Grade 8</option>
-                <option>Grade 9</option>
-                <option>Grade 10</option>
-                <option>Grade 11</option>
-                <option>Grade 12</option>
-              </select>
-            </label>
-            <label>Gender
-              <select id="gender" required>
-                <option value="" disabled selected>Please Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Prefer not to say</option>
-              </select>
-            </label>
-
-            <label class="full-field">Email Address
-              <input type="email" id="email" required placeholder="studentname@lourdes.edu.ph or personal email">
-              <small class="field-help">School email is preferred, but a valid personal email is accepted if your account is registered.</small>
-            </label>
-
-            <label>Password
-              <span class="password-field">
-                <input type="password" id="signup-password" required aria-describedby="password-help">
-                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('signup-password', this)"><span aria-hidden="true">👁</span></button>
-              </span>
-              <small id="password-help" class="field-help">8+ characters with uppercase, lowercase, number, and special character.</small>
-            </label>
-            <label>Confirm Password
-              <span class="password-field">
-                <input type="password" id="confirm-password" required>
-                <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('confirm-password', this)"><span aria-hidden="true">👁</span></button>
-              </span>
-            </label>
+          <div class="candidate-row">
+            <div class="candidate-photo candidate-one"></div>
+            <div class="candidate-photo candidate-two"></div>
           </div>
 
-          <label class="agreement"><input type="checkbox" required> <em>I confirm that the information I provided is accurate.</em></label>
+          <div class="candidate-names">
+            <div>
+              <span>Cloe Santos</span>
+              <small>Vice President</small>
+            </div>
+            <div>
+              <span>Jas Svente</span>
+              <small>Vice President</small>
+            </div>
+          </div>
+        </article>
 
-          <button type="submit">CREATE ACCOUNT</button>
-          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
-          <p id="signup-message"></p>
-        </form>
+        <article class="panel reminders-panel">
+          <div class="panel-topline">
+            <div class="icon-wrap warning-icon" aria-hidden="true">!</div>
+            <h2>Reminders</h2>
+          </div>
 
-      </div>
-    </div>
-
+          <ul>
+            <li>Use your own student account.</li>
+            <li>Vote only once.</li>
+            <li>Review your choices before submitting.</li>
+            <li>Your vote is final and cannot be changed.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth-flow.js"></script>
-  <script>
-    const SUPABASE_URL = 'https://ilwixrwknjywonoahmof.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_PFN0Iyati_Na8JZxeZAUEQ_lvNI_WmE';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  </script>
-  <script src="script.js"></script>
 </body>
 </html>

@@ -19,9 +19,14 @@ const defaultElection = {
 let election = null;
 let electionId = 1;
 let totalVotes = 0;
+let hasLoadedVoteTotal = false;
 initializeAdmin();
 window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
+window.addEventListener("focus", updateResults);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) updateResults();
+});
 
 async function initializeAdmin() {
   const storedUserRole = (() => {
@@ -334,6 +339,7 @@ function formatTime(value) {
 }
 
 function showAdminToast(message) {
+  if (!isImportantAdminNotification(message)) return;
   const toast = document.getElementById("admin-toast");
   toast.textContent = message;
   toast.classList.add("show");
@@ -341,11 +347,28 @@ function showAdminToast(message) {
   showAdminToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2600);
 }
 
+function isImportantAdminNotification(message) {
+  const text = String(message).toLowerCase();
+  return text.includes("vote was submitted") || text.includes("election is active now");
+}
+
 async function updateResults() {
   if (!election) return;
   const { data: result, error } = await supabaseClient.rpc("get_admin_results", { requested_election_id: electionId });
-  if (error) return;
+  if (error) {
+    document.getElementById("tally-updated").textContent = "Unable to refresh vote totals. Check the admin results function in Supabase.";
+    return;
+  }
+  if (!result) {
+    document.getElementById("tally-updated").textContent = "Unable to refresh vote totals. Confirm that this account has the admin role.";
+    return;
+  }
   const totalVotes = Number(result?.total_votes || 0);
+  if (hasLoadedVoteTotal && totalVotes > window.adminVoteTotal) {
+    showAdminToast("A vote was submitted successfully.");
+  }
+  window.adminVoteTotal = totalVotes;
+  hasLoadedVoteTotal = true;
   const eligibleVoters = Number(election.eligibleVoters || 100);
   const turnout = Math.min(100, Math.round((totalVotes / Math.max(eligibleVoters, 1)) * 100));
   const tally = {};

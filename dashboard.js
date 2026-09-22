@@ -2,6 +2,7 @@ let account = null;
 let currentUser = null;
 let authUser = null;
 let hasVoted = false;
+let hasLoadedElectionStatus = false;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart." },
@@ -18,13 +19,14 @@ const defaultElection = {
 let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") || defaultElection;
 
 let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
+window.elourdesCandidates = candidates;
+window.elourdesElection = election;
 initializeDashboard();
 window.setInterval(() => {
   updateCountdown();
-  refreshElectionSettings();
   updateElectionState();
 }, 1000);
-window.addEventListener("storage", refreshElectionSettings);
+window.setInterval(refreshElectionStatus, 5000);
 
 async function initializeDashboard() {
   const storedUserRole = (() => {
@@ -64,11 +66,25 @@ async function initializeDashboard() {
     return;
   }
 
-  const { data: electionData } = await supabaseClient.from("elections").select("*").eq("id", 1).single();
-  if (electionData) election = { ...electionData, startDate: electionData.start_date || election.startDate, endDate: electionData.end_date || election.endDate, deadline: electionData.deadline || election.deadline, eligibleVoters: electionData.eligible_voters || election.eligibleVoters };
+  const { data: electionData, error: electionError } = await supabaseClient.from("elections").select("*").eq("id", 1).single();
+  if (electionError) {
+    showToast("Election settings could not be loaded. Please refresh and try again.");
+  } else if (electionData) {
+    election = {
+      ...electionData,
+      status: String(electionData.status || "").trim().toLowerCase(),
+      startDate: electionData.start_date || election.startDate,
+      endDate: electionData.end_date || election.endDate,
+      deadline: electionData.deadline || election.deadline,
+      eligibleVoters: electionData.eligible_voters || election.eligibleVoters
+    };
+  }
+  window.elourdesElection = election;
+  hasLoadedElectionStatus = true;
 
   const { data: candidateData } = await supabaseClient.from("candidates").select("*").eq("election_id", 1).order("id");
   if (candidateData) candidates = candidateData.map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
+  window.elourdesCandidates = candidates;
 
   const { data: ballot } = await supabaseClient.from("vote_ballots").select("id").eq("election_id", 1).eq("voter_id", authUser.id).maybeSingle();
   hasVoted = Boolean(ballot);
@@ -76,6 +92,37 @@ async function initializeDashboard() {
   renderCandidates();
   renderElectionDetails();
   updateVotingStatus();
+  updateCountdown();
+  updateElectionState();
+}
+
+async function refreshElectionStatus() {
+  if (!authUser) return;
+
+  const { data, error } = await supabaseClient
+    .from("elections")
+    .select("*")
+    .eq("id", 1)
+    .single();
+  if (error || !data) return;
+
+  const previousStatus = String(election.status || "").trim().toLowerCase();
+  const nextStatus = String(data.status || "").trim().toLowerCase();
+  election = {
+    ...data,
+    status: nextStatus,
+    startDate: data.start_date || election.startDate,
+    endDate: data.end_date || election.endDate,
+    deadline: data.deadline || election.deadline,
+    eligibleVoters: data.eligible_voters || election.eligibleVoters
+  };
+  window.elourdesElection = election;
+
+  if (hasLoadedElectionStatus && previousStatus !== "active" && nextStatus === "active") {
+    showToast("Voting is now active. You can cast your vote.");
+  }
+
+  renderElectionDetails();
   updateCountdown();
   updateElectionState();
 }
@@ -247,17 +294,14 @@ function renderElectionDetails() {
   if (metrics) metrics.innerHTML = `All currently enrolled<br>${election.eligibleVoters} eligible voters`;
 }
 
-function refreshElectionSettings() {
-  const savedElection = JSON.parse(localStorage.getItem("elourdesElection") || "null");
-  if (!savedElection || JSON.stringify(savedElection) === JSON.stringify(election)) return;
-  election = savedElection;
-  renderElectionDetails();
-  updateCountdown();
-}
-
 function updateCountdown() {
   const countdown = document.getElementById("election-countdown");
   if (!countdown) return;
+
+  if (String(election.status || "").trim().toLowerCase() === "active") {
+    countdown.textContent = hasVoted ? "Vote submitted successfully" : "Election is active";
+    return;
+  }
 
   const start = getElectionStart();
   const end = getElectionEnd();
@@ -291,10 +335,16 @@ function getElectionEnd() {
 }
 
 function electionHasEnded() {
+  const status = String(election.status || "").trim().toLowerCase();
+  if (status === "active") return false;
+  if (status === "closed") return true;
   return new Date().getTime() >= getElectionEnd().getTime();
 }
 
 function electionHasStarted() {
+  const status = String(election.status || "").trim().toLowerCase();
+  if (status === "active") return true;
+  if (status === "closed") return false;
   return new Date().getTime() >= getElectionStart().getTime();
 }
 
@@ -306,10 +356,11 @@ function updateElectionState() {
   const badge = document.getElementById("election-status-badge");
   const buttons = document.querySelectorAll("[onclick*='startVoting']");
   buttons.forEach(button => {
-    button.disabled = ended || !started;
+    button.disabled = hasVoted || ended || !started;
     if (ended && button.id !== "cast-vote-button") button.textContent = "VOTING CLOSED";
     if (!started && button.id !== "cast-vote-button") button.textContent = "VOTING NOT STARTED";
-    if (started && !ended && button.id !== "cast-vote-button") button.textContent = "VOTE";
+    if (hasVoted && button.id !== "cast-vote-button") button.textContent = "VOTE SUBMITTED";
+    else if (started && !ended && button.id !== "cast-vote-button") button.textContent = "VOTE";
   });
 
   if (badge) {
@@ -319,7 +370,15 @@ function updateElectionState() {
   }
 
   const castButton = document.getElementById("cast-vote-button");
-  if (ended) {
+  if (hasVoted) {
+  let hasLoadedElectionStatus = false;
+    document.querySelector(".dashboard").classList.remove("results-only");
+    title.textContent = "VOTING SUCCESSFULLY";
+    text.textContent = "Your vote has been submitted successfully.";
+    castButton.disabled = true;
+    castButton.textContent = "VOTE SUBMITTED";
+  window.setInterval(refreshElectionStatus, 5000);
+  } else if (ended) {
     title.textContent = "ELECTION CLOSED";
     text.textContent = "Voting has ended. Final results are now available.";
     castButton.disabled = true;
@@ -663,14 +722,13 @@ async function confirmVoteSubmission(event) {
 }
 
 function updateVotingStatus() {
-  if (electionHasEnded() || !electionHasStarted()) return;
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");
   const button = document.getElementById("cast-vote-button");
 
   if (hasVoted) {
-    title.textContent = "VOTED";
-    text.textContent = "Your vote has been submitted.";
+    title.textContent = "VOTING SUCCESSFULLY";
+    text.textContent = "Your vote has been submitted successfully.";
     button.disabled = true;
     button.textContent = "VOTE SUBMITTED";
   }
@@ -687,11 +745,19 @@ function showGuidelines() {
 }
 
 function showToast(text) {
+  if (!isImportantNotification(text)) return;
   const toast = document.getElementById("toast");
   toast.textContent = text;
   toast.classList.add("show");
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
+function isImportantNotification(text) {
+  const message = String(text).toLowerCase();
+  return message.includes("vote submitted successfully")
+    || message.includes("vote was submitted successfully")
+    || message.includes("voting is now active");
 }
 
 function escapeHtml(value) {

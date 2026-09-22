@@ -175,11 +175,11 @@ security definer
 set search_path = public
 as $$
   select jsonb_build_object(
-    'total_votes', (
-      select count(*)
+    'total_votes', coalesce((
+      select count(*)::bigint
       from public.vote_ballots
       where election_id = requested_election_id
-    ),
+    ), 0),
     'rows', coalesce((
       select jsonb_agg(jsonb_build_object(
         'candidate_position', grouped_entries.position,
@@ -198,7 +198,7 @@ as $$
       ) grouped_entries
     ), '[]'::jsonb)
   )
-  where (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin';
+  where coalesce(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin';
 $$;
 
 revoke all on function public.get_admin_results(bigint) from public;

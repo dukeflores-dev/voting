@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elourdes Vote - Login</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chatbot.css">
 </head>
 
 <body>
@@ -141,6 +142,16 @@
 
   </div>
 
+  <aside class="voting-chatbot" id="voting-chatbot" aria-label="Elourdes Vote AI assistant">
+    <section class="chatbot-panel" hidden>
+      <header class="chatbot-header"><div><strong>ELOURDES AI</strong><small>Voting and candidate assistant</small></div><button class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button></header>
+      <div class="chatbot-messages" aria-live="polite"></div>
+      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
+      <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..." aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
+    </section>
+    <button class="chatbot-toggle" type="button" aria-label="Open Elourdes AI assistant" aria-expanded="false"><span class="chatbot-ai-icon" aria-hidden="true">AI</span></button>
+  </aside>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth-flow.js"></script>
   <script>
@@ -149,5 +160,6 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
   <script src="script.js"></script>
+  <script src="chatbot.js"></script>
 </body>
 </html>

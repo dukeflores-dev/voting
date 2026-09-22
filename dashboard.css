@@ -953,9 +953,8 @@ body > * {
 
 .toast {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 5;
+  left: 50%;
+  top: 24px;
   max-width: 300px;
   padding: 13px 17px;
   border-radius: 5px;
@@ -964,19 +963,35 @@ body > * {
   font-size: 12px;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px);
+  transform: translate(-50%, -12px);
   transition: .2s ease;
 }
 
 .toast.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
+}
+
+
+@media (max-width: 700px) {
+  .toast {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    text-align: center;
+    transform: translateY(-12px);
+  }
+
+  .toast.show {
+    transform: translateY(0);
+  }
 }
 
 .modal[hidden] {
   display: none;
 }
-
 .modal {
   position: fixed;
   inset: 0;

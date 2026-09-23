@@ -64,7 +64,11 @@
       <label>Initials<input type="text" id="candidate-initials" maxlength="3" required></label>
       <label>Profile Picture<input type="file" id="candidate-picture" accept="image/*" onchange="previewCandidatePicture(event)"></label>
       <img class="picture-preview" id="picture-preview" alt="" hidden>
-      <label>Candidate Description<textarea id="candidate-description" rows="4" placeholder="Write the candidate's platform and background..." required></textarea></label>
+      <label>Short Description<textarea id="candidate-description" rows="3" placeholder="Give voters a concise overview." required></textarea></label>
+      <label>Background<textarea id="candidate-background" rows="3" placeholder="Education, experience, interests, or personal background."></textarea></label>
+      <label>Credentials<textarea id="candidate-credentials" rows="3" placeholder="Leadership roles, training, certifications, or qualifications."></textarea></label>
+      <label>Achievements<textarea id="candidate-achievements" rows="3" placeholder="Relevant awards, projects, or accomplishments."></textarea></label>
+      <label>Relevant Information<textarea id="candidate-relevant-information" rows="3" placeholder="Other information voters should consider before voting."></textarea></label>
       <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeCandidateForm()">CANCEL</button><button type="submit" class="save-button">SAVE CANDIDATE</button></div>
     </form>
   </div>
@@ -84,7 +88,7 @@
     <section class="chatbot-panel" hidden>
       <header class="chatbot-header"><div><strong>ELOURDES AI</strong><small>Voting and candidate assistant</small></div><button class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button></header>
       <div class="chatbot-messages" aria-live="polite"></div>
-      <div class="chatbot-quick-actions"><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
+      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I create an account?">Create an account</button><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..." aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
     </section>
     <button class="chatbot-toggle" type="button" aria-label="Open Elourdes AI assistant" aria-expanded="false"><span class="chatbot-ai-icon" aria-hidden="true">AI</span></button>

@@ -5,9 +5,9 @@ let hasVoted = false;
 let hasLoadedElectionStatus = false;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
-  { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart." },
-  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", group_name: "Uniteam", initials: "JD", description: "Together, we can build a better OLLC." },
-  { name: "Ana Reyes", position: "SECRETARY", group_name: "Uniteam", initials: "AR", description: "Organized today, empowered tomorrow." }
+  { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
+  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", group_name: "Uniteam", initials: "JD", description: "Together, we can build a better OLLC.", background: "", credentials: "", achievements: "", relevant_information: "" },
+  { name: "Ana Reyes", position: "SECRETARY", group_name: "Uniteam", initials: "AR", description: "Organized today, empowered tomorrow.", background: "", credentials: "", achievements: "", relevant_information: "" }
 ];
 const defaultElection = {
   title: "Student Council Election 2026",
@@ -86,8 +86,9 @@ async function initializeDashboard() {
   if (candidateData) candidates = candidateData.map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
   window.elourdesCandidates = candidates;
 
-  const { data: ballot } = await supabaseClient.from("vote_ballots").select("id").eq("election_id", 1).eq("voter_id", authUser.id).maybeSingle();
+  const { data: ballot } = await supabaseClient.from("vote_ballots").select("id, created_at").eq("election_id", 1).eq("voter_id", authUser.id).maybeSingle();
   hasVoted = Boolean(ballot);
+  if (hasVoted && ballot.created_at) saveVoteReceipt(ballot.created_at);
   accountName.textContent = `Welcome, ${currentUser.name}`;
   renderCandidates();
   renderElectionDetails();
@@ -212,30 +213,41 @@ function sortCandidatesByPosition(groupCandidates) {
 
 function renderAllCandidates() {
   const list = document.getElementById("all-candidates-list");
-  list.innerHTML = groupCandidatesByGroup().map(([group, groupCandidates]) => `
-    <section class="position-group">
-      <h3 class="group-heading">${escapeHtml(group)}</h3>
-      ${[...new Set(sortCandidatesByPosition(groupCandidates).map(candidate => candidate.position || "Other"))].map(position => `
-        <div class="position-group">
-          <h4>${escapeHtml(position)}</h4>
-          <div class="position-group-grid">
-            ${groupCandidates.filter(candidate => (candidate.position || "Other") === position).sort((first, second) => first.name.localeCompare(second.name)).map((candidate, index) => `
-              <article class="full-candidate-card">
-                ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}" onclick="openCandidateImage('')">${escapeHtml(candidate.initials)}</div>`}
-                <div class="full-candidate-info">
-                  <h3>${escapeHtml(candidate.name)}</h3>
-                  <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
-                  <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
-                  <div class="full-candidate-actions">
-                    <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-                    <button type="button" onclick="startVoting()">VOTE</button>
-                  </div>
-                </div>
-              </article>
-            `).join("")}
-          </div>
-        </div>
-      `).join("")}
+  list.innerHTML = renderCandidatesByPosition(candidates, "full-candidate-card");
+}
+
+function renderCandidatesByPosition(candidateList, cardClass = "candidate") {
+  const positions = [...new Set(sortCandidatesByPosition([...candidateList]).map(candidate => candidate.position || "Other"))];
+  return positions.map(position => `
+    <section class="candidate-group">
+      <h3 class="candidate-group-title">${escapeHtml(position)}</h3>
+      <div class="candidate-group-list">
+        ${candidateList.filter(candidate => (candidate.position || "Other") === position).sort((first, second) => first.name.localeCompare(second.name)).map((candidate, index) => cardClass === "full-candidate-card" ? `
+          <article class="full-candidate-card">
+            ${candidate.picture ? `<img class="full-candidate-avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="full-candidate-avatar avatar-${index % 3 + 1}" onclick="openCandidateImage('')">${escapeHtml(candidate.initials)}</div>`}
+            <div class="full-candidate-info">
+              <h3>${escapeHtml(candidate.name)}</h3>
+              <span class="full-candidate-position">${escapeHtml(candidate.position)}</span>
+              <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
+              <div class="full-candidate-actions">
+                <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
+                <button type="button" onclick="startVoting()">VOTE</button>
+              </div>
+            </div>
+          </article>
+        ` : `
+          <article class="candidate">
+            ${candidate.picture ? `<img class="avatar profile-picture candidate-image-trigger" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}" onclick="openCandidateImage('${escapeJs(candidate.picture)}')">` : `<div class="avatar avatar-${index % 3 + 1}">${escapeHtml(candidate.initials)}</div>`}
+            <h3>${escapeHtml(candidate.name)}</h3>
+            <small>${escapeHtml(candidate.position)}</small>
+            <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
+            <div class="candidate-actions">
+              <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
+              <button type="button" onclick="startVoting()">VOTE</button>
+            </div>
+          </article>
+        `).join("")}
+      </div>
     </section>
   `).join("");
 }
@@ -277,7 +289,7 @@ function renderNotifications() {
   const list = document.getElementById("notification-list");
   const notifications = JSON.parse(localStorage.getItem("elourdesNotifications") || "[]");
   list.innerHTML = notifications.length
-    ? notifications.map(notification => `<div class="notification-item"><strong>${escapeHtml(notification.message)}</strong><span>${new Date(notification.date).toLocaleString()}</span></div>`).join("")
+    ? notifications.map(notification => `<div class="notification-item"><strong>${escapeHtml(notification.message)}</strong>${notification.status ? `<span>Status: ${escapeHtml(notification.status)}</span>` : ""}${notification.electionName ? `<span>Election: ${escapeHtml(notification.electionName)}</span>` : ""}<span>${new Date(notification.date).toLocaleString()}</span></div>`).join("")
     : "<p class=\"empty-notification\">No new notifications.</p>";
 }
 
@@ -373,8 +385,8 @@ function updateElectionState() {
   if (hasVoted) {
   let hasLoadedElectionStatus = false;
     document.querySelector(".dashboard").classList.remove("results-only");
-    title.textContent = "VOTING SUCCESSFULLY";
-    text.textContent = "Your vote has been submitted successfully.";
+    title.textContent = "VOTE RECORDED";
+    text.textContent = "Your vote has been successfully recorded.";
     castButton.disabled = true;
     castButton.textContent = "VOTE SUBMITTED";
   window.setInterval(refreshElectionStatus, 5000);
@@ -486,6 +498,10 @@ function selectCandidate(name) {
   document.getElementById("profile-name").textContent = candidate.name;
   document.getElementById("profile-position").textContent = candidate.position;
   document.getElementById("profile-description").textContent = candidate.description || candidate.platform || "No description available yet.";
+  document.getElementById("profile-background").textContent = candidate.background || "Not provided yet.";
+  document.getElementById("profile-credentials").textContent = candidate.credentials || "Not provided yet.";
+  document.getElementById("profile-achievements").textContent = candidate.achievements || "Not provided yet.";
+  document.getElementById("profile-relevant-information").textContent = candidate.relevant_information || "Not provided yet.";
   document.getElementById("profile-modal").hidden = false;
 }
 
@@ -509,36 +525,18 @@ function closeProfile() {
 }
 
 function renderCandidates() {
-  renderCandidateGroups([]);
+  renderCandidateGroups(candidates);
 }
 
 function renderCandidateGroups(candidateList) {
   const list = document.getElementById("candidate-list");
   if (!candidateList.length) {
-    list.innerHTML = '<p class="candidate-search-empty">Type a candidate name to view the matching candidate.</p>';
+    list.innerHTML = '<p class="candidate-search-empty">No candidates are available yet.</p>';
     list.classList.add("candidate-list-empty");
     return;
   }
   list.classList.remove("candidate-list-empty");
-  list.innerHTML = groupCandidatesByGroup(candidateList).map(([group, groupCandidates]) => `
-    <section class="candidate-group">
-      <h3 class="candidate-group-title">${escapeHtml(group)}</h3>
-      <div class="candidate-group-list">
-        ${sortCandidatesByPosition(groupCandidates).map((candidate, index) => `
-          <article class="candidate">
-            ${candidate.picture ? `<img class="avatar profile-picture" src="${candidate.picture}" alt="${escapeHtml(candidate.name)}">` : `<div class="avatar avatar-${index % 3 + 1}">${escapeHtml(candidate.initials)}</div>`}
-            <h3>${escapeHtml(candidate.name)}</h3>
-            <small>${escapeHtml(candidate.position)}</small>
-            <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
-            <div class="candidate-actions">
-              <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-              <button type="button" onclick="startVoting()">VOTE</button>
-            </div>
-          </article>
-        `).join("")}
-      </div>
-    </section>
-  `).join("");
+  list.innerHTML = renderCandidatesByPosition(candidateList);
 }
 
 function searchCandidates(event) {
@@ -687,11 +685,28 @@ async function submitVote(event) {
   showToast("Your vote was submitted successfully.");
 }
 
-function addVoteConfirmationNotification() {
+function getVoteReceiptKey() {
+  return authUser ? `elourdesVoteReceipt:${authUser.id}` : "elourdesVoteReceipt";
+}
+
+function saveVoteReceipt(votedAt) {
+  const receipt = {
+    status: "Voted",
+    votedAt,
+    electionName: election.title
+  };
+  localStorage.setItem(getVoteReceiptKey(), JSON.stringify(receipt));
+  return receipt;
+}
+
+function addVoteConfirmationNotification(votedAt = new Date().toISOString()) {
+  const receipt = saveVoteReceipt(votedAt);
   const notifications = JSON.parse(localStorage.getItem("elourdesNotifications") || "[]");
   notifications.unshift({
-    message: "Vote submitted successfully. Your ballot has been recorded.",
-    date: new Date().toISOString()
+    message: "Voting receipt: Successfully submitted.",
+    status: receipt.status,
+    electionName: receipt.electionName,
+    date: receipt.votedAt
   });
   localStorage.setItem("elourdesNotifications", JSON.stringify(notifications.slice(0, 10)));
 }
@@ -727,10 +742,21 @@ function updateVotingStatus() {
   const button = document.getElementById("cast-vote-button");
 
   if (hasVoted) {
-    title.textContent = "VOTING SUCCESSFULLY";
-    text.textContent = "Your vote has been submitted successfully.";
+    const receipt = JSON.parse(localStorage.getItem(getVoteReceiptKey()) || "null");
+    title.textContent = "VOTE RECORDED";
+    text.textContent = "Your vote has been successfully recorded.";
     button.disabled = true;
     button.textContent = "VOTE SUBMITTED";
+    const confirmation = document.getElementById("vote-confirmation");
+    if (confirmation) {
+      confirmation.hidden = false;
+      document.getElementById("vote-receipt-status").textContent = receipt?.status || "Voted";
+      document.getElementById("vote-receipt-date").textContent = receipt?.votedAt ? new Date(receipt.votedAt).toLocaleString() : "Recorded date unavailable";
+      document.getElementById("vote-receipt-election").textContent = receipt?.electionName || election.title;
+    }
+  } else {
+    const confirmation = document.getElementById("vote-confirmation");
+    if (confirmation) confirmation.hidden = true;
   }
 }
 

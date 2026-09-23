@@ -1,9 +1,9 @@
 let adminUser = null;
 const adminName = document.getElementById("admin-name");
 const defaultCandidates = [
-  { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart." },
-  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", initials: "JD", description: "Together, we can build a better OLLC." },
-  { name: "Ana Reyes", position: "SECRETARY", initials: "AR", description: "Organized today, empowered tomorrow." }
+  { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
+  { name: "Juan Dela Cruz", position: "VICE PRESIDENT", initials: "JD", description: "Together, we can build a better OLLC.", background: "", credentials: "", achievements: "", relevant_information: "" },
+  { name: "Ana Reyes", position: "SECRETARY", initials: "AR", description: "Organized today, empowered tomorrow.", background: "", credentials: "", achievements: "", relevant_information: "" }
 ];
 
 let candidates = [];
@@ -101,6 +101,10 @@ function openCandidateForm(index = -1) {
   document.getElementById("candidate-position").value = index < 0 ? "" : candidates[index].position;
   document.getElementById("candidate-initials").value = index < 0 ? "" : candidates[index].initials;
   document.getElementById("candidate-description").value = index < 0 ? "" : (candidates[index].description || candidates[index].platform || "");
+  document.getElementById("candidate-background").value = index < 0 ? "" : (candidates[index].background || "");
+  document.getElementById("candidate-credentials").value = index < 0 ? "" : (candidates[index].credentials || "");
+  document.getElementById("candidate-achievements").value = index < 0 ? "" : (candidates[index].achievements || "");
+  document.getElementById("candidate-relevant-information").value = index < 0 ? "" : (candidates[index].relevant_information || "");
   document.getElementById("candidate-picture").value = "";
   const preview = document.getElementById("picture-preview");
   preview.src = index < 0 ? "" : (candidates[index].picture || "");
@@ -123,6 +127,10 @@ async function saveCandidate(event) {
     position: document.getElementById("candidate-position").value.trim().toUpperCase(),
     initials: document.getElementById("candidate-initials").value.trim().toUpperCase(),
     description: document.getElementById("candidate-description").value.trim(),
+    background: document.getElementById("candidate-background").value.trim(),
+    credentials: document.getElementById("candidate-credentials").value.trim(),
+    achievements: document.getElementById("candidate-achievements").value.trim(),
+    relevant_information: document.getElementById("candidate-relevant-information").value.trim(),
     picture: existingPicture
   };
 
@@ -135,6 +143,10 @@ async function saveCandidate(event) {
       position: candidate.position,
       initials: candidate.initials,
       description: candidate.description,
+      background: candidate.background,
+      credentials: candidate.credentials,
+      achievements: candidate.achievements,
+      relevant_information: candidate.relevant_information,
       image_url: candidate.picture || null
     };
     const result = index < 0

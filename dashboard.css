@@ -420,6 +420,65 @@ body > * {
   line-height: 1.45;
 }
 
+.vote-confirmation {
+  margin: 0 14px 14px;
+  padding: 14px 16px;
+  border: 1px solid #b9e3cd;
+  border-radius: 6px;
+  background: #effaf4;
+  color: #17633c;
+}
+
+.vote-confirmation strong,
+.vote-confirmation p {
+  display: block;
+  margin: 0;
+}
+
+.vote-confirmation strong {
+  font-size: 12px;
+}
+
+.vote-confirmation p {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.vote-receipt {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #ccebd9;
+}
+
+.vote-receipt div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.vote-receipt dt {
+  color: #4b7960;
+}
+
+.vote-receipt dd {
+  margin: 0;
+  color: #17633c;
+  font-weight: 700;
+  text-align: right;
+}
+
+.vote-secrecy-note {
+  display: block;
+  margin-top: 12px;
+  color: #4b7960;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .detail {
   margin: 14px 18px;
 }
@@ -1015,7 +1074,9 @@ body > * {
 
 .profile-card {
   position: relative;
-  width: min(430px, 100%);
+  width: min(620px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
   padding: 32px;
   border-radius: 8px;
   background: white;
@@ -1081,9 +1142,48 @@ body > * {
   line-height: 1.55;
 }
 
+.candidate-profile-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+  text-align: left;
+}
+
+.candidate-profile-details section {
+  padding: 14px;
+  border: 1px solid #dfeaf5;
+  border-radius: 6px;
+  background: #f8fbfd;
+}
+
+.candidate-profile-details h3 {
+  margin: 0 0 6px;
+  color: var(--blue);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.candidate-profile-details p {
+  margin: 0;
+  color: #5b6c7d;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.candidate-image-trigger {
+  cursor: pointer;
+}
+
 .profile-vote-button {
   border: 0;
   font-family: inherit;
+}
+
+@media (max-width: 600px) {
+  .profile-card { padding: 24px 18px; }
+  .candidate-profile-details { grid-template-columns: 1fr; }
 }
 
 .ballot-form h2 {
@@ -1108,43 +1208,6 @@ body > * {
   color: #778596;
   cursor: pointer;
   font-size: 25px;
-}
-
-.position-group {
-  margin-bottom: 24px;
-}
-
-.position-group h3 {
-  margin-bottom: 12px;
-  color: var(--blue);
-  font-size: 15px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.group-heading {
-  margin: 0 0 16px;
-  padding: 10px 14px;
-  border-bottom: 2px solid var(--blue);
-  background: #f2f7fc;
-  color: var(--blue);
-  font-size: 18px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.position-group > .position-group h4 {
-  margin: 14px 0 8px;
-  color: var(--muted);
-  font-size: 12px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.position-group-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
 }
 
 .ballot-position {
@@ -1327,7 +1390,7 @@ body > * {
   .welcome-copy .eyebrow, .welcome-copy p:not(.eyebrow), .welcome-copy .primary-button { display: none; }
   .welcome-copy h1, .welcome-copy h1 strong { color: white; font-family: Impact, "Arial Narrow", sans-serif; font-size: 42px; line-height: .96; text-shadow: 2px 3px 0 rgba(0, 0, 0, .2); }
   .vote-illustration { right: 12px; bottom: -35px; transform: scale(.6); }
-  .summary-grid { display: grid; grid-template-columns: 1.05fr 1.1fr 1fr; gap: 10px; margin-top: 0; }
+  .summary-grid { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 10px; margin-top: 0; }
   .summary-grid > .status-card, .summary-grid > .candidates-card, .summary-grid > .reminders-card { min-height: 150px; margin: 0; padding: 9px 12px; border: 1px solid #111; border-radius: 5px; box-shadow: none; }
   .status-card h2 { display: none; }
   .countdown { color: #111; font-size: 10px; text-align: center; }
@@ -1365,7 +1428,7 @@ body > * {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1.1fr 1fr;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
   gap: 10px;
   width: 100%;
 }
@@ -1392,7 +1455,7 @@ body > * {
   }
 
   .summary-grid {
-    grid-template-columns: 1.05fr 1.1fr 1fr;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
   }
 }
 

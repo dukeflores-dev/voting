@@ -61,6 +61,9 @@ ${profile}`;
       const names = getCandidates().map(candidate => `${candidate.name} (${candidate.position || 'Position not set'})`).join(', ');
       return names ? `Registered candidates: ${names}. Type a candidate name to view their profile or achievements.` : 'No candidate information is available yet.';
     }
+    if (/create.*account|make.*account|sign[ -]?up|register|registration|new account|paano.*(account|mag.*sign)|mag.*(register|sign up)|gumawa.*account/.test(question)) {
+      return 'To create an account, click Sign up on the login page, complete your full name, student ID, year and level, gender, email, and password, then confirm the Terms and Conditions. Click Create Account. If email confirmation is required, open the confirmation email before logging in.';
+    }
     if (/how.*vote|paano.*vote|cast|bumoto|ballot|voting process/.test(question)) return 'Go to Election, choose one candidate for each position, review your ballot, and submit it. Your vote is final after submission.';
     if (/when|kailan|period|deadline|schedule|date/.test(question)) {
       const election = getElection();

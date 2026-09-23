@@ -62,25 +62,26 @@
     <aside class="status-card">
       <h2>YOUR VOTING STATUS</h2>
       <div class="countdown">Election Countdown<strong id="election-countdown">Loading current time...</strong></div>
-      <div class="status-alert" id="voting-status"><span class="status-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
+      <div class="status-alert" id="voting-status" role="status" aria-live="polite"><span class="status-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
+      <div class="vote-confirmation" id="vote-confirmation" hidden>
+        <strong>Vote recorded successfully</strong>
+        <p>Your vote has been successfully recorded and cannot be changed.</p>
+        <dl class="vote-receipt">
+          <div><dt>Status</dt><dd id="vote-receipt-status">Voted</dd></div>
+          <div><dt>Date and time</dt><dd id="vote-receipt-date">-</dd></div>
+          <div><dt>Election</dt><dd id="vote-receipt-election">-</dd></div>
+        </dl>
+        <small class="vote-secrecy-note">Your candidate selections are not shown in this receipt.</small>
+      </div>
       <p class="detail"><span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span> Election: <span id="student-election-title">Student Council Election 2026</span></p>
       <button class="primary-button full-button" id="cast-vote-button" type="button" onclick="startVoting()">CAST YOUR VOTE <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
     </aside>
 
     <section class="candidates-card" id="candidates">
-      <div class="section-heading candidates-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2><div class="candidate-search"><label class="sr-only" for="candidate-search-input">Search candidates</label><svg class="candidate-search-icon icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="candidate-search-input" type="search" placeholder="Search candidates" autocomplete="off" oninput="searchCandidates(event)" onfocus="searchCandidates(event)"><div class="candidate-autocomplete" id="candidate-autocomplete" role="listbox" hidden></div></div></div>
+      <div class="section-heading candidates-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2></div>
       <div class="candidate-list" id="candidate-list"></div>
     </section>
 
-    <aside class="reminders-card" id="about">
-      <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="m10.3 2.9-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span><h2>REMINDERS</h2></div>
-      <ul class="reminders">
-        <li>Use your own student account.</li>
-        <li>Vote only once.</li>
-        <li>Review your choices before submitting.</li>
-        <li>Your vote is final and cannot be changed.</li>
-      </ul>
-    </aside>
     </section>
 
     <section class="election-card" id="current-election">
@@ -148,6 +149,12 @@
       <h2 id="profile-name"></h2>
       <span class="profile-position" id="profile-position"></span>
       <p class="profile-description" id="profile-description"></p>
+      <div class="candidate-profile-details">
+        <section><h3>Background</h3><p id="profile-background"></p></section>
+        <section><h3>Credentials</h3><p id="profile-credentials"></p></section>
+        <section><h3>Achievements</h3><p id="profile-achievements"></p></section>
+        <section><h3>Relevant Information</h3><p id="profile-relevant-information"></p></section>
+      </div>
       <button class="primary-button profile-vote-button" type="button" onclick="closeProfile(); startVoting()">VOTE FOR THIS CANDIDATE</button>
     </article>
   </div>
@@ -226,7 +233,7 @@
     <section class="chatbot-panel" hidden>
       <header class="chatbot-header"><div><strong>ELOURDES AI</strong><small>Voting and candidate assistant</small></div><button class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button></header>
       <div class="chatbot-messages" aria-live="polite"></div>
-      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
+      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I create an account?">Create an account</button><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..." aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
     </section>
     <button class="chatbot-toggle" type="button" aria-label="Open Elourdes AI assistant" aria-expanded="false"><span class="chatbot-ai-icon" aria-hidden="true">AI</span></button>

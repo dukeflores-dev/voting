@@ -23,6 +23,18 @@ create table if not exists public.candidates (
   created_at timestamptz not null default now()
 );
 
+alter table public.elections add column if not exists start_date date;
+alter table public.elections add column if not exists end_date date;
+alter table public.elections add column if not exists deadline time;
+alter table public.elections add column if not exists eligible_voters integer default 0;
+alter table public.candidates add column if not exists initials text;
+alter table public.candidates add column if not exists group_name text default 'Independent';
+alter table public.candidates add column if not exists description text;
+alter table public.candidates add column if not exists background text;
+alter table public.candidates add column if not exists credentials text;
+alter table public.candidates add column if not exists achievements text;
+alter table public.candidates add column if not exists relevant_information text;
+
 insert into public.elections (id, title, status, start_date, end_date, deadline, eligible_voters)
 select 1, 'Student Council Election 2026', 'active', current_date, current_date + 7, '23:59', 100
 where not exists (select 1 from public.elections where id = 1);
@@ -44,14 +56,6 @@ create table if not exists public.vote_ballots (
   created_at timestamptz not null default now(),
   unique (election_id, voter_id)
 );
-
-alter table public.elections add column if not exists start_date date;
-alter table public.elections add column if not exists end_date date;
-alter table public.elections add column if not exists deadline time;
-alter table public.elections add column if not exists eligible_voters integer default 0;
-alter table public.candidates add column if not exists initials text;
-alter table public.candidates add column if not exists group_name text default 'Independent';
-alter table public.candidates add column if not exists description text;
 
 update public.candidates set group_name = 'Independent' where group_name is null or trim(group_name) = '';
 

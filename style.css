@@ -208,6 +208,13 @@ select {
   display: none;
 }
 
+.password-field input::-webkit-textfield-decoration-container,
+.password-field input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .field-help {
   display: block;
   margin: 2px 0 0;

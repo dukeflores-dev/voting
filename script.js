@@ -89,9 +89,16 @@ function showRecoveryPasswordForm() {
 
 function togglePassword(inputId, button) {
   const input = document.getElementById(inputId);
+  if (!input || !button) return;
+
   const isVisible = input.type === "text";
   input.type = isVisible ? "password" : "text";
   button.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
+  button.setAttribute("aria-pressed", String(!isVisible));
+  const visibleIcon = button.querySelector(".eye-icon-visible");
+  const hiddenIcon = button.querySelector(".eye-icon-hidden");
+  if (visibleIcon) visibleIcon.hidden = isVisible;
+  if (hiddenIcon) hiddenIcon.hidden = !isVisible;
 }
 
 function isValidEmail(email) {

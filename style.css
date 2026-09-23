@@ -213,24 +213,46 @@ select {
 
 .password-toggle {
   position: absolute;
-  top: 3px;
+  top: 50%;
   right: 0;
   width: 40px;
   height: 27px;
   margin: 0;
   padding: 0;
+  transform: translateY(-50%);
   color: #3f687b;
   background: transparent;
-  font-size: 18px;
   line-height: 20px;
   box-shadow: none;
+}
+
+.password-toggle .eye-icon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+}
+
+.password-toggle .eye-icon[hidden] {
+  display: none;
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .password-toggle:hover {
   color: #1e5068;
   background: transparent;
   box-shadow: none;
-  transform: none;
+  transform: translateY(-50%);
 }
 
 .signup-form > button[type="submit"] {

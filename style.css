@@ -203,6 +203,11 @@ select {
   padding-right: 42px;
 }
 
+.password-field input::-ms-reveal,
+.password-field input::-ms-clear {
+  display: none;
+}
+
 .field-help {
   display: block;
   margin: 2px 0 0;

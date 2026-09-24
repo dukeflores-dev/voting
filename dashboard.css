@@ -69,7 +69,7 @@ body > * {
   transition: color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
-.main-nav a.active,
+.main-nav a.nav-selected,
 .main-nav a:hover {
   color: var(--blue);
   border-color: var(--blue);
@@ -1380,7 +1380,12 @@ body > * {
   .brand { display: none; }
   .main-nav { display: flex; flex: 1 1 auto; min-width: 0; gap: 18px; overflow-x: auto; }
   .main-nav a { display: flex; flex: 0 0 auto; height: 30px; color: #111; font-size: 13px; font-weight: 400; border: 0; }
-  .main-nav a.active { padding: 0 14px; border-radius: 18px; background: #090997; color: white; }
+  .main-nav a.nav-selected {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--blue);
+  }
   .account-area { margin-left: auto; gap: 14px; }
   .account-name { color: #111; font-size: 16px; font-weight: 400; line-height: 1.05; }
   .account-name small { display: block; font-size: 11px; }
@@ -2077,8 +2082,8 @@ body > * {
     transform-origin: bottom right;
   }
 }
-.student-profile-card { position: relative; width: min(430px, 100%); padding: 32px; border-radius: 8px; background: white; text-align: center; box-shadow: 0 18px 50px rgba(7, 39, 79, .25); }
-.student-profile-avatar { display: grid; place-items: center; width: 88px; height: 88px; margin: 0 auto 15px; border-radius: 50%; background: #dff1ff; color: #06439a; font-size: 36px; }
+.student-profile-card { position: relative; width: min(430px, 100%); padding: 24px 28px 20px; border-radius: 8px; background: white; text-align: center; box-shadow: 0 18px 50px rgba(7, 39, 79, .25); }
+.student-profile-avatar { display: grid; place-items: center; width: 78px; height: 78px; margin: 0 auto 12px; border-radius: 50%; background: #dff1ff; color: #06439a; font-size: 34px; }
 .student-profile-card h2 { margin: 8px 0; color: #06439a; font-size: 25px; }
 .student-profile-role { color: #6381a3; font-size: 16px; }
 .student-profile-details { margin-top: 22px; border-top: 1px solid #e4ebf2; text-align: left; }
@@ -2118,7 +2123,57 @@ body > * {
     transition-duration: .01ms !important;
   }
 }
-.edit-name-button { padding: 8px 13px; border: 0; border-radius: 4px; background: #e9f5ff; color: #06439a; cursor: pointer; font-size: 12px; font-weight: 800; }
-.student-name-form { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
-.student-name-form input { width: 190px; margin: 0; padding: 9px; border: 1px solid #cbd9e6; background: #f7fbfe; font-size: 14px; }
-.save-name-button { width: auto; padding: 9px 11px; border: 0; border-radius: 4px; background: #06439a; color: white; cursor: pointer; font-size: 11px; font-weight: 800; }
+.edit-name-button {
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 4px;
+  background: #e9f5ff;
+  color: #06439a;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+.student-name-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 14px 0 18px;
+}
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  text-align: left;
+  color: #2a3e57;
+  font-size: 13px;
+  font-weight: 700;
+}
+.profile-field span {
+  margin-left: 2px;
+}
+.student-name-form select {
+  width: 100%;
+  min-width: 135px;
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #cbd9e6;
+  border-radius: 4px;
+  background: #f7fbfe;
+  color: #1c2b3b;
+  font-size: 14px;
+}
+.save-name-button {
+  min-width: 116px;
+  width: auto;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #06439a;
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}

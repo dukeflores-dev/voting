@@ -58,7 +58,9 @@ async function initializeDashboard() {
   account = {
     fullName: currentUser.name,
     studentId: authUser.user_metadata?.student_id || "Not available",
-    email: authUser.email
+    email: authUser.email,
+    yearLevel: authUser.user_metadata?.year_level || "Not available",
+    gender: authUser.user_metadata?.gender || "Not available"
   };
 
   if (currentUser.role === "admin") {
@@ -146,7 +148,7 @@ function showDashboardView(view) {
   if (view !== "home") document.body.classList.add(`dashboard-view-${view}`);
 
   document.querySelectorAll(".main-nav a[data-view]").forEach(link => {
-    link.classList.toggle("active", link.dataset.view === view);
+    link.classList.toggle("nav-selected", link.dataset.view === view);
   });
   document.getElementById("home-content").hidden = false;
   document.getElementById("candidates-page").hidden = true;
@@ -454,6 +456,8 @@ function openStudentProfile() {
   document.getElementById("student-profile-name").textContent = account?.fullName || currentUser?.name || "Student Voter";
   document.getElementById("student-profile-id").textContent = account?.studentId || currentUser?.username || "Not available";
   document.getElementById("student-profile-email").textContent = account?.email || "Not available";
+  document.getElementById("student-profile-year-level").textContent = account?.yearLevel || "Not available";
+  document.getElementById("student-profile-gender").textContent = account?.gender || "Not available";
   document.getElementById("student-profile-status").textContent = hasVoted ? "Voted" : "Not yet voted";
   document.getElementById("student-profile-modal").hidden = false;
 }
@@ -462,27 +466,36 @@ function closeStudentProfile() {
   document.getElementById("student-profile-modal").hidden = true;
 }
 
-function editStudentName() {
-  const nameInput = document.getElementById("student-name-input");
-  nameInput.value = account?.fullName || currentUser?.name || "";
+function editStudentProfile() {
+  const yearLevelInput = document.getElementById("student-year-level");
+  const genderInput = document.getElementById("student-gender");
+  yearLevelInput.value = account?.yearLevel && account.yearLevel !== "Not available" ? account.yearLevel : "";
+  genderInput.value = account?.gender && account.gender !== "Not available" ? account.gender : "";
   document.getElementById("student-name-form").hidden = false;
-  nameInput.focus();
+  yearLevelInput.focus();
 }
 
-async function saveStudentName(event) {
+async function saveStudentProfile(event) {
   event.preventDefault();
-  const newName = document.getElementById("student-name-input").value.trim();
-  if (!newName) return;
+  const yearLevel = document.getElementById("student-year-level").value.trim();
+  const gender = document.getElementById("student-gender").value.trim();
+  if (!yearLevel || !gender) return;
 
-  const { error } = await supabaseClient.auth.updateUser({ data: { full_name: newName } });
-  if (error) { showToast("Your name could not be updated."); return; }
-  account.fullName = newName;
-  currentUser.name = newName;
+  const { error } = await supabaseClient.auth.updateUser({
+    data: {
+      year_level: yearLevel,
+      gender: gender
+    }
+  });
+  if (error) { showToast("Your profile could not be updated."); return; }
 
-  document.getElementById("student-profile-name").textContent = newName;
-  accountName.innerHTML = `Welcome<br><small>${escapeHtml(newName)}</small>`;
+  account.yearLevel = yearLevel;
+  account.gender = gender;
+
+  document.getElementById("student-profile-year-level").textContent = yearLevel;
+  document.getElementById("student-profile-gender").textContent = gender;
   document.getElementById("student-name-form").hidden = true;
-  showToast("Your name was updated successfully.");
+  showToast("Your profile was updated successfully.");
 }
 
 function selectCandidate(name) {

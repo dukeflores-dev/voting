@@ -15,7 +15,7 @@
     </a>
 
     <nav class="main-nav" aria-label="Main navigation">
-      <a class="active" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
+      <a class="nav-selected" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
       <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
       <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Guidelines</a>
       <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
@@ -199,15 +199,37 @@
       <div class="student-profile-avatar" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
       <p class="eyebrow">MY PROFILE</p>
       <h2 id="student-profile-name">Student Voter</h2>
-      <button class="edit-name-button" type="button" onclick="editStudentName()">EDIT NAME</button>
-      <form id="student-name-form" class="student-name-form" onsubmit="saveStudentName(event)" hidden>
-        <input type="text" id="student-name-input" placeholder="Enter your name" required>
-        <button class="save-name-button" type="submit">SAVE NAME</button>
+      <button class="edit-name-button" type="button" onclick="editStudentProfile()">EDIT PROFILE</button>
+      <form id="student-name-form" class="student-name-form" onsubmit="saveStudentProfile(event)" hidden>
+        <label class="profile-field">
+          <span>Year level</span>
+          <select id="student-year-level" required>
+            <option value="" disabled selected>Select year level</option>
+            <option>Grade 7</option>
+            <option>Grade 8</option>
+            <option>Grade 9</option>
+            <option>Grade 10</option>
+            <option>Grade 11</option>
+            <option>Grade 12</option>
+          </select>
+        </label>
+        <label class="profile-field">
+          <span>Gender</span>
+          <select id="student-gender" required>
+            <option value="" disabled selected>Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Prefer not to say</option>
+          </select>
+        </label>
+        <button class="save-name-button" type="submit">SAVE CHANGES</button>
       </form>
       <p class="student-profile-role">Registered Student Voter</p>
       <div class="student-profile-details">
         <p><strong>Student ID</strong><span id="student-profile-id">Not available</span></p>
         <p><strong>Email</strong><span id="student-profile-email">Not available</span></p>
+        <p><strong>Year level</strong><span id="student-profile-year-level">Not available</span></p>
+        <p><strong>Gender</strong><span id="student-profile-gender">Not available</span></p>
         <p><strong>Voting status</strong><span id="student-profile-status">Not yet voted</span></p>
       </div>
     </article>

@@ -351,7 +351,8 @@ function getElectionStart() {
 }
 
 function getElectionEnd() {
-  return new Date(`${election.endDate}T${election.deadline}:00`);
+  const deadline = String(election.deadline || "23:59").slice(0, 5);
+  return new Date(`${election.endDate}T${deadline}:00`);
 }
 
 function electionHasEnded() {

@@ -203,6 +203,11 @@ select {
   position: relative;
   z-index: 1;
   padding-right: 42px;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
 }
 
 .password-field input::-ms-reveal,
@@ -239,6 +244,7 @@ select {
   line-height: 20px;
   box-shadow: none;
   z-index: 2;
+  touch-action: manipulation;
 }
 
 .password-toggle .eye-icon {

@@ -93,6 +93,7 @@ function togglePassword(inputId, button) {
 
   const isVisible = input.type === "text";
   input.type = isVisible ? "password" : "text";
+  input.focus({ preventScroll: true });
   button.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
   button.setAttribute("aria-pressed", String(!isVisible));
   const visibleIcon = button.querySelector(".eye-icon-visible");

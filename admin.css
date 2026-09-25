@@ -351,3 +351,218 @@ body > * { animation: pageFadeIn .6s ease-out both; }
 .admin-stats span {
 	font-size: 13px;
 }
+
+@media (max-width: 750px) {
+  .admin-topbar {
+    min-height: 0;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 12px;
+  }
+
+  .admin-brand img {
+    width: 132px;
+    height: 38px;
+  }
+
+  .admin-heading {
+    min-width: 0;
+    padding: 8px 0 0;
+  }
+
+  .admin-heading span,
+  .eyebrow {
+    font-size: 10px;
+  }
+
+  .admin-heading strong {
+    font-size: 14px;
+  }
+
+  .admin-account {
+    margin-left: auto;
+    gap: 4px;
+    font-size: 10px;
+  }
+
+  .admin-account .profile-trigger {
+    max-width: 142px;
+    overflow: hidden;
+    padding: 7px 9px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-account button:not(.profile-trigger) {
+    padding: 8px 6px;
+    font-size: 9px;
+  }
+
+  .admin-main {
+    width: min(100% - 20px, 600px);
+    margin: 12px auto;
+    padding-bottom: 16px;
+  }
+
+  .admin-welcome {
+    display: block;
+    padding: 22px 20px 24px;
+    border-radius: 12px;
+  }
+
+  .admin-welcome h1 {
+    max-width: 290px;
+    margin: 7px 0 10px;
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.08;
+  }
+
+  .admin-welcome p:not(.eyebrow) {
+    max-width: 340px;
+    font-size: 12px;
+  }
+
+  .admin-hero-art {
+    display: none;
+  }
+
+  .admin-stats {
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .admin-stats article {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .stat-icon {
+    font-size: 23px;
+  }
+
+  .admin-stats strong {
+    font-size: 21px;
+  }
+
+  .admin-stats span {
+    font-size: 11px;
+  }
+
+  .admin-panel {
+    padding: 17px 14px;
+    border-radius: 8px;
+  }
+
+  .panel-header {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .panel-header h2 {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .panel-header p:not(.eyebrow) {
+    font-size: 11px;
+  }
+
+  .candidate-controls,
+  .settings-actions {
+    width: 100%;
+  }
+
+  .candidate-controls button,
+  .settings-actions button {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 7px;
+    font-size: 10px;
+  }
+
+  .admin-candidate-list,
+  .results-list {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-candidate {
+    padding: 15px;
+  }
+
+  .admin-candidate p {
+    min-height: 0;
+  }
+
+  .turnout-row {
+    grid-template-columns: auto 1fr;
+    gap: 6px 9px;
+    margin-bottom: 18px;
+  }
+
+  .turnout-row strong {
+    font-size: 24px;
+  }
+
+  .turnout-track {
+    grid-column: 1 / -1;
+  }
+
+  .result-group {
+    padding: 13px;
+  }
+
+  #candidate-modal .candidate-form,
+  .candidate-form {
+    max-height: calc(100vh - 24px);
+    padding: 22px 17px;
+  }
+
+  .modal {
+    padding: 12px;
+  }
+
+  .modal-actions {
+    position: sticky;
+    bottom: -22px;
+    padding: 12px 0 4px;
+    background: white;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-brand img {
+    width: 108px;
+  }
+
+  .admin-account .profile-trigger {
+    max-width: 106px;
+  }
+
+  .admin-account button:not(.profile-trigger) {
+    font-size: 8px;
+  }
+
+  .admin-main {
+    width: calc(100% - 16px);
+  }
+
+  .admin-welcome {
+    padding: 19px 16px 21px;
+  }
+
+  .admin-welcome h1 {
+    font-size: 29px;
+  }
+
+  .admin-panel {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .candidate-controls button,
+  .settings-actions button {
+    font-size: 9px;
+  }
+}

@@ -1892,6 +1892,7 @@ main.dashboard[hidden] { display: none !important; }
 @media (max-width: 700px) {
   .candidates-page { padding: 18px 12px; }
   .candidates-page-header { align-items: flex-start; flex-direction: column; }
+  .candidates-page .candidate-group-list { grid-template-columns: 1fr; gap: 12px; }
   .full-candidate-card { align-items: flex-start; flex-direction: column; }
   .full-candidate-avatar { flex-basis: 88px; width: 88px; height: 88px; }
 }

@@ -76,6 +76,15 @@ body > * {
   transform: translateY(-2px);
 }
 
+.nav-label {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: #425167;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .dashboard-view-status .welcome-banner,
 .dashboard-view-status .election-card,
 .dashboard-view-status .lower-grid,
@@ -439,6 +448,18 @@ body > * {
   font-size: 12px;
 }
 
+.receipt-check {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: #1b9a5b;
+  color: white;
+  font-size: 12px;
+}
+
 .vote-confirmation p {
   margin-top: 4px;
   font-size: 11px;
@@ -636,6 +657,15 @@ body > * {
   font-size: 11px;
 }
 
+.reminder-summary {
+  display: grid;
+  gap: 12px;
+  padding: 0 0 0 18px;
+  color: #53657a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .steps span {
   margin-top: 3px;
   color: #667281;
@@ -764,6 +794,22 @@ body > * {
 
 .candidate-list {
   display: block;
+}
+
+/* Keep the home preview flat; position grouping is reserved for View all. */
+.summary-grid .candidate-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.summary-grid .candidate-group,
+.summary-grid .candidate-group-list {
+  display: contents;
+}
+
+.summary-grid .candidate-group-title {
+  display: none;
 }
 
 .candidate-list-empty {
@@ -1370,6 +1416,7 @@ body > * {
   .election-content { grid-template-columns: 70px 1fr; }
   .metric { padding: 10px 0 0; border-left: 0; border-top: 1px solid #d6e0ea; }
   .candidate-list { grid-template-columns: 1fr; }
+  .summary-grid .candidate-list { grid-template-columns: 1fr; }
 }
 
 /* Screenshot-inspired compact student view */
@@ -1804,16 +1851,31 @@ body > * {
 .dashboard.results-only > .election-card:not(.student-results-card),
 .dashboard.results-only > .lower-grid { display: none; }
 .dashboard.results-only > .student-results-card { display: block; margin-top: 0; }
+.dashboard.receipt-only > .welcome-banner,
+.dashboard.receipt-only > .election-card:not(.student-results-card),
+.dashboard.receipt-only > .lower-grid,
+.dashboard.receipt-only .candidates-card { display: none; }
+.dashboard.receipt-only { display: block; max-width: 760px; }
+.dashboard.receipt-only > .summary-grid { display: block; }
+.dashboard.receipt-only .status-card { width: 100%; min-height: 0; }
+.dashboard.receipt-only:not(.results-unlocked) > .student-results-card { display: none; }
+.dashboard.receipt-only.results-unlocked > .student-results-card { display: block; margin-top: 18px; }
+.results-total { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 12px; color: #526274; }
+.results-total strong { color: var(--blue); font-size: 30px; }
+.results-total span { font-size: 12px; font-weight: 700; }
+.results-summary { margin-bottom: 18px; color: #526274; font-size: 13px; line-height: 1.45; }
 .welcome-banner .welcome-copy,
 .welcome-banner .vote-illustration { display: block; }
 .welcome-banner { min-height: 270px; }
 .candidates-page[hidden] { display: none; }
+main.dashboard[hidden] { display: none !important; }
 .candidates-page { max-width: 1180px; margin: 0 auto; padding: 28px 0; }
 .candidates-page-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; padding: 26px 30px; border: 1px solid #dbeaf3; border-radius: 9px; background: #f1f9ff; }
 .candidates-page-header h2 { margin: 7px 0; color: #06439a; font-size: 32px; }
 .candidates-page-header p:not(.eyebrow) { color: #526274; font-size: 16px; }
 .back-home-button { padding: 12px 16px; border: 0; border-radius: 4px; background: #06439a; color: white; cursor: pointer; font-size: 13px; font-weight: 800; }
-.all-candidates-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.all-candidates-list { display: block; }
+.all-candidates-list .candidate-group + .candidate-group { margin-top: 28px; }
 .full-candidate-card { display: flex; align-items: center; gap: 20px; padding: 22px; border: 1px solid #dfe8f0; border-radius: 8px; background: white; box-shadow: 0 4px 15px rgba(30, 69, 108, .06); }
 .full-candidate-avatar { display: grid; place-items: center; flex: 0 0 110px; width: 110px; height: 110px; border-radius: 50%; color: white; font-size: 28px; font-weight: 800; }
 .full-candidate-avatar.avatar-one { background: #d59f91; }
@@ -1822,6 +1884,7 @@ body > * {
 .full-candidate-info h3 { color: #06439a; font-size: 22px; }
 .full-candidate-position { display: inline-block; margin: 6px 0 10px; color: #4a8fd0; font-size: 13px; font-weight: 800; }
 .full-candidate-info p { color: #5d6978; font-size: 15px; line-height: 1.45; }
+.full-candidate-info { min-width: 0; flex: 1 1 auto; }
 .full-candidate-actions { display: flex; gap: 8px; margin-top: 14px; }
 .full-candidate-actions button { padding: 9px 12px; border: 0; border-radius: 4px; background: #eaf6ff; color: #06439a; cursor: pointer; font-size: 12px; font-weight: 800; }
 .full-candidate-actions button:last-child { background: #06439a; color: white; }
@@ -1829,8 +1892,8 @@ body > * {
 @media (max-width: 700px) {
   .candidates-page { padding: 18px 12px; }
   .candidates-page-header { align-items: flex-start; flex-direction: column; }
-  .all-candidates-list { grid-template-columns: 1fr; }
   .full-candidate-card { align-items: flex-start; flex-direction: column; }
+  .full-candidate-avatar { flex-basis: 88px; width: 88px; height: 88px; }
 }
 
 /* Updated welcome hero matching the supplied reference */

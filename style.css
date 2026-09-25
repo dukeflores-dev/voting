@@ -200,6 +200,8 @@ select {
 }
 
 .password-field input {
+  position: relative;
+  z-index: 1;
   padding-right: 42px;
 }
 
@@ -236,6 +238,7 @@ select {
   background: transparent;
   line-height: 20px;
   box-shadow: none;
+  z-index: 2;
 }
 
 .password-toggle .eye-icon {

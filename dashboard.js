@@ -233,7 +233,6 @@ function renderCandidatesByPosition(candidateList, cardClass = "candidate") {
               <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
               <div class="full-candidate-actions">
                 <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-                <button type="button" onclick="startVoting()">VOTE</button>
               </div>
             </div>
           </article>
@@ -245,7 +244,6 @@ function renderCandidatesByPosition(candidateList, cardClass = "candidate") {
             <p>${escapeHtml(candidate.description || candidate.platform || "No description available yet.")}</p>
             <div class="candidate-actions">
               <button type="button" onclick="selectCandidate('${escapeJs(candidate.name)}')">VIEW PROFILE</button>
-              <button type="button" onclick="startVoting()">VOTE</button>
             </div>
           </article>
         `).join("")}
@@ -312,11 +310,6 @@ function updateCountdown() {
   const countdown = document.getElementById("election-countdown");
   if (!countdown) return;
 
-  if (String(election.status || "").trim().toLowerCase() === "active") {
-    countdown.textContent = hasVoted ? "Vote submitted successfully" : "Election is active";
-    return;
-  }
-
   const start = getElectionStart();
   const end = getElectionEnd();
   const now = new Date();
@@ -324,6 +317,18 @@ function updateCountdown() {
     countdown.textContent = "Schedule unavailable";
     return;
   }
+
+  if (now >= end) {
+    countdown.textContent = "Election ended";
+    return;
+  }
+
+  const electionStatus = String(election.status || "").trim().toLowerCase();
+  if (electionStatus === "active" && !hasVoted) {
+    countdown.textContent = "Election is active";
+    return;
+  }
+
   const target = now < start ? start : end;
   const difference = Math.max(0, target.getTime() - now.getTime());
 
@@ -337,7 +342,8 @@ function updateCountdown() {
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  countdown.textContent = `${days} Days : ${String(hours).padStart(2, "0")} Hours : ${String(minutes).padStart(2, "0")} Minutes : ${String(seconds).padStart(2, "0")} Seconds`;
+  const clock = `${String(days * 24 + hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  countdown.textContent = hasVoted ? `Results available in: ${clock}` : `${days} Days : ${String(hours).padStart(2, "0")} Hours : ${String(minutes).padStart(2, "0")} Minutes : ${String(seconds).padStart(2, "0")} Seconds`;
 }
 
 function getElectionStart() {
@@ -350,7 +356,6 @@ function getElectionEnd() {
 
 function electionHasEnded() {
   const status = String(election.status || "").trim().toLowerCase();
-  if (status === "active") return false;
   if (status === "closed") return true;
   return new Date().getTime() >= getElectionEnd().getTime();
 }
@@ -385,29 +390,31 @@ function updateElectionState() {
 
   const castButton = document.getElementById("cast-vote-button");
   if (hasVoted) {
-  let hasLoadedElectionStatus = false;
-    document.querySelector(".dashboard").classList.remove("results-only");
+    document.querySelector(".dashboard").classList.add("receipt-only");
     title.textContent = "VOTE RECORDED";
     text.textContent = "Your vote has been successfully recorded.";
     castButton.disabled = true;
     castButton.textContent = "VOTE SUBMITTED";
-  window.setInterval(refreshElectionStatus, 5000);
+    if (ended) {
+      document.querySelector(".dashboard").classList.add("results-unlocked");
+      renderStudentResults();
+    } else {
+      document.querySelector(".dashboard").classList.remove("results-unlocked");
+    }
   } else if (ended) {
+    document.querySelector(".dashboard").classList.remove("receipt-only", "results-unlocked");
     title.textContent = "ELECTION CLOSED";
     text.textContent = "Voting has ended. Final results are now available.";
     castButton.disabled = true;
     castButton.textContent = "VOTING CLOSED";
-    if (hasVoted) {
-      renderStudentResults();
-      document.querySelector(".dashboard").classList.add("results-only");
-    }
   } else if (!started) {
+    document.querySelector(".dashboard").classList.remove("receipt-only", "results-unlocked");
     title.textContent = "NOT STARTED";
     text.textContent = `Voting opens on ${formatDate(election.startDate)}.`;
     castButton.disabled = true;
     castButton.textContent = "VOTING NOT STARTED";
   } else {
-    document.querySelector(".dashboard").classList.remove("results-only");
+    document.querySelector(".dashboard").classList.remove("receipt-only", "results-unlocked");
     castButton.disabled = false;
     castButton.textContent = "CAST YOUR VOTE";
     updateVotingStatus();
@@ -431,14 +438,20 @@ async function renderStudentResults() {
     if (candidate) candidate.votes += Number(record.vote_count);
   });
 
-  resultsList.innerHTML = Object.entries(tally).map(([position, entries]) => {
+  const totalVotes = Object.values(tally).flat().reduce((sum, item) => sum + item.votes, 0);
+  const leadingCandidate = Object.values(tally).flat().sort((first, second) => second.votes - first.votes)[0];
+  const summary = leadingCandidate && totalVotes
+    ? `<p class="results-summary"><strong>${escapeHtml(leadingCandidate.name)}</strong> currently leads with ${leadingCandidate.votes} vote${leadingCandidate.votes === 1 ? "" : "s"} (${Math.round(leadingCandidate.votes / totalVotes * 100)}%).</p>`
+    : "<p class=\"results-summary\">No votes have been recorded yet.</p>";
+
+  resultsList.innerHTML = `<div class="results-total"><strong>${totalVotes}</strong><span>Total votes</span></div>${summary}${Object.entries(tally).map(([position, entries]) => {
     entries.sort((first, second) => second.votes - first.votes || first.name.localeCompare(second.name));
     const total = entries.reduce((sum, item) => sum + item.votes, 0);
     return `<section class="student-result-group"><h3>${escapeHtml(position)}</h3>${entries.map(item => {
       const percent = total ? Math.round(item.votes / total * 100) : 0;
       return `<div class="student-result-row"><strong>${escapeHtml(item.name)}</strong><span>${item.votes} vote${item.votes === 1 ? "" : "s"} | ${percent}%</span><div><i style="width: ${percent}%"></i></div></div>`;
     }).join("")}</section>`;
-  }).join("");
+  }).join("")}`;
   resultsCard.hidden = false;
 }
 
@@ -538,7 +551,7 @@ function closeProfile() {
 }
 
 function renderCandidates() {
-  renderCandidateGroups(candidates);
+  renderCandidateGroups(candidates.slice(0, Math.min(3, candidates.length)));
 }
 
 function renderCandidateGroups(candidateList) {
@@ -628,6 +641,7 @@ function startVoting() {
   }
 
   if (hasVoted) {
+    document.querySelector(".dashboard")?.classList.add("receipt-only");
     showToast("You have already submitted your vote.");
     return;
   }
@@ -675,6 +689,7 @@ function closeBallotReview() {
 
 async function submitVote(event) {
   event.preventDefault();
+  if (hasVoted) return;
   if (electionHasEnded()) {
     closeBallot();
     closeBallotReview();
@@ -695,6 +710,7 @@ async function submitVote(event) {
   closeBallot();
   closeBallotReview();
   updateVotingStatus();
+  updateElectionState();
   showToast("Your vote was submitted successfully.");
 }
 
@@ -726,6 +742,7 @@ function addVoteConfirmationNotification(votedAt = new Date().toISOString()) {
 
 async function confirmVoteSubmission(event) {
   event.preventDefault();
+  if (hasVoted) return;
   const reviewForm = event.target;
   const formData = new FormData(reviewForm);
   const selections = Object.fromEntries(formData.entries());
@@ -743,9 +760,11 @@ async function confirmVoteSubmission(event) {
   }
 
   hasVoted = true;
+  event.submitter?.setAttribute("disabled", "disabled");
   addVoteConfirmationNotification();
   closeBallotReview();
   updateVotingStatus();
+  updateElectionState();
   showToast("Vote submitted successfully. A confirmation receipt has been recorded.");
 }
 
@@ -768,6 +787,7 @@ function updateVotingStatus() {
       document.getElementById("vote-receipt-election").textContent = receipt?.electionName || election.title;
     }
   } else {
+    document.querySelector(".dashboard")?.classList.remove("receipt-only");
     const confirmation = document.getElementById("vote-confirmation");
     if (confirmation) confirmation.hidden = true;
   }

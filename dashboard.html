@@ -17,7 +17,7 @@
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-selected" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
       <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
-      <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Guidelines</a>
+      <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Reminders</a>
       <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
       <a data-view="results" href="#student-results" onclick="showDashboardResults(); return false;">Results</a>
     </nav>
@@ -64,21 +64,21 @@
       <div class="countdown">Election Countdown<strong id="election-countdown">Loading current time...</strong></div>
       <div class="status-alert" id="voting-status" role="status" aria-live="polite"><span class="status-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong id="status-title">NOT YET VOTED</strong><p id="status-text">You have not submitted your vote.</p></div></div>
       <div class="vote-confirmation" id="vote-confirmation" hidden>
-        <strong>Vote recorded successfully</strong>
+        <strong><span class="receipt-check" aria-hidden="true">&#10003;</span> Vote Successfully Submitted</strong>
         <p>Your vote has been successfully recorded and cannot be changed.</p>
         <dl class="vote-receipt">
           <div><dt>Status</dt><dd id="vote-receipt-status">Voted</dd></div>
           <div><dt>Date and time</dt><dd id="vote-receipt-date">-</dd></div>
           <div><dt>Election</dt><dd id="vote-receipt-election">-</dd></div>
         </dl>
-        <small class="vote-secrecy-note">Your candidate selections are not shown in this receipt.</small>
+        <small class="vote-secrecy-note">Your vote is recorded and locked. Candidate selections are not shown in this receipt.</small>
       </div>
       <p class="detail"><span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span> Election: <span id="student-election-title">Student Council Election 2026</span></p>
       <button class="primary-button full-button" id="cast-vote-button" type="button" onclick="startVoting()">CAST YOUR VOTE <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
     </aside>
 
     <section class="candidates-card" id="candidates">
-      <div class="section-heading candidates-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2></div>
+      <div class="section-heading candidates-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>MEET THE CANDIDATES</h2><button class="view-all-button" type="button" onclick="showCandidates()">VIEW ALL <span class="icon" aria-hidden="true">&#8594;</span></button></div>
       <div class="candidate-list" id="candidate-list"></div>
     </section>
 
@@ -102,13 +102,13 @@
 
     <section class="lower-grid">
       <div class="steps-card" id="guidelines">
-        <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7 12 3 3 7-7"/></svg></span><h2>BEFORE YOU VOTE</h2></div>
-        <ol class="steps">
-          <li><strong>Review Candidates</strong><span>Get to know the candidates and their platforms.</span></li>
-          <li><strong>Choose Wisely</strong><span>Select your preferred candidate for each position.</span></li>
-          <li><strong>Review Your Ballot</strong><span>Check your selections before submitting.</span></li>
-          <li><strong>Submit Your Vote</strong><span>Once submitted, your vote is recorded securely.</span></li>
-        </ol>
+        <div class="section-heading"><span class="section-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7 12 3 3 7-7"/></svg></span><h2>REMINDERS</h2></div>
+        <ul class="reminder-summary">
+          <li>Review candidate profiles before voting.</li>
+          <li>Select one candidate for each position.</li>
+          <li>Check your ballot carefully before submitting.</li>
+          <li>Submitted votes are final, recorded, and locked.</li>
+        </ul>
       </div>
 
       <div class="candidates-card supplemental-candidates" id="notifications">
@@ -155,7 +155,6 @@
         <section><h3>Achievements</h3><p id="profile-achievements"></p></section>
         <section><h3>Relevant Information</h3><p id="profile-relevant-information"></p></section>
       </div>
-      <button class="primary-button profile-vote-button" type="button" onclick="closeProfile(); startVoting()">VOTE FOR THIS CANDIDATE</button>
     </article>
   </div>
   <div class="modal" id="candidate-image-modal" hidden>

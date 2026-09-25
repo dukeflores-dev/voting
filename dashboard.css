@@ -2374,6 +2374,75 @@ main.dashboard[hidden] { display: none !important; }
     height: 50px;
   }
 }
+
+@media (max-width: 700px) {
+  .candidates-page {
+    width: 100%;
+    max-width: none;
+    padding: 12px 10px 24px;
+  }
+
+  .candidates-page-header {
+    margin-bottom: 16px;
+    padding: 20px 16px;
+  }
+
+  .candidates-page-header h2 {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .candidates-page-header p:not(.eyebrow) {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .candidates-page .candidate-group .candidate-group-list {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .candidates-page .full-candidate-card {
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    flex-direction: row;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .candidates-page .full-candidate-avatar {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    font-size: 18px;
+  }
+
+  .candidates-page .full-candidate-info h3 {
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  .candidates-page .full-candidate-info p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .candidates-page .full-candidate-actions button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .candidates-page .full-candidate-actions {
+    margin-top: 8px;
+  }
+
+  .candidates-page + .voting-chatbot .chatbot-toggle {
+    width: 46px;
+    height: 46px;
+  }
+}
 .edit-name-button {
   padding: 8px 13px;
   border: 0;

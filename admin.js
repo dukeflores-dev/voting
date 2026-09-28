@@ -10,7 +10,7 @@ let candidates = [];
 let candidateUndoStack = [];
 let candidateRedoStack = [];
 const defaultElection = {
-  title: "Student Council Election 2026",
+  title: "STUDENT COUNCIL ELECTION 2026",
   startDate: "2026-05-20",
   endDate: "2026-05-23",
   deadline: "23:59",
@@ -20,6 +20,8 @@ let election = null;
 let electionId = 1;
 let totalVotes = 0;
 let hasLoadedVoteTotal = false;
+let adminResultsCharts = [];
+let adminResultsChartSignature = "";
 initializeAdmin();
 window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
@@ -68,7 +70,13 @@ async function initializeAdmin() {
 async function loadElection() {
   const { data, error } = await supabaseClient.from("elections").select("*").eq("id", electionId).single();
   if (error) { showAdminToast("Election data could not be loaded."); return; }
-  election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
+  let electionData = data;
+  if (/demo/i.test(data.title || "")) {
+    const result = await supabaseClient.from("elections").update({ title: "STUDENT COUNCIL ELECTION 2026" }).eq("id", electionId).select().single();
+    if (result.error) showAdminToast("Election title could not be updated.");
+    else electionData = result.data;
+  }
+  election = { ...electionData, startDate: electionData.start_date, endDate: electionData.end_date, eligibleVoters: electionData.eligible_voters };
 }
 
 async function loadCandidates() {
@@ -286,23 +294,12 @@ function closeElectionSettings() {
 }
 
 async function setActiveElectionPeriod() {
-  const now = new Date();
-  const end = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const updates = {
-    start_date: toDateInputValue(now),
-    end_date: toDateInputValue(end),
-    deadline: `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`,
-    status: "active"
-  };
+  const updates = { status: "active" };
   const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
   if (error) { showAdminToast("Election period could not be updated."); return; }
   election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
   renderElectionSettings();
-  showAdminToast("Election is active now and will close after 24 hours.");
-}
-
-function toDateInputValue(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  showAdminToast(`Election is active now and will close on ${formatDate(election.endDate)} at ${formatTime(election.deadline)}.`);
 }
 
 function updateSystemTime() {
@@ -361,7 +358,7 @@ function showAdminToast(message) {
 
 function isImportantAdminNotification(message) {
   const text = String(message).toLowerCase();
-  return text.includes("vote was submitted") || text.includes("election is active now");
+  return text.includes("vote was submitted") || text.includes("election is active now") || text.includes("election title could not be updated");
 }
 
 async function updateResults() {
@@ -391,7 +388,8 @@ async function updateResults() {
   });
 
   (result?.rows || []).forEach(record => {
-    const candidate = tally[record.candidate_position]?.find(item => item.name === record.candidate_name);
+    const position = Object.keys(tally).find(item => item.trim().toLowerCase() === String(record.candidate_position || "").trim().toLowerCase());
+    const candidate = tally[position]?.find(item => item.name.trim().toLowerCase() === String(record.candidate_name || "").trim().toLowerCase());
     if (candidate) candidate.votes += Number(record.vote_count);
   });
 
@@ -400,13 +398,102 @@ async function updateResults() {
   document.getElementById("turnout-bar").style.width = `${turnout}%`;
   document.getElementById("tally-updated").textContent = `Last updated ${new Date().toLocaleTimeString()} | ${eligibleVoters} eligible voters`;
 
-  document.getElementById("results-list").innerHTML = Object.entries(tally).map(([position, entries]) => {
+  const chartGroups = Object.entries(tally).map(([position, entries]) => {
+    entries.sort((first, second) => second.votes - first.votes || first.name.localeCompare(second.name));
     const positionTotal = entries.reduce((sum, item) => sum + item.votes, 0);
-    return `<section class="result-group"><h3>${escapeHtml(position)}</h3>${entries.map(item => {
-      const percent = positionTotal ? Math.round((item.votes / positionTotal) * 100) : 0;
-      return `<div class="result-row"><div class="result-label"><strong>${escapeHtml(item.name)}</strong><span>${item.votes} vote${item.votes === 1 ? "" : "s"} | ${percent}%</span></div><div class="result-track"><i style="width: ${percent}%"></i></div></div>`;
-    }).join("")}</section>`;
-  }).join("");
+    return {
+      position,
+      entries: entries.map(item => ({
+        name: item.name,
+        position,
+        votes: item.votes,
+        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0
+      }))
+    };
+  });
+  const chartContainer = document.getElementById("results-list");
+  const signature = JSON.stringify(chartGroups.map(group => [group.position, group.entries.map(item => item.name)]));
+  if (signature !== adminResultsChartSignature) {
+    adminResultsCharts.forEach(chart => chart.destroy());
+    adminResultsCharts = [];
+    chartContainer.innerHTML = `<div class="admin-result-groups">${chartGroups.map((group, index) => `<section class="admin-result-group"><h3>${escapeHtml(group.position)}</h3><div class="admin-result-chart"><canvas id="admin-results-chart-${index}" role="img" aria-label="${escapeHtml(group.position)} live election results bar graph"></canvas></div></section>`).join("")}</div>`;
+    adminResultsChartSignature = signature;
+  }
+  if (typeof Chart === "undefined" || typeof ChartDataLabels === "undefined") return;
+
+  chartGroups.forEach((group, index) => {
+    const labels = group.entries.map(item => item.name);
+    const values = group.entries.map(item => item.votes);
+    const colors = getAdminResultsChartColors(group.entries);
+    const options = createAdminResultsChartOptions(group.entries);
+    const existingChart = adminResultsCharts[index];
+    if (!existingChart) {
+      adminResultsCharts[index] = new Chart(document.getElementById(`admin-results-chart-${index}`), {
+        type: "bar",
+        data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 4, maxBarThickness: 42 }] },
+        plugins: [ChartDataLabels],
+        options
+      });
+    } else {
+      existingChart.data.labels = labels;
+      existingChart.data.datasets[0].data = values;
+      existingChart.data.datasets[0].backgroundColor = colors;
+      existingChart.options = options;
+      existingChart.update("none");
+    }
+  });
+}
+
+function getAdminResultsChartColors(entries) {
+  const palette = ["#1976d2", "#15966f", "#d88917", "#c34f62", "#168a9a", "#7156b5"];
+  const positions = [...new Set(entries.map(item => item.position))];
+  return entries.map(item => palette[positions.indexOf(item.position) % palette.length]);
+}
+
+function createAdminResultsChartOptions(entries) {
+  const maxVotes = Math.max(1, ...entries.map(item => item.votes));
+  const darkMode = document.documentElement.dataset.theme === "dark";
+  const textColor = darkMode ? "#dce7f1" : "#40546a";
+  const gridColor = darkMode ? "#3a4d60" : "#e7edf3";
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 22 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label(context) {
+            const item = entries[context.dataIndex];
+            return `${item.votes} vote${item.votes === 1 ? "" : "s"} | ${item.percent}% for ${item.position}`;
+          }
+        }
+      },
+      datalabels: {
+        anchor: "end",
+        align: "top",
+        clamp: true,
+        color: textColor,
+        font: { weight: "700" },
+        formatter(value, context) {
+          return `${value} (${entries[context.dataIndex].percent}%)`;
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: textColor, maxRotation: 35, minRotation: 0 },
+        grid: { display: false }
+      },
+      y: {
+        beginAtZero: true,
+        max: maxVotes + Math.max(1, Math.ceil(maxVotes * 0.2)),
+        ticks: { precision: 0, stepSize: 1, color: textColor },
+        title: { display: true, text: "Number of votes", color: textColor },
+        grid: { color: gridColor }
+      }
+    }
+  };
 }
 
 function escapeHtml(value) {

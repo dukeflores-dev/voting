@@ -3,6 +3,7 @@ let currentUser = null;
 let authUser = null;
 let hasVoted = false;
 let hasLoadedElectionStatus = false;
+let studentResultsCharts = [];
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
@@ -10,7 +11,7 @@ const defaultCandidates = [
   { name: "Ana Reyes", position: "SECRETARY", group_name: "Uniteam", initials: "AR", description: "Organized today, empowered tomorrow.", background: "", credentials: "", achievements: "", relevant_information: "" }
 ];
 const defaultElection = {
-  title: "Student Council Election 2026",
+  title: "STUDENT COUNCIL ELECTION 2026",
   startDate: "2026-05-20",
   endDate: "2026-05-23",
   deadline: "23:59",
@@ -21,6 +22,12 @@ let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") ||
 let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
 window.elourdesCandidates = candidates;
 window.elourdesElection = election;
+window.addEventListener("themechange", () => {
+  studentResultsCharts.forEach(chart => {
+    chart.options = createResultsChartOptions(chart.$resultEntries);
+    chart.update("none");
+  });
+});
 initializeDashboard();
 window.setInterval(() => {
   updateCountdown();
@@ -161,10 +168,6 @@ async function showDashboardResults() {
     showToast("Election results will be available after the election ends.");
     return;
   }
-  if (!hasVoted) {
-    showToast("Results are available after you submit your vote.");
-    return;
-  }
 
   showDashboardView("results");
   await renderStudentResults();
@@ -257,12 +260,9 @@ function showElectionResults() {
     showToast("Election results will be available after the countdown ends.");
     return;
   }
-  if (!hasVoted) {
-    showToast("Results are available after you submit your vote and the election ends.");
-    return;
-  }
   renderStudentResults();
   document.getElementById("student-results").hidden = false;
+  document.querySelector(".dashboard").classList.add("results-only");
   document.getElementById("student-results").scrollIntoView({ behavior: "smooth" });
   showToast("Election Results");
 }
@@ -323,13 +323,8 @@ function updateCountdown() {
     return;
   }
 
-  const electionStatus = String(election.status || "").trim().toLowerCase();
-  if (electionStatus === "active" && !hasVoted) {
-    countdown.textContent = "Election is active";
-    return;
-  }
-
-  const target = now < start ? start : end;
+  const isActive = String(election.status || "").trim().toLowerCase() === "active";
+  const target = isActive || now >= start ? end : start;
   const difference = Math.max(0, target.getTime() - now.getTime());
 
   if (difference <= 0) {
@@ -371,9 +366,21 @@ function electionHasStarted() {
 function updateElectionState() {
   const ended = electionHasEnded();
   const started = electionHasStarted();
+  const dashboard = document.querySelector(".dashboard");
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");
   const badge = document.getElementById("election-status-badge");
+  if (ended) {
+    const resultsWereShown = dashboard.classList.contains("results-only");
+    dashboard.classList.add("results-only");
+    dashboard.classList.remove("receipt-only", "results-unlocked");
+    if (!resultsWereShown) {
+      document.getElementById("student-results").hidden = false;
+      renderStudentResults();
+    }
+  } else {
+    dashboard.classList.remove("results-only");
+  }
   const buttons = document.querySelectorAll("[onclick*='startVoting']");
   buttons.forEach(button => {
     button.disabled = hasVoted || ended || !started;
@@ -391,17 +398,12 @@ function updateElectionState() {
 
   const castButton = document.getElementById("cast-vote-button");
   if (hasVoted) {
-    document.querySelector(".dashboard").classList.add("receipt-only");
+    if (!ended) dashboard.classList.add("receipt-only");
     title.textContent = "VOTE RECORDED";
     text.textContent = "Your vote has been successfully recorded.";
     castButton.disabled = true;
     castButton.textContent = "VOTE SUBMITTED";
-    if (ended) {
-      document.querySelector(".dashboard").classList.add("results-unlocked");
-      renderStudentResults();
-    } else {
-      document.querySelector(".dashboard").classList.remove("results-unlocked");
-    }
+    if (!ended) dashboard.classList.remove("results-unlocked");
   } else if (ended) {
     document.querySelector(".dashboard").classList.remove("receipt-only", "results-unlocked");
     title.textContent = "ELECTION CLOSED";
@@ -435,25 +437,105 @@ async function renderStudentResults() {
   });
 
   (ballots || []).forEach(record => {
-    const candidate = tally[record.candidate_position]?.find(item => item.name === record.candidate_name);
+    const position = Object.keys(tally).find(item => item.trim().toLowerCase() === String(record.candidate_position || "").trim().toLowerCase());
+    const candidate = tally[position]?.find(item => item.name.trim().toLowerCase() === String(record.candidate_name || "").trim().toLowerCase());
     if (candidate) candidate.votes += Number(record.vote_count);
   });
 
-  const totalVotes = Object.values(tally).flat().reduce((sum, item) => sum + item.votes, 0);
-  const leadingCandidate = Object.values(tally).flat().sort((first, second) => second.votes - first.votes)[0];
-  const summary = leadingCandidate && totalVotes
-    ? `<p class="results-summary"><strong>${escapeHtml(leadingCandidate.name)}</strong> currently leads with ${leadingCandidate.votes} vote${leadingCandidate.votes === 1 ? "" : "s"} (${Math.round(leadingCandidate.votes / totalVotes * 100)}%).</p>`
-    : "<p class=\"results-summary\">No votes have been recorded yet.</p>";
-
-  resultsList.innerHTML = `<div class="results-total"><strong>${totalVotes}</strong><span>Total votes</span></div>${summary}${Object.entries(tally).map(([position, entries]) => {
+  const totalVotes = Number(ballots?.[0]?.total_votes || 0);
+  const chartGroups = Object.entries(tally).map(([position, entries]) => {
     entries.sort((first, second) => second.votes - first.votes || first.name.localeCompare(second.name));
-    const total = entries.reduce((sum, item) => sum + item.votes, 0);
-    return `<section class="student-result-group"><h3>${escapeHtml(position)}</h3>${entries.map(item => {
-      const percent = total ? Math.round(item.votes / total * 100) : 0;
-      return `<div class="student-result-row"><strong>${escapeHtml(item.name)}</strong><span>${item.votes} vote${item.votes === 1 ? "" : "s"} | ${percent}%</span><div><i style="width: ${percent}%"></i></div></div>`;
-    }).join("")}</section>`;
-  }).join("")}`;
+    const positionTotal = entries.reduce((sum, item) => sum + item.votes, 0);
+    return {
+      position,
+      entries: entries.map(item => ({
+        name: item.name,
+        position,
+        votes: item.votes,
+        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0
+      }))
+    };
+  });
+
   resultsCard.hidden = false;
+  studentResultsCharts.forEach(chart => chart.destroy());
+  studentResultsCharts = [];
+  resultsList.innerHTML = `<div class="student-results-overview"><div class="results-total"><strong>${totalVotes}</strong><span>Total votes</span></div>${totalVotes ? "" : "<p class=\"results-summary\">No votes have been recorded yet.</p>"}</div><div class="student-result-groups">${chartGroups.map((group, index) => `<section class="student-result-group"><h3>${escapeHtml(group.position)}</h3><div class="student-results-chart"><canvas id="student-results-chart-${index}" role="img" aria-label="${escapeHtml(group.position)} election results bar graph"></canvas></div></section>`).join("")}</div>`;
+  if (typeof Chart === "undefined" || typeof ChartDataLabels === "undefined") {
+    resultsList.insertAdjacentHTML("beforeend", '<p class="results-summary">The results graph could not be loaded. Refresh the page to try again.</p>');
+    return;
+  }
+
+  studentResultsCharts = chartGroups.map((group, index) => {
+    const chart = new Chart(document.getElementById(`student-results-chart-${index}`), {
+      type: "bar",
+      data: {
+        labels: group.entries.map(item => item.name),
+        datasets: [{
+          data: group.entries.map(item => item.votes),
+          backgroundColor: getResultsChartColors(group.entries),
+          borderRadius: 4,
+          maxBarThickness: 42
+        }]
+      },
+      plugins: [ChartDataLabels],
+      options: createResultsChartOptions(group.entries)
+    });
+    chart.$resultEntries = group.entries;
+    return chart;
+  });
+}
+
+function getResultsChartColors(entries) {
+  const palette = ["#1976d2", "#15966f", "#d88917", "#c34f62", "#168a9a", "#7156b5"];
+  const positions = [...new Set(entries.map(item => item.position))];
+  return entries.map(item => palette[positions.indexOf(item.position) % palette.length]);
+}
+
+function createResultsChartOptions(entries) {
+  const maxVotes = Math.max(1, ...entries.map(item => item.votes));
+  const darkMode = document.documentElement.dataset.theme === "dark";
+  const textColor = darkMode ? "#dce7f1" : "#40546a";
+  const gridColor = darkMode ? "#3a4d60" : "#e7edf3";
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 22 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label(context) {
+            const item = entries[context.dataIndex];
+            return `${item.votes} vote${item.votes === 1 ? "" : "s"} | ${item.percent}% for ${item.position}`;
+          }
+        }
+      },
+      datalabels: {
+        anchor: "end",
+        align: "top",
+        clamp: true,
+        color: textColor,
+        font: { weight: "700" },
+        formatter(value, context) {
+          return `${value} (${entries[context.dataIndex].percent}%)`;
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: textColor, maxRotation: 35, minRotation: 0 },
+        grid: { display: false }
+      },
+      y: {
+        beginAtZero: true,
+        max: maxVotes + Math.max(1, Math.ceil(maxVotes * 0.2)),
+        ticks: { precision: 0, stepSize: 1, color: textColor },
+        title: { display: true, text: "Number of votes", color: textColor },
+        grid: { color: gridColor }
+      }
+    }
+  };
 }
 
 function formatDate(value) {
@@ -470,9 +552,8 @@ function openStudentProfile() {
   document.getElementById("student-profile-name").textContent = account?.fullName || currentUser?.name || "Student Voter";
   document.getElementById("student-profile-id").textContent = account?.studentId || currentUser?.username || "Not available";
   document.getElementById("student-profile-email").textContent = account?.email || "Not available";
-  document.getElementById("student-profile-year-level").textContent = account?.yearLevel || "Not available";
-  document.getElementById("student-profile-gender").textContent = account?.gender || "Not available";
   document.getElementById("student-profile-status").textContent = hasVoted ? "Voted" : "Not yet voted";
+  document.getElementById("student-name-form").hidden = true;
   document.getElementById("student-profile-modal").hidden = false;
 }
 
@@ -505,9 +586,6 @@ async function saveStudentProfile(event) {
 
   account.yearLevel = yearLevel;
   account.gender = gender;
-
-  document.getElementById("student-profile-year-level").textContent = yearLevel;
-  document.getElementById("student-profile-gender").textContent = gender;
   document.getElementById("student-name-form").hidden = true;
   showToast("Your profile was updated successfully.");
 }

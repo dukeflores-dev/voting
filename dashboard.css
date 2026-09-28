@@ -1807,17 +1807,17 @@ body > * {
 
 .student-results-card[hidden] { display: none; }
 .results-subtitle { margin-bottom: 18px; color: #526274; font-size: 15px; }
-.student-results-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.student-result-group { padding: 16px; border: 1px solid #dfe8f0; border-radius: 6px; }
-.student-result-group h3 { margin-bottom: 15px; color: #06439a; font-size: 18px; }
-.student-result-row { margin-top: 13px; color: #334b63; font-size: 14px; }
-.student-result-row strong { display: inline-block; }
-.student-result-row span { float: right; color: #687789; }
-.student-result-row > div { clear: both; height: 9px; margin-top: 7px; overflow: hidden; border-radius: 10px; background: #e9f0f6; }
-.student-result-row i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #1976d2, #48a9ed); }
+.student-results-overview { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.student-results-list { display: block; }
+.student-result-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.student-result-group { min-width: 0; padding: 16px; border: 1px solid #dfe8f0; border-radius: 6px; }
+.student-result-group h3 { margin-bottom: 10px; color: #06439a; font-size: 16px; }
+.student-results-chart { position: relative; width: 100%; height: 260px; }
 
 @media (max-width: 700px) {
-  .student-results-list { grid-template-columns: 1fr; }
+  .student-results-overview { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .student-result-groups { grid-template-columns: 1fr; }
+  .student-results-chart { height: 250px; }
 }
 
 .student-profile-trigger { padding: 7px 11px; border: 1px solid #b9cfe0; border-radius: 6px; background: #f3f9fd; color: #111; cursor: pointer; text-align: left; }

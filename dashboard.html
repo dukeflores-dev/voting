@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elourdes Vote - Home</title>
+  <script src="theme.js"></script>
   <link rel="stylesheet" href="dashboard.css">
   <link rel="stylesheet" href="chatbot.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
   <header class="topbar">
@@ -227,8 +230,6 @@
       <div class="student-profile-details">
         <p><strong>Student ID</strong><span id="student-profile-id">Not available</span></p>
         <p><strong>Email</strong><span id="student-profile-email">Not available</span></p>
-        <p><strong>Year level</strong><span id="student-profile-year-level">Not available</span></p>
-        <p><strong>Gender</strong><span id="student-profile-gender">Not available</span></p>
         <p><strong>Voting status</strong><span id="student-profile-status">Not yet voted</span></p>
       </div>
     </article>
@@ -265,6 +266,8 @@
     const SUPABASE_KEY = 'sb_publishable_PFN0Iyati_Na8JZxeZAUEQ_lvNI_WmE';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script src="dashboard.js?v=20260923"></script>
   <script src="chatbot.js"></script>
 </body>

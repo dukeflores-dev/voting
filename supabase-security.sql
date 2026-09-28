@@ -36,7 +36,7 @@ alter table public.candidates add column if not exists achievements text;
 alter table public.candidates add column if not exists relevant_information text;
 
 insert into public.elections (id, title, status, start_date, end_date, deadline, eligible_voters)
-select 1, 'Student Council Election 2026', 'active', current_date, current_date + 7, '23:59', 100
+select 1, 'STUDENT COUNCIL ELECTION 2026', 'active', current_date, current_date + 7, '23:59', 100
 where not exists (select 1 from public.elections where id = 1);
 
 insert into public.candidates (election_id, name, group_name, position, initials, description)
@@ -126,26 +126,37 @@ with check (
 drop function if exists public.get_election_results(bigint);
 
 create function public.get_election_results(requested_election_id bigint)
-returns table (candidate_position text, candidate_name text, vote_count bigint)
+returns table (candidate_position text, candidate_name text, vote_count bigint, total_votes bigint)
 language sql
 security definer
 set search_path = public
 as $$
+  with eligible_election as (
+    select elections.id
+    from public.elections
+    where elections.id = requested_election_id
+      and (
+        elections.status = 'closed'
+        or elections.end_date + elections.deadline <= (now() at time zone 'Asia/Manila')
+      )
+  ), tallies as (
+    select
+      entries.key as candidate_position,
+      entries.value as candidate_name,
+      count(*)::bigint as vote_count
+    from public.vote_ballots ballots
+    cross join lateral jsonb_each_text(ballots.selections) entries
+    where ballots.election_id = requested_election_id
+      and exists (select 1 from eligible_election)
+    group by entries.key, entries.value
+  )
   select
-    entries.key as candidate_position,
-    entries.value as candidate_name,
-    count(*)::bigint as vote_count
-  from public.vote_ballots ballots
-  cross join lateral jsonb_each_text(ballots.selections) entries
-  where ballots.election_id = requested_election_id
-    and exists (
-      select 1
-      from public.elections
-      where elections.id = ballots.election_id
-        and elections.status = 'closed'
-    )
-  group by entries.key, entries.value
-  order by entries.key, count(*) desc, entries.value;
+    tallies.candidate_position,
+    tallies.candidate_name,
+    tallies.vote_count,
+    (select count(*)::bigint from public.vote_ballots where election_id = requested_election_id) as total_votes
+  from tallies
+  order by tallies.candidate_position, tallies.vote_count desc, tallies.candidate_name;
 $$;
 
 revoke all on function public.get_election_results(bigint) from public;

@@ -1,0 +1,153 @@
+:root {
+  color-scheme: light;
+  --theme-page: #f4f7fa;
+  --theme-surface: #ffffff;
+  --theme-raised: #f7fafc;
+  --theme-text: #18324c;
+  --theme-muted: #596a7c;
+  --theme-border: #d8e2eb;
+  --theme-input: #ffffff;
+  --theme-accent: #06439a;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-page: #101923;
+  --theme-surface: #1b2937;
+  --theme-raised: #233446;
+  --theme-text: #edf3f8;
+  --theme-muted: #c0cbd6;
+  --theme-border: #3a4d60;
+  --theme-input: #152230;
+  --theme-accent: #8fc4ff;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+  background: var(--theme-raised);
+  color: var(--theme-text);
+  cursor: pointer;
+  font: inherit;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.theme-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  border-color: var(--theme-accent);
+  outline: 2px solid color-mix(in srgb, var(--theme-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+html[data-theme="dark"] .theme-toggle[aria-pressed="true"] {
+  border-color: #82bfff;
+  background: #174b78;
+  color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(130, 191, 255, .2);
+}
+
+html[data-theme="dark"] body {
+  background: var(--theme-page) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] body::before {
+  filter: brightness(.38) blur(3px);
+}
+
+html[data-theme="dark"] .container {
+  background: rgba(8, 17, 27, .62);
+}
+
+html[data-theme="dark"] .left {
+  background: rgba(4, 15, 27, .72);
+}
+
+html[data-theme="dark"] :is(
+  .login-box, .admin-topbar, .topbar, .admin-welcome, .admin-panel,
+  .admin-stats article, .admin-candidate, .candidate-form, .admin-profile-card,
+  .status-card, .candidates-card, .election-card, .steps-card, .reminders-card,
+  .student-result-group, .student-profile-card, .notifications-card, .notification-item,
+  .support-card, .profile-card, .full-candidate-card, .guidelines-modal-card,
+  .quick-guide-card, .chatbot-panel, .student-menu, .signup-guidelines-card,
+  .candidate-group, .candidate-profile-details, .summary-card, .metric
+) {
+  border-color: var(--theme-border) !important;
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] .admin-welcome {
+  background-image: linear-gradient(110deg, #1b2937, #233446) !important;
+}
+
+html[data-theme="dark"] .admin-welcome::before {
+  background: linear-gradient(90deg, rgba(27, 41, 55, .76), rgba(27, 41, 55, 0)) !important;
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu, .support-card, .notifications-card) :is(h1, h2, h3, h4, p, label, span, small, li, dt, dd, strong, legend) {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu, .support-card, .notifications-card) :is(a, .eyebrow, .profile-role, .detail, .results-subtitle, .notification-text) {
+  color: #a8d0ff !important;
+}
+
+html[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select) {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-input) !important;
+  color: var(--theme-text) !important;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #aab8c7 !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu) :is(button:not(.theme-toggle), .primary-button, .save-button, .student-menu-vote) {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu) button:not(.theme-toggle):not(.primary-button):not(.save-button):not(.student-menu-vote):not(.chatbot-toggle) {
+  border-color: var(--theme-border);
+  background: #2b3e50;
+  color: var(--theme-text);
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page) :is(.result-track, .student-result-track, .turnout-track, .progress-track) {
+  background: #34485c;
+}
+
+html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page) :is(.result-group, .student-result-group, .student-results-card, .admin-result-group) {
+  border-color: var(--theme-border);
+}
+
+html[data-theme="dark"] .chatbot-messages {
+  background: #152230;
+}
+
+html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
+  border-color: var(--theme-border);
+  background: var(--theme-raised);
+  color: var(--theme-text);
+}
+
+@media (max-width: 700px) {
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+}

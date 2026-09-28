@@ -1,0 +1,341 @@
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+canvas,
+video {
+  max-width: 100%;
+}
+
+@media (max-width: 760px) {
+  .admin-topbar {
+    gap: 10px 14px;
+    padding: 10px 14px;
+  }
+
+  .admin-brand img {
+    width: min(180px, 42vw);
+  }
+
+  .admin-account {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .admin-account .profile-trigger {
+    min-width: 0;
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-main {
+    width: calc(100% - 24px);
+    margin: 14px auto;
+  }
+
+  .admin-welcome {
+    min-height: 0;
+    padding: 22px;
+  }
+
+  .admin-welcome h1 {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .admin-hero-art {
+    display: none;
+  }
+
+  .admin-stats,
+  .admin-candidate-list,
+  .admin-result-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-panel {
+    min-width: 0;
+    padding: 18px;
+  }
+
+  .panel-header,
+  .panel-header > div {
+    min-width: 0;
+  }
+
+  .candidate-controls,
+  .settings-actions {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .admin-result-chart {
+    height: 250px;
+  }
+
+  .turnout-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .turnout-track {
+    grid-column: 1 / -1;
+  }
+
+  .topbar {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .topbar .menu-button {
+    flex: 0 0 36px;
+  }
+
+  .main-nav {
+    order: 3;
+    width: 100%;
+    flex: 0 0 100%;
+    gap: 18px;
+    padding-bottom: 2px;
+  }
+
+  .main-nav a {
+    flex: 0 0 auto;
+  }
+
+  .account-area {
+    min-width: 0;
+    margin-left: auto;
+    gap: 7px;
+  }
+
+  .student-profile-trigger {
+    min-width: 0;
+    max-width: 36vw;
+    overflow: hidden;
+    padding: 6px 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .account-name {
+    font-size: 13px;
+  }
+
+  .logout-button {
+    padding: 6px 9px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .dashboard {
+    width: 100%;
+    min-width: 0;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .summary-grid,
+  .dashboard-view-candidates .candidate-group-list,
+  .election-content,
+  .lower-grid,
+  .student-result-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .summary-grid > *,
+  .election-card,
+  .lower-grid > *,
+  .student-result-group {
+    min-width: 0;
+  }
+
+  .welcome-banner {
+    min-height: 190px;
+    padding: 22px;
+    background-position: center;
+  }
+
+  .welcome-copy {
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .welcome-copy h1,
+  .welcome-copy h1 strong {
+    font-size: clamp(27px, 8vw, 38px);
+  }
+
+  .election-content {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .metric {
+    min-width: 0;
+    border-left: 0;
+  }
+
+  .student-results-card,
+  .dashboard-view-results .student-results-card {
+    padding: 16px;
+  }
+
+  .student-result-group {
+    padding: 12px;
+  }
+
+  .student-results-chart {
+    height: 230px;
+  }
+
+  .candidates-page,
+  .candidates-only-view .candidates-page {
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 0 auto;
+    padding: 18px 0;
+  }
+
+  .full-candidate-card {
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .full-candidate-info {
+    width: 100%;
+  }
+
+  .modal {
+    overflow-y: auto;
+    align-items: start;
+    padding: 12px;
+  }
+
+  .candidate-form,
+  #candidate-modal .candidate-form {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 24px 16px 18px;
+  }
+
+  .signup-grid,
+  .form-row,
+  .signup-guidelines-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .modal-actions button {
+    flex: 1 1 auto;
+    min-height: 42px;
+  }
+
+  .login-box {
+    min-width: 0;
+  }
+
+  .chatbot-panel {
+    right: 0;
+    width: min(430px, calc(100vw - 20px));
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-topbar {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .admin-brand img {
+    width: 132px;
+  }
+
+  .admin-heading {
+    padding-left: 10px;
+  }
+
+  .admin-heading strong {
+    font-size: 14px;
+  }
+
+  .admin-account .profile-trigger {
+    max-width: 38vw;
+    padding: 7px 8px;
+    font-size: 14px;
+  }
+
+  .admin-account button:not(.profile-trigger) {
+    padding: 7px 6px;
+  }
+
+  .theme-toggle {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .topbar {
+    gap: 6px;
+    padding: 7px 8px;
+  }
+
+  .account-area {
+    gap: 5px;
+  }
+
+  .student-profile-trigger {
+    max-width: 31vw;
+    padding: 5px 6px;
+  }
+
+  .account-name {
+    font-size: 12px;
+  }
+
+  .logout-button {
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+
+  .main-nav {
+    gap: 16px;
+  }
+
+  .main-nav a {
+    font-size: 12px;
+  }
+
+  .admin-panel {
+    padding: 14px;
+  }
+
+  .admin-result-group {
+    padding: 12px;
+  }
+
+  .admin-result-chart {
+    height: 220px;
+  }
+
+  .student-results-chart {
+    height: 210px;
+  }
+}

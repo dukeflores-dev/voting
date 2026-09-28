@@ -23,7 +23,7 @@
   }
 
   function getElection() {
-    return window.elourdesElection || { title: 'Student Council Election 2026', startDate: '2026-05-20', endDate: '2026-05-23', deadline: '23:59' };
+    return window.elourdesElection || { title: 'STUDENT COUNCIL ELECTION 2026', startDate: '2026-05-20', endDate: '2026-05-23', deadline: '23:59' };
   }
 
   function addMessage(text, type) {

@@ -6,7 +6,7 @@
 begin;
 
 update public.elections
-set title = 'Demo Student Council Election 2026',
+set title = 'STUDENT COUNCIL ELECTION 2026',
     status = 'active',
     start_date = current_date,
     end_date = current_date + 7,

@@ -95,7 +95,7 @@ html[data-theme="dark"] .admin-welcome::before {
   background: linear-gradient(90deg, rgba(27, 41, 55, .76), rgba(27, 41, 55, 0)) !important;
 }
 
-html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu, .support-card, .notifications-card) :is(h1, h2, h3, h4, p, label, span, small, li, dt, dd, strong, legend) {
+:is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu, .support-card, .notifications-card) :is(h1, h2, h3, h4, p, label, span, small, li, dt, dd, strong, legend, div, i, b, u, em, blockquote, th, td, caption) {
   color: var(--theme-text) !important;
 }
 

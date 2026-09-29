@@ -324,3 +324,76 @@ html[data-theme="dark"] .candidate-group {
 html[data-theme="dark"] .view-all-button {
   color: var(--theme-accent) !important;
 }
+
+/* ── Candidates page header dark mode ───────────────────────────────── */
+html[data-theme="dark"] .candidates-page-header {
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html[data-theme="dark"] .candidates-page-header h2 {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] .candidates-page-header p:not(.eyebrow) {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="dark"] .back-home-button {
+  background: var(--theme-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-accent) !important;
+}
+
+/* ── Full candidate cards dark mode ─────────────────────────────────── */
+html[data-theme="dark"] .full-candidate-card {
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, .3) !important;
+}
+
+html[data-theme="dark"] .full-candidate-info h3 {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] .full-candidate-position {
+  color: var(--theme-accent) !important;
+}
+
+html[data-theme="dark"] .full-candidate-info p {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="dark"] .full-candidate-actions button {
+  background: #1e3a55 !important;
+  color: #90ceff !important;
+}
+
+html[data-theme="dark"] .full-candidate-actions button:last-child {
+  background: #06439a !important;
+  color: #ffffff !important;
+}
+
+/* ── Welcome banner copy box dark mode ──────────────────────────────── */
+html[data-theme="dark"] .welcome-copy {
+  background: rgba(10, 22, 40, 0.78) !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="dark"] .welcome-copy .eyebrow {
+  color: #8fc4ff !important;
+}
+
+html[data-theme="dark"] .welcome-copy h1,
+html[data-theme="dark"] .welcome-copy h1 strong {
+  color: #edf3f8 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .5) !important;
+}
+
+html[data-theme="dark"] .welcome-copy h1 strong {
+  color: #90ceff !important;
+}
+
+html[data-theme="dark"] .welcome-copy p:not(.eyebrow) {
+  color: #c0cbd6 !important;
+}

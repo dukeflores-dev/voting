@@ -151,3 +151,39 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
     flex-basis: 36px;
   }
 }
+
+html[data-theme="dark"] .welcome-copy {
+  background: rgba(16, 25, 35, 0.75) !important;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+html[data-theme="dark"] .status-alert {
+  background: rgba(230, 185, 30, 0.15) !important;
+  border-color: rgba(204, 168, 40, 0.4) !important;
+}
+
+html[data-theme="dark"] .status-alert strong {
+  color: #fce883 !important;
+}
+
+html[data-theme="dark"] .status-alert p,
+html[data-theme="dark"] .status-alert div {
+  color: #e3d29b !important;
+}
+
+html[data-theme="dark"] .vote-confirmation {
+  background: rgba(30, 150, 90, 0.15) !important;
+  border-color: rgba(27, 154, 91, 0.4) !important;
+}
+
+html[data-theme="dark"] .vote-confirmation strong {
+  color: #79f5b4 !important;
+}
+
+html[data-theme="dark"] .vote-confirmation p,
+html[data-theme="dark"] .vote-receipt dt,
+html[data-theme="dark"] .vote-receipt dd,
+html[data-theme="dark"] .vote-secrecy-note {
+  color: #b7efd4 !important;
+}

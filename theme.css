@@ -284,3 +284,43 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
     color: var(--theme-muted) !important;
   }
 }
+
+/* ── Candidate card dark mode (all screen sizes) ───────────────────────── */
+html[data-theme="dark"] .candidate,
+html[data-theme="dark"] .summary-grid .candidate {
+  background: var(--theme-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html[data-theme="dark"] .candidate h3 {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] .candidate small {
+  color: var(--theme-accent) !important;
+}
+
+html[data-theme="dark"] .candidate p {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="dark"] .candidate button,
+html[data-theme="dark"] .summary-grid .candidate button {
+  background: #1e3a55 !important;
+  border-color: var(--theme-border) !important;
+  color: #90ceff !important;
+}
+
+html[data-theme="dark"] .candidate-group-title {
+  background: #1b2e42 !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+}
+
+html[data-theme="dark"] .candidate-group {
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .view-all-button {
+  color: var(--theme-accent) !important;
+}

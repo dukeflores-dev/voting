@@ -152,38 +152,135 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
   }
 }
 
-html[data-theme="dark"] .welcome-copy {
-  background: rgba(16, 25, 35, 0.75) !important;
-  padding: 20px;
-  border-radius: 8px;
+@media (min-width: 901px) {
+  html[data-theme="dark"] .welcome-copy {
+    background: rgba(16, 25, 35, 0.75) !important;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  html[data-theme="dark"] .status-alert {
+    background: rgba(230, 185, 30, 0.15) !important;
+    border-color: rgba(204, 168, 40, 0.4) !important;
+  }
+
+  html[data-theme="dark"] .status-alert strong {
+    color: #fce883 !important;
+  }
+
+  html[data-theme="dark"] .status-alert p,
+  html[data-theme="dark"] .status-alert div {
+    color: #e3d29b !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation {
+    background: rgba(30, 150, 90, 0.15) !important;
+    border-color: rgba(27, 154, 91, 0.4) !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation strong {
+    color: #79f5b4 !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation p,
+  html[data-theme="dark"] .vote-receipt dt,
+  html[data-theme="dark"] .vote-receipt dd,
+  html[data-theme="dark"] .vote-secrecy-note {
+    color: #b7efd4 !important;
+  }
 }
 
-html[data-theme="dark"] .status-alert {
-  background: rgba(230, 185, 30, 0.15) !important;
-  border-color: rgba(204, 168, 40, 0.4) !important;
-}
+/* ── Mobile dark mode overrides ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  html[data-theme="dark"] body {
+    background: var(--theme-page) !important;
+  }
 
-html[data-theme="dark"] .status-alert strong {
-  color: #fce883 !important;
-}
+  /* Topbar */
+  html[data-theme="dark"] .topbar {
+    background: var(--theme-surface) !important;
+    border-bottom: 1px solid var(--theme-border) !important;
+  }
 
-html[data-theme="dark"] .status-alert p,
-html[data-theme="dark"] .status-alert div {
-  color: #e3d29b !important;
-}
+  html[data-theme="dark"] .menu-button {
+    color: var(--theme-text) !important;
+  }
 
-html[data-theme="dark"] .vote-confirmation {
-  background: rgba(30, 150, 90, 0.15) !important;
-  border-color: rgba(27, 154, 91, 0.4) !important;
-}
+  html[data-theme="dark"] .main-nav a {
+    color: var(--theme-muted) !important;
+  }
 
-html[data-theme="dark"] .vote-confirmation strong {
-  color: #79f5b4 !important;
-}
+  html[data-theme="dark"] .main-nav a.nav-selected {
+    color: var(--theme-accent) !important;
+  }
 
-html[data-theme="dark"] .vote-confirmation p,
-html[data-theme="dark"] .vote-receipt dt,
-html[data-theme="dark"] .vote-receipt dd,
-html[data-theme="dark"] .vote-secrecy-note {
-  color: #b7efd4 !important;
+  html[data-theme="dark"] .account-name {
+    color: var(--theme-text) !important;
+  }
+
+  html[data-theme="dark"] .logout-button {
+    border-color: var(--theme-border) !important;
+    color: var(--theme-text) !important;
+  }
+
+  /* Welcome banner — keep the bg image but darken overlay */
+  html[data-theme="dark"] .welcome-banner {
+    background: linear-gradient(90deg, rgba(0, 20, 50, .82), rgba(0, 20, 50, .45)),
+      url("welcome-background.jpg") center/cover !important;
+  }
+
+  /* Status card */
+  html[data-theme="dark"] .summary-grid > .status-card,
+  html[data-theme="dark"] .summary-grid > .candidates-card,
+  html[data-theme="dark"] .summary-grid > .reminders-card {
+    border-color: var(--theme-border) !important;
+    background-color: var(--theme-surface) !important;
+  }
+
+  html[data-theme="dark"] .countdown {
+    color: var(--theme-muted) !important;
+  }
+
+  html[data-theme="dark"] .countdown strong {
+    color: var(--theme-text) !important;
+  }
+
+  /* Status alert badge on mobile */
+  html[data-theme="dark"] .status-alert {
+    background: transparent !important;
+    color: var(--theme-text) !important;
+  }
+
+  html[data-theme="dark"] .status-alert strong {
+    background: #1d3a55 !important;
+    color: #90ceff !important;
+  }
+
+  html[data-theme="dark"] .status-alert strong::before {
+    color: var(--theme-muted) !important;
+  }
+
+  /* Section headings */
+  html[data-theme="dark"] .summary-grid .section-heading h2 {
+    color: var(--theme-text) !important;
+  }
+
+  html[data-theme="dark"] .summary-grid .section-icon {
+    color: var(--theme-accent) !important;
+  }
+
+  /* Candidate names */
+  html[data-theme="dark"] .summary-grid .candidate h3 {
+    color: var(--theme-text) !important;
+  }
+
+  html[data-theme="dark"] .summary-grid .candidate-actions button {
+    color: var(--theme-accent) !important;
+  }
+
+  /* Reminders */
+  html[data-theme="dark"] .summary-grid .reminders,
+  html[data-theme="dark"] .summary-grid .reminders li {
+    color: var(--theme-muted) !important;
+  }
 }

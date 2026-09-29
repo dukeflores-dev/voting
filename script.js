@@ -16,8 +16,12 @@ async function login(event) {
 
   const emailInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
-  const email = emailInput.value.trim().toLowerCase();
-  emailInput.value = email;
+  let inputValue = emailInput.value.trim().toLowerCase();
+  let email = inputValue;
+  if (!email.includes('@')) {
+    email = inputValue + '@lourdes.edu.ph';
+  }
+  emailInput.value = inputValue;
   const password = passwordInput.value;
   const message = document.getElementById("message");
   const loginButton = document.querySelector("#login-form button[type='submit']");
@@ -40,7 +44,7 @@ async function login(event) {
     loginButton.disabled = false;
     message.style.color = "red";
     message.textContent = error.message === "Invalid login credentials"
-      ? "Email or password is incorrect. Check both fields or use Forgot Password."
+      ? "Student ID/Email or password is incorrect. Check both fields or use Forgot Password."
       : error.message;
     return;
   }

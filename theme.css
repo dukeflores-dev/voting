@@ -150,6 +150,10 @@ html[data-theme="dark"] #ballot-modal .ballot-form {
   color: var(--theme-text);
 }
 
+html[data-theme="dark"] :is(#ballot-modal, #ballot-review-modal) {
+  z-index: 50;
+}
+
 html[data-theme="dark"] #ballot-modal .ballot-position {
   border-color: var(--theme-border);
   background: var(--theme-raised);

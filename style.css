@@ -163,6 +163,18 @@ select {
   font-weight: 800;
 }
 
+.signup-prompt {
+  margin: 14px 0 4px;
+  color: #536b78;
+}
+
+.signup-prompt a {
+  color: #285c78;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .signup-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

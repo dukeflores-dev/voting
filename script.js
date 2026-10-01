@@ -15,28 +15,17 @@ async function login(event) {
   if (event) event.preventDefault();
 
   const emailInput = document.getElementById("username");
-  const surnameInput = document.getElementById("surname");
   const passwordInput = document.getElementById("password");
   let inputValue = emailInput.value.trim().toLowerCase();
-  const surname = surnameInput.value.trim();
-  let email = inputValue;
-  if (!email.includes('@')) {
-    if (!validateStudentId(inputValue)) {
-      const message = document.getElementById("message");
-      message.style.color = "red";
-      message.textContent = getStudentIdFormatMessage();
-      return;
-    }
-    if (!surname) {
-      const message = document.getElementById("message");
-      message.style.color = "red";
-      message.textContent = "Enter your surname to log in.";
-      return;
-    }
-    email = inputValue + '@lourdes.edu.ph';
+  const identity = getLoginIdentity(inputValue);
+  if (!identity) {
+    const message = document.getElementById("message");
+    message.style.color = "red";
+    message.textContent = getStudentIdFormatMessage();
+    return;
   }
   emailInput.value = inputValue;
-  const password = passwordInput.value;
+  const password = identity.type === "email" ? passwordInput.value : null;
   const message = document.getElementById("message");
   const loginButton = document.querySelector("#login-form button[type='submit']");
 
@@ -45,7 +34,24 @@ async function login(event) {
   loginButton.disabled = true;
   let result;
   try {
-    result = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (identity.type === "student_id") {
+      const { data: loginData, error: loginError } = await supabaseClient.functions.invoke(
+        "login-with-student-id",
+        { body: { studentId: identity.value } }
+      );
+      if (loginError || !loginData?.access_token || !loginData?.refresh_token) {
+        loginButton.disabled = false;
+        message.style.color = "red";
+        message.textContent = "Student ID or password is incorrect.";
+        return;
+      }
+      result = await supabaseClient.auth.setSession({
+        access_token: loginData.access_token,
+        refresh_token: loginData.refresh_token
+      });
+    } else {
+      result = await supabaseClient.auth.signInWithPassword({ email: identity.value, password });
+    }
   } catch (error) {
     loginButton.disabled = false;
     message.style.color = "red";
@@ -58,7 +64,7 @@ async function login(event) {
     loginButton.disabled = false;
     message.style.color = "red";
     message.textContent = error.message === "Invalid login credentials"
-      ? "Student ID/Email or password is incorrect. Check both fields or use Forgot Password."
+      ? "Student ID or password is incorrect."
       : error.message;
     return;
   }
@@ -67,10 +73,8 @@ async function login(event) {
   const userRole = resolveUserRole(user);
   const isAdmin = userRole === "admin";
   if (!isAdmin) {
-    const registeredStudentId = user.user_metadata?.student_id;
-    const studentIdMatches = inputValue.includes("@") || !registeredStudentId ||
-      normalizeStudentId(inputValue) === normalizeStudentId(registeredStudentId);
-    if (!surname || !matchesRegisteredSurname(user, surname) || !studentIdMatches) {
+    const studentIdMatches = matchesLoginStudentId(user, inputValue);
+    if (!studentIdMatches) {
       try {
         await supabaseClient.auth.signOut();
       } catch (error) {
@@ -78,7 +82,7 @@ async function login(event) {
       }
       loginButton.disabled = false;
       message.style.color = "red";
-      message.textContent = "Surname and Student ID do not match the registered account.";
+      message.textContent = "Student ID does not match the registered account.";
       return;
     }
   }
@@ -115,11 +119,37 @@ function showLogin() {
   document.getElementById("login-form").hidden = false;
 }
 
-function showRecoveryPasswordForm() {
+function updateLoginPasswordField() {
+  const identity = getLoginIdentity(document.getElementById("username").value);
+  const passwordField = document.querySelector(".login-password-field");
+  const forgotPasswordLink = document.querySelector(".forgot-password-link");
+  const passwordInput = document.getElementById("password");
+  const needsPassword = identity?.type === "email";
+
+  passwordField.hidden = !needsPassword;
+  forgotPasswordLink.hidden = identity?.type === "student_id";
+  passwordInput.required = needsPassword;
+  if (!needsPassword) passwordInput.value = "";
+}
+
+async function showRecoveryPasswordForm() {
   document.getElementById("login-form").hidden = true;
   document.getElementById("signup-form").hidden = true;
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("new-password-form").hidden = false;
+
+  const { data } = await supabaseClient.auth.getUser();
+  const studentId = data.user?.user_metadata?.student_id;
+  const isStudentAccount = validateStudentId(studentId);
+  document.getElementById("admin-password-reset-fields").hidden = isStudentAccount;
+  document.getElementById("new-password").required = !isStudentAccount;
+  document.getElementById("confirm-new-password").required = !isStudentAccount;
+  document.getElementById("recovery-password-help").textContent = isStudentAccount
+    ? "Your Student ID will remain your password."
+    : "Choose a new password for your account.";
+  document.getElementById("new-password-submit").textContent = isStudentAccount
+    ? "RESTORE STUDENT ID PASSWORD"
+    : "UPDATE PASSWORD";
 }
 
 function togglePassword(inputId, button) {
@@ -150,33 +180,25 @@ function normalizeStudentId(studentId) {
   return String(studentId || "").replace(/\D/g, "");
 }
 
-function normalizeSurname(surname) {
-  return String(surname || "").trim().replace(/[.,]/g, "").replace(/\s+/g, " ").toLowerCase();
+function getLoginIdentity(identity) {
+  const value = String(identity || "").trim().toLowerCase();
+  if (validateStudentId(value)) return { type: "student_id", value };
+  if (isValidEmail(value)) return { type: "email", value };
+  return null;
 }
 
-function matchesRegisteredSurname(user, surname) {
-  const metadata = user?.user_metadata || {};
-  const fullName = String(metadata.full_name || "").trim();
-  const registeredSurnames = metadata.surname
-    ? [metadata.surname]
-    : fullName.includes(",")
-      ? [fullName.split(",", 1)[0]]
-      : fullName.split(/\s+/).map((part, index, parts) => parts.slice(index).join(" "));
-  const normalizedSurname = normalizeSurname(surname);
-  return Boolean(normalizedSurname) && registeredSurnames.some(registered => normalizeSurname(registered) === normalizedSurname);
+function matchesLoginStudentId(user, identity) {
+  const registeredStudentId = user?.user_metadata?.student_id;
+  return validateStudentId(identity) && Boolean(registeredStudentId) &&
+    normalizeStudentId(identity) === normalizeStudentId(registeredStudentId);
 }
 
 function getStudentIdFormatMessage() {
   return "Student ID format: enter 8 digits or use YYYY-#### (example: 2024-1234).";
 }
 
-function validatePassword(password) {
-  const value = (password || "").trim();
-  if (value.length < 8) return false;
-  if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) return false;
-  if (!/\d/.test(value)) return false;
-  if (!/[^A-Za-z0-9]/.test(value)) return false;
-  return true;
+function getRegistrationPassword(studentId) {
+  return String(studentId || "").trim();
 }
 
 function forgotPassword(event) {
@@ -244,7 +266,7 @@ async function applyPasswordRecoverySession() {
       }
     }
 
-    showRecoveryPasswordForm();
+    await showRecoveryPasswordForm();
   } catch (error) {
     recoveryMessage.style.color = "red";
     recoveryMessage.textContent = "The reset link is invalid or expired. Please request a new one.";
@@ -257,21 +279,37 @@ async function updatePassword(event) {
   const newPassword = document.getElementById("new-password").value;
   const confirmPassword = document.getElementById("confirm-new-password").value;
   const message = document.getElementById("new-password-message");
+  let passwordToSet = newPassword;
+  let isStudentAccount = false;
 
-  if (newPassword.length < 6) {
+  try {
+    const { data, error: userError } = await supabaseClient.auth.getUser();
+    if (userError) throw userError;
+    const studentId = data.user?.user_metadata?.student_id;
+    if (studentId && validateStudentId(studentId)) {
+      isStudentAccount = true;
+      passwordToSet = String(studentId).trim();
+    }
+  } catch (error) {
+    message.style.color = "red";
+    message.textContent = "Unable to verify the account. Please request a new reset link.";
+    return;
+  }
+
+  if (!isStudentAccount && newPassword.length < 6) {
     message.style.color = "red";
     message.textContent = "Password must be at least 6 characters long.";
     return;
   }
 
-  if (newPassword !== confirmPassword) {
+  if (!isStudentAccount && newPassword !== confirmPassword) {
     message.style.color = "red";
     message.textContent = "Passwords do not match.";
     return;
   }
 
   try {
-    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+    const { error } = await supabaseClient.auth.updateUser({ password: passwordToSet });
 
     if (error) {
       message.style.color = "red";
@@ -280,7 +318,9 @@ async function updatePassword(event) {
     }
 
     message.style.color = "green";
-    message.textContent = "Password updated successfully. You can now sign in with your new password.";
+    message.textContent = isStudentAccount
+      ? "Your Student ID is now your password. You can sign in using your Student ID."
+      : "Password updated successfully. You can now sign in with your new password.";
     event.target.reset();
     window.setTimeout(() => showLogin(), 1800);
   } catch (error) {
@@ -292,11 +332,10 @@ async function updatePassword(event) {
 async function createAccount(event) {
   event.preventDefault();
 
-  const password = document.getElementById("signup-password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
   const message = document.getElementById("signup-message");
   const email = document.getElementById("email").value.trim();
   const studentId = document.getElementById("student-id").value.trim();
+  const password = getRegistrationPassword(studentId);
 
   if (!isValidEmail(email)) {
     message.style.color = "red";
@@ -307,18 +346,6 @@ async function createAccount(event) {
   if (!validateStudentId(studentId)) {
     message.style.color = "red";
     message.textContent = getStudentIdFormatMessage();
-    return;
-  }
-
-  if (!validatePassword(password)) {
-    message.style.color = "red";
-    message.textContent = "Password must be 8+ characters with uppercase, lowercase, number, and special character.";
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    message.style.color = "red";
-    message.textContent = "Passwords do not match.";
     return;
   }
 
@@ -342,9 +369,9 @@ async function confirmSignupGuidelines() {
   }
 
   const message = document.getElementById("signup-message");
-  const password = document.getElementById("signup-password").value;
   const email = document.getElementById("email").value.trim();
   const studentId = document.getElementById("student-id").value.trim();
+  const password = getRegistrationPassword(studentId);
 
   let result;
   try {
@@ -408,9 +435,9 @@ if (typeof module !== 'undefined') {
   module.exports = {
     validateStudentId,
     normalizeStudentId,
-    normalizeSurname,
-    matchesRegisteredSurname,
-    validatePassword,
+    getLoginIdentity,
+    matchesLoginStudentId,
+    getRegistrationPassword,
     getStudentIdFormatMessage,
     isValidEmail
   };

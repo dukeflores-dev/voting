@@ -4,8 +4,9 @@ const assert = require('node:assert/strict');
 const {
   validateStudentId,
   normalizeStudentId,
-  matchesRegisteredSurname,
-  validatePassword,
+  getLoginIdentity,
+  matchesLoginStudentId,
+  getRegistrationPassword,
   getStudentIdFormatMessage
 } = require('./script.js');
 
@@ -17,15 +18,19 @@ test('student IDs accept numeric or dashed format with clear guidance', () => {
   assert.match(getStudentIdFormatMessage(), /Student ID/i);
 });
 
-test('surname login matches registered names case-insensitively', () => {
-  const user = { user_metadata: { full_name: 'Hanna Louise Baco' } };
-  assert.equal(matchesRegisteredSurname(user, 'BACO'), true);
-  assert.equal(matchesRegisteredSurname(user, 'Louise Baco'), true);
-  assert.equal(matchesRegisteredSurname(user, 'Flores'), false);
+test('login routes student IDs to the private auth lookup and permits admin email login', () => {
+  assert.deepEqual(getLoginIdentity('2024-1234'), { type: 'student_id', value: '2024-1234' });
+  assert.equal(getLoginIdentity('not-a-student-id'), null);
+  assert.deepEqual(getLoginIdentity('admin@example.com'), { type: 'email', value: 'admin@example.com' });
 });
 
-test('password validation enforces a strong password policy', () => {
-  assert.equal(validatePassword('Abc123$5'), true);
-  assert.equal(validatePassword('short'), false);
-  assert.equal(validatePassword('onlylowercase123'), false);
+test('voter authentication requires the registered Student ID, not email', () => {
+  const user = { user_metadata: { student_id: '2024-1234' } };
+  assert.equal(matchesLoginStudentId(user, '2024-1234'), true);
+  assert.equal(matchesLoginStudentId(user, '2024-9999'), false);
+  assert.equal(matchesLoginStudentId(user, 'student@example.com'), false);
+});
+
+test('registration uses the exact Student ID as its password', () => {
+  assert.equal(getRegistrationPassword(' 2024-1234 '), '2024-1234');
 });

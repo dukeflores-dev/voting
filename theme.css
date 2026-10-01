@@ -283,6 +283,45 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
   html[data-theme="dark"] .summary-grid .reminders li {
     color: var(--theme-muted) !important;
   }
+
+  html[data-theme="dark"] .candidate-profile-details section {
+    border-color: var(--theme-border) !important;
+    background: var(--theme-raised) !important;
+  }
+
+  html[data-theme="dark"] .candidate-profile-details h3 {
+    color: var(--theme-accent) !important;
+  }
+
+  html[data-theme="dark"] .candidate-profile-details p {
+    color: var(--theme-muted) !important;
+  }
+
+  html[data-theme="dark"] .profile-position {
+    background: #1d3a55 !important;
+    color: #a8d0ff !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation {
+    border-color: rgba(75, 190, 130, .4) !important;
+    background: rgba(30, 150, 90, .15) !important;
+    color: #b7efd4 !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation strong,
+  html[data-theme="dark"] .vote-receipt dd {
+    color: #79f5b4 !important;
+  }
+
+  html[data-theme="dark"] .vote-confirmation p,
+  html[data-theme="dark"] .vote-receipt dt,
+  html[data-theme="dark"] .vote-secrecy-note {
+    color: #b7efd4 !important;
+  }
+
+  html[data-theme="dark"] .vote-receipt {
+    border-color: rgba(75, 190, 130, .35) !important;
+  }
 }
 
 /* ── Candidate card dark mode (all screen sizes) ───────────────────────── */

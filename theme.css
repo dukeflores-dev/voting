@@ -144,14 +144,25 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
   color: var(--theme-text);
 }
 
-html[data-theme="dark"] #ballot-modal .ballot-form {
+#ballot-modal,
+#ballot-review-modal {
+  z-index: 50;
+}
+
+html[data-theme="dark"] :is(#ballot-modal, #ballot-review-modal) .ballot-form {
   border: 1px solid var(--theme-border);
   background: var(--theme-surface);
   color: var(--theme-text);
 }
 
-html[data-theme="dark"] :is(#ballot-modal, #ballot-review-modal) {
-  z-index: 50;
+html[data-theme="dark"] #ballot-review-modal .review-row {
+  border-color: var(--theme-border);
+  background: var(--theme-raised);
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] #ballot-review-modal .review-row strong {
+  color: var(--theme-accent) !important;
 }
 
 html[data-theme="dark"] #ballot-modal .ballot-position {

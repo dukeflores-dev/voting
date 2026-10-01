@@ -210,16 +210,11 @@ video {
     padding: 12px;
   }
 
-  #ballot-modal {
-    z-index: 50;
+  :is(#ballot-modal, #ballot-review-modal) {
     padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
   }
 
-  #ballot-review-modal {
-    z-index: 50;
-  }
-
-  #ballot-modal .ballot-form {
+  :is(#ballot-modal, #ballot-review-modal) .ballot-form {
     width: 100%;
     max-width: 520px;
     max-height: calc(100vh - 24px);

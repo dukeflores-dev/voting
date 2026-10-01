@@ -284,24 +284,6 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
     color: var(--theme-muted) !important;
   }
 
-  html[data-theme="dark"] .candidate-profile-details section {
-    border-color: var(--theme-border) !important;
-    background: var(--theme-raised) !important;
-  }
-
-  html[data-theme="dark"] .candidate-profile-details h3 {
-    color: var(--theme-accent) !important;
-  }
-
-  html[data-theme="dark"] .candidate-profile-details p {
-    color: var(--theme-muted) !important;
-  }
-
-  html[data-theme="dark"] .profile-position {
-    background: #1d3a55 !important;
-    color: #a8d0ff !important;
-  }
-
   html[data-theme="dark"] .vote-confirmation {
     border-color: rgba(75, 190, 130, .4) !important;
     background: rgba(30, 150, 90, .15) !important;
@@ -329,6 +311,24 @@ html[data-theme="dark"] .candidate,
 html[data-theme="dark"] .summary-grid .candidate {
   background: var(--theme-raised) !important;
   border-color: var(--theme-border) !important;
+}
+
+html[data-theme="dark"] .candidate-profile-details section {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-raised) !important;
+}
+
+html[data-theme="dark"] .candidate-profile-details h3 {
+  color: var(--theme-accent) !important;
+}
+
+html[data-theme="dark"] .candidate-profile-details p {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="dark"] .profile-position {
+  background: #1d3a55 !important;
+  color: #a8d0ff !important;
 }
 
 html[data-theme="dark"] .candidate h3 {

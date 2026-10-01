@@ -4,6 +4,19 @@ body {
   overflow-x: hidden;
 }
 
+@media (max-width: 900px) {
+  .main-nav a[data-view="election"],
+  .main-nav a[data-view="guidelines"],
+  .main-nav a[data-view="notifications"] {
+    display: none;
+  }
+
+  .main-nav a[data-view="home"],
+  .main-nav a[data-view="results"] {
+    flex: 0 0 auto;
+  }
+}
+
 img,
 canvas,
 video {

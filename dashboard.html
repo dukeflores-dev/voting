@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elourdes Vote - Home</title>
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="dashboard.css?v=10">
-  <link rel="stylesheet" href="chatbot.css?v=10">
-  <link rel="stylesheet" href="theme.css?v=10">
-  <link rel="stylesheet" href="responsive.css?v=10">
+  <link rel="stylesheet" href="dashboard.css?v=11">
+  <link rel="stylesheet" href="chatbot.css?v=11">
+  <link rel="stylesheet" href="theme.css?v=11">
+  <link rel="stylesheet" href="responsive.css?v=11">
 </head>
 <body>
   <header class="topbar">
@@ -19,6 +19,9 @@
 
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-selected" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
+      <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
+      <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Reminders</a>
+      <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
       <a data-view="results" href="#student-results" onclick="showDashboardResults(); return false;">Results</a>
     </nav>
 

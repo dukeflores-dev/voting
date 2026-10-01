@@ -76,10 +76,6 @@ video {
     gap: 8px;
   }
 
-  .admin-result-chart {
-    height: 250px;
-  }
-
   .turnout-row {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -189,10 +185,6 @@ video {
 
   .student-result-group {
     padding: 12px;
-  }
-
-  .student-results-chart {
-    height: 230px;
   }
 
   .candidates-page,
@@ -331,11 +323,4 @@ video {
     padding: 12px;
   }
 
-  .admin-result-chart {
-    height: 220px;
-  }
-
-  .student-results-chart {
-    height: 210px;
-  }
 }

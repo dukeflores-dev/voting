@@ -79,7 +79,7 @@ html[data-theme="dark"] :is(
   .status-card, .candidates-card, .election-card, .steps-card, .reminders-card,
   .student-result-group, .student-profile-card, .notifications-card, .notification-item,
   .support-card, .profile-card, .full-candidate-card, .guidelines-modal-card,
-  .quick-guide-card, .chatbot-panel, .student-menu, .signup-guidelines-card,
+  .quick-guide-card, .chatbot-panel, .student-menu, .signup-guidelines-card, .result-candidate-card,
   .candidate-group, .candidate-profile-details, .summary-card, .metric
 ) {
   border-color: var(--theme-border) !important;
@@ -329,6 +329,24 @@ html[data-theme="dark"] .candidate-profile-details p {
 html[data-theme="dark"] .profile-position {
   background: #1d3a55 !important;
   color: #a8d0ff !important;
+}
+
+html[data-theme="dark"] .result-percent-track {
+  background: #34485c !important;
+}
+
+html[data-theme="dark"] .result-candidate-initials {
+  background: #1d3a55 !important;
+  color: #a8d0ff !important;
+}
+
+html[data-theme="dark"] .result-candidate-position,
+html[data-theme="dark"] .result-votes-row {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="dark"] .result-percent {
+  color: var(--theme-accent) !important;
 }
 
 html[data-theme="dark"] .candidate h3 {

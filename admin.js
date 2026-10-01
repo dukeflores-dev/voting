@@ -20,8 +20,7 @@ let election = null;
 let electionId = 1;
 let totalVotes = 0;
 let hasLoadedVoteTotal = false;
-let adminResultsCharts = [];
-let adminResultsChartSignature = "";
+let adminResultsMarkupSignature = "";
 initializeAdmin();
 window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
@@ -384,7 +383,7 @@ async function updateResults() {
 
   candidates.forEach(candidate => {
     if (!tally[candidate.position]) tally[candidate.position] = [];
-    tally[candidate.position].push({ name: candidate.name, votes: 0 });
+    tally[candidate.position].push({ ...candidate, votes: 0 });
   });
 
   (result?.rows || []).forEach(record => {
@@ -407,93 +406,23 @@ async function updateResults() {
         name: item.name,
         position,
         votes: item.votes,
-        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0
+        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0,
+        picture: item.picture || item.image_url || "",
+        initials: item.initials || String(item.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase()
       }))
     };
   });
   const chartContainer = document.getElementById("results-list");
-  const signature = JSON.stringify(chartGroups.map(group => [group.position, group.entries.map(item => item.name)]));
-  if (signature !== adminResultsChartSignature) {
-    adminResultsCharts.forEach(chart => chart.destroy());
-    adminResultsCharts = [];
-    chartContainer.innerHTML = `<div class="admin-result-groups">${chartGroups.map((group, index) => `<section class="admin-result-group"><h3>${escapeHtml(group.position)}</h3><div class="admin-result-chart"><canvas id="admin-results-chart-${index}" role="img" aria-label="${escapeHtml(group.position)} live election results bar graph"></canvas></div></section>`).join("")}</div>`;
-    adminResultsChartSignature = signature;
+  const signature = JSON.stringify(chartGroups.map(group => [group.position, group.entries.map(item => [item.name, item.votes, item.percent, item.picture])]));
+  if (signature !== adminResultsMarkupSignature) {
+    chartContainer.innerHTML = `<div class="admin-result-groups">${chartGroups.map(group => `<section class="admin-result-group"><h3>${escapeHtml(group.position)}</h3><div class="result-candidate-grid">${group.entries.map(item => {
+      const photo = item.picture
+        ? `<img class="result-candidate-photo" src="${escapeHtml(item.picture)}" alt="${escapeHtml(item.name)}">`
+        : `<div class="result-candidate-photo result-candidate-initials" aria-hidden="true">${escapeHtml(item.initials)}</div>`;
+      return `<article class="result-candidate-card"><div class="result-candidate-identity">${photo}<div><h4 class="result-candidate-name">${escapeHtml(item.name)}</h4><span class="result-candidate-position">${escapeHtml(item.position)}</span></div></div><div class="result-votes-row"><span>${item.votes} vote${item.votes === 1 ? "" : "s"}</span><strong class="result-percent">${item.percent}%</strong></div><div class="result-percent-track" role="progressbar" aria-label="${escapeHtml(item.name)} vote percentage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${item.percent}"><span style="width: ${item.percent}%"></span></div></article>`;
+    }).join("")}</div></section>`).join("")}</div>`;
+    adminResultsMarkupSignature = signature;
   }
-  if (typeof Chart === "undefined" || typeof ChartDataLabels === "undefined") return;
-
-  chartGroups.forEach((group, index) => {
-    const labels = group.entries.map(item => item.name);
-    const values = group.entries.map(item => item.votes);
-    const colors = getAdminResultsChartColors(group.entries);
-    const options = createAdminResultsChartOptions(group.entries);
-    const existingChart = adminResultsCharts[index];
-    if (!existingChart) {
-      adminResultsCharts[index] = new Chart(document.getElementById(`admin-results-chart-${index}`), {
-        type: "bar",
-        data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 4, maxBarThickness: 42 }] },
-        plugins: [ChartDataLabels],
-        options
-      });
-    } else {
-      existingChart.data.labels = labels;
-      existingChart.data.datasets[0].data = values;
-      existingChart.data.datasets[0].backgroundColor = colors;
-      existingChart.options = options;
-      existingChart.update("none");
-    }
-  });
-}
-
-function getAdminResultsChartColors(entries) {
-  const palette = ["#1976d2", "#15966f", "#d88917", "#c34f62", "#168a9a", "#7156b5"];
-  const positions = [...new Set(entries.map(item => item.position))];
-  return entries.map(item => palette[positions.indexOf(item.position) % palette.length]);
-}
-
-function createAdminResultsChartOptions(entries) {
-  const maxVotes = Math.max(1, ...entries.map(item => item.votes));
-  const darkMode = document.documentElement.dataset.theme === "dark";
-  const textColor = darkMode ? "#dce7f1" : "#40546a";
-  const gridColor = darkMode ? "#3a4d60" : "#e7edf3";
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: { padding: { top: 22 } },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label(context) {
-            const item = entries[context.dataIndex];
-            return `${item.votes} vote${item.votes === 1 ? "" : "s"} | ${item.percent}% for ${item.position}`;
-          }
-        }
-      },
-      datalabels: {
-        anchor: "end",
-        align: "top",
-        clamp: true,
-        color: textColor,
-        font: { weight: "700" },
-        formatter(value, context) {
-          return `${value} (${entries[context.dataIndex].percent}%)`;
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: { color: textColor, maxRotation: 35, minRotation: 0 },
-        grid: { display: false }
-      },
-      y: {
-        beginAtZero: true,
-        max: maxVotes + Math.max(1, Math.ceil(maxVotes * 0.2)),
-        ticks: { precision: 0, stepSize: 1, color: textColor },
-        title: { display: true, text: "Number of votes", color: textColor },
-        grid: { color: gridColor }
-      }
-    }
-  };
 }
 
 function escapeHtml(value) {

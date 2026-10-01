@@ -3,7 +3,6 @@ let currentUser = null;
 let authUser = null;
 let hasVoted = false;
 let hasLoadedElectionStatus = false;
-let studentResultsCharts = [];
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
@@ -22,12 +21,6 @@ let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") ||
 let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
 window.elourdesCandidates = candidates;
 window.elourdesElection = election;
-window.addEventListener("themechange", () => {
-  studentResultsCharts.forEach(chart => {
-    chart.options = createResultsChartOptions(chart.$resultEntries);
-    chart.update("none");
-  });
-});
 initializeDashboard();
 window.setInterval(() => {
   updateCountdown();
@@ -433,7 +426,7 @@ async function renderStudentResults() {
 
   candidates.forEach(candidate => {
     if (!tally[candidate.position]) tally[candidate.position] = [];
-    tally[candidate.position].push({ name: candidate.name, votes: 0 });
+    tally[candidate.position].push({ ...candidate, votes: 0 });
   });
 
   (ballots || []).forEach(record => {
@@ -452,90 +445,20 @@ async function renderStudentResults() {
         name: item.name,
         position,
         votes: item.votes,
-        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0
+        percent: positionTotal ? Math.round(item.votes / positionTotal * 100) : 0,
+        picture: item.picture || item.image_url || "",
+        initials: item.initials || String(item.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase()
       }))
     };
   });
 
   resultsCard.hidden = false;
-  studentResultsCharts.forEach(chart => chart.destroy());
-  studentResultsCharts = [];
-  resultsList.innerHTML = `<div class="student-results-overview"><div class="results-total"><strong>${totalVotes}</strong><span>Total votes</span></div>${totalVotes ? "" : "<p class=\"results-summary\">No votes have been recorded yet.</p>"}</div><div class="student-result-groups">${chartGroups.map((group, index) => `<section class="student-result-group"><h3>${escapeHtml(group.position)}</h3><div class="student-results-chart"><canvas id="student-results-chart-${index}" role="img" aria-label="${escapeHtml(group.position)} election results bar graph"></canvas></div></section>`).join("")}</div>`;
-  if (typeof Chart === "undefined" || typeof ChartDataLabels === "undefined") {
-    resultsList.insertAdjacentHTML("beforeend", '<p class="results-summary">The results graph could not be loaded. Refresh the page to try again.</p>');
-    return;
-  }
-
-  studentResultsCharts = chartGroups.map((group, index) => {
-    const chart = new Chart(document.getElementById(`student-results-chart-${index}`), {
-      type: "bar",
-      data: {
-        labels: group.entries.map(item => item.name),
-        datasets: [{
-          data: group.entries.map(item => item.votes),
-          backgroundColor: getResultsChartColors(group.entries),
-          borderRadius: 4,
-          maxBarThickness: 42
-        }]
-      },
-      plugins: [ChartDataLabels],
-      options: createResultsChartOptions(group.entries)
-    });
-    chart.$resultEntries = group.entries;
-    return chart;
-  });
-}
-
-function getResultsChartColors(entries) {
-  const palette = ["#1976d2", "#15966f", "#d88917", "#c34f62", "#168a9a", "#7156b5"];
-  const positions = [...new Set(entries.map(item => item.position))];
-  return entries.map(item => palette[positions.indexOf(item.position) % palette.length]);
-}
-
-function createResultsChartOptions(entries) {
-  const maxVotes = Math.max(1, ...entries.map(item => item.votes));
-  const darkMode = document.documentElement.dataset.theme === "dark";
-  const textColor = darkMode ? "#dce7f1" : "#40546a";
-  const gridColor = darkMode ? "#3a4d60" : "#e7edf3";
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: { padding: { top: 22 } },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label(context) {
-            const item = entries[context.dataIndex];
-            return `${item.votes} vote${item.votes === 1 ? "" : "s"} | ${item.percent}% for ${item.position}`;
-          }
-        }
-      },
-      datalabels: {
-        anchor: "end",
-        align: "top",
-        clamp: true,
-        color: textColor,
-        font: { weight: "700" },
-        formatter(value, context) {
-          return `${value} (${entries[context.dataIndex].percent}%)`;
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: { color: textColor, maxRotation: 35, minRotation: 0 },
-        grid: { display: false }
-      },
-      y: {
-        beginAtZero: true,
-        max: maxVotes + Math.max(1, Math.ceil(maxVotes * 0.2)),
-        ticks: { precision: 0, stepSize: 1, color: textColor },
-        title: { display: true, text: "Number of votes", color: textColor },
-        grid: { color: gridColor }
-      }
-    }
-  };
+  resultsList.innerHTML = `<div class="student-results-overview"><div class="results-total"><strong>${totalVotes}</strong><span>Total votes</span></div>${totalVotes ? "" : "<p class=\"results-summary\">No votes have been recorded yet.</p>"}</div><div class="student-result-groups">${chartGroups.map(group => `<section class="student-result-group"><h3>${escapeHtml(group.position)}</h3><div class="result-candidate-grid">${group.entries.map(item => {
+    const photo = item.picture
+      ? `<img class="result-candidate-photo" src="${escapeHtml(item.picture)}" alt="${escapeHtml(item.name)}">`
+      : `<div class="result-candidate-photo result-candidate-initials" aria-hidden="true">${escapeHtml(item.initials)}</div>`;
+    return `<article class="result-candidate-card"><div class="result-candidate-identity">${photo}<div><h4 class="result-candidate-name">${escapeHtml(item.name)}</h4><span class="result-candidate-position">${escapeHtml(item.position)}</span></div></div><div class="result-votes-row"><span>${item.votes} vote${item.votes === 1 ? "" : "s"}</span><strong class="result-percent">${item.percent}%</strong></div><div class="result-percent-track" role="progressbar" aria-label="${escapeHtml(item.name)} vote percentage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${item.percent}"><span style="width: ${item.percent}%"></span></div></article>`;
+  }).join("")}</div></section>`).join("")}</div>`;
 }
 
 function formatDate(value) {

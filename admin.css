@@ -185,14 +185,24 @@ body > * { animation: pageFadeIn .6s ease-out both; }
 .turnout-row { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 10px; margin-bottom: 24px; }
 .turnout-row strong { color: var(--blue); font-size: 26px; }
 .turnout-row span { color: #667789; font-size: 12px; }
-.turnout-track, .result-track { overflow: hidden; border-radius: 20px; background: #e9f0f6; }
+.turnout-track, .result-track, .result-percent-track { overflow: hidden; border-radius: 20px; background: #e9f0f6; }
 .turnout-track { height: 11px; }
 .turnout-track i, .result-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #1976d2, #48a9ed); transition: width .35s ease; }
 .results-list { width: 100%; }
 .admin-result-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .admin-result-group { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 7px; }
 .admin-result-group h3 { margin-bottom: 10px; color: var(--deep); font-size: 13px; }
-.admin-result-chart { position: relative; width: 100%; height: 260px; }
+.result-candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.result-candidate-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.result-candidate-identity { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.result-candidate-photo { display: grid; width: 58px; height: 58px; flex: 0 0 58px; place-items: center; border-radius: 50%; object-fit: cover; }
+.result-candidate-initials { background: #e4f4ff; color: var(--blue); font-size: 17px; font-weight: 800; }
+.result-candidate-name { overflow-wrap: anywhere; color: var(--ink); font-size: 15px; line-height: 1.3; }
+.result-candidate-position { display: block; margin-top: 4px; color: #60758a; font-size: 10px; font-weight: 800; }
+.result-votes-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; color: #607080; font-size: 12px; }
+.result-percent { color: var(--blue); font-size: 21px; line-height: 1; }
+.result-percent-track { height: 12px; margin-top: 8px; }
+.result-percent-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #1976d2, #48a9ed); transition: width .35s ease; }
 @media (max-width: 750px) {
   .admin-result-groups { grid-template-columns: 1fr; }
 }

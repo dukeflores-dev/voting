@@ -15,10 +15,24 @@ async function login(event) {
   if (event) event.preventDefault();
 
   const emailInput = document.getElementById("username");
+  const surnameInput = document.getElementById("surname");
   const passwordInput = document.getElementById("password");
   let inputValue = emailInput.value.trim().toLowerCase();
+  const surname = surnameInput.value.trim();
   let email = inputValue;
   if (!email.includes('@')) {
+    if (!validateStudentId(inputValue)) {
+      const message = document.getElementById("message");
+      message.style.color = "red";
+      message.textContent = getStudentIdFormatMessage();
+      return;
+    }
+    if (!surname) {
+      const message = document.getElementById("message");
+      message.style.color = "red";
+      message.textContent = "Enter your surname to log in.";
+      return;
+    }
     email = inputValue + '@lourdes.edu.ph';
   }
   emailInput.value = inputValue;
@@ -49,12 +63,29 @@ async function login(event) {
     return;
   }
 
-  message.className = "success-notice";
-  message.style.color = "#0d7d3a";
-  message.textContent = "Login successful!";
   const user = data.user;
   const userRole = resolveUserRole(user);
   const isAdmin = userRole === "admin";
+  if (!isAdmin) {
+    const registeredStudentId = user.user_metadata?.student_id;
+    const studentIdMatches = inputValue.includes("@") || !registeredStudentId ||
+      normalizeStudentId(inputValue) === normalizeStudentId(registeredStudentId);
+    if (!surname || !matchesRegisteredSurname(user, surname) || !studentIdMatches) {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (error) {
+        console.error("Unable to clear the session after failed identity verification.", error);
+      }
+      loginButton.disabled = false;
+      message.style.color = "red";
+      message.textContent = "Surname and Student ID do not match the registered account.";
+      return;
+    }
+  }
+
+  message.className = "success-notice";
+  message.style.color = "#0d7d3a";
+  message.textContent = "Login successful!";
   localStorage.setItem("elourdesCurrentUser", JSON.stringify({
     id: user.id,
     name: user.user_metadata?.full_name || user.email,
@@ -113,6 +144,26 @@ function isValidEmail(email) {
 function validateStudentId(studentId) {
   const normalized = (studentId || "").trim();
   return /^\d{8}$|^\d{4}-\d{4}$/.test(normalized);
+}
+
+function normalizeStudentId(studentId) {
+  return String(studentId || "").replace(/\D/g, "");
+}
+
+function normalizeSurname(surname) {
+  return String(surname || "").trim().replace(/[.,]/g, "").replace(/\s+/g, " ").toLowerCase();
+}
+
+function matchesRegisteredSurname(user, surname) {
+  const metadata = user?.user_metadata || {};
+  const fullName = String(metadata.full_name || "").trim();
+  const registeredSurnames = metadata.surname
+    ? [metadata.surname]
+    : fullName.includes(",")
+      ? [fullName.split(",", 1)[0]]
+      : fullName.split(/\s+/).map((part, index, parts) => parts.slice(index).join(" "));
+  const normalizedSurname = normalizeSurname(surname);
+  return Boolean(normalizedSurname) && registeredSurnames.some(registered => normalizeSurname(registered) === normalizedSurname);
 }
 
 function getStudentIdFormatMessage() {
@@ -356,6 +407,9 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined') {
   module.exports = {
     validateStudentId,
+    normalizeStudentId,
+    normalizeSurname,
+    matchesRegisteredSurname,
     validatePassword,
     getStudentIdFormatMessage,
     isValidEmail

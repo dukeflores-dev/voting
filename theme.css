@@ -184,6 +184,16 @@ html[data-theme="dark"] #ballot-review-modal .review-row strong {
   color: var(--theme-accent);
 }
 
+html[data-theme="dark"] #ballot-review-modal .ballot-submit-success {
+  border-color: #4a7295;
+  background: #174b78;
+  color: #edf3f8;
+}
+
+html[data-theme="dark"] #ballot-review-modal .ballot-submit-success strong {
+  color: #ffffff;
+}
+
 @media (max-width: 700px) {
   .theme-toggle {
     width: 36px;

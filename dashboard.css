@@ -1284,6 +1284,31 @@ body > * {
   color: var(--blue);
 }
 
+.ballot-submit-success {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 18px 14px;
+  border: 1px solid #b7d8f2;
+  border-radius: 6px;
+  background: #f0f8ff;
+  color: #18324c;
+  text-align: center;
+}
+
+.ballot-submit-success p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ballot-submit-success strong {
+  color: var(--blue);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+}
+
 .candidate-image-card,
 .guidelines-modal-card {
   position: relative;

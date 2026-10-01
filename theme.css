@@ -144,6 +144,32 @@ html[data-theme="dark"] :is(.chatbot-message, .chatbot-quick-actions button) {
   color: var(--theme-text);
 }
 
+html[data-theme="dark"] #ballot-modal .ballot-form {
+  border: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  color: var(--theme-text);
+}
+
+html[data-theme="dark"] #ballot-modal .ballot-position {
+  border-color: var(--theme-border);
+  background: var(--theme-raised);
+}
+
+html[data-theme="dark"] #ballot-modal .ballot-option {
+  border-radius: 4px;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] #ballot-modal .ballot-option input[type="radio"] {
+  accent-color: var(--theme-accent);
+}
+
+html[data-theme="dark"] #ballot-modal .ballot-option:has(input:checked) {
+  background: #174b78;
+  color: #ffffff !important;
+  outline: 1px solid #5ba5e8;
+}
+
 @media (max-width: 700px) {
   .theme-toggle {
     width: 36px;

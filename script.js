@@ -121,12 +121,10 @@ function showLogin() {
 
 function updateLoginPasswordField() {
   const identity = getLoginIdentity(document.getElementById("username").value);
-  const passwordField = document.querySelector(".login-password-field");
   const forgotPasswordLink = document.querySelector(".forgot-password-link");
   const passwordInput = document.getElementById("password");
   const needsPassword = Boolean(identity);
 
-  passwordField.hidden = !needsPassword;
   forgotPasswordLink.hidden = false;
   passwordInput.required = needsPassword;
   if (!needsPassword) passwordInput.value = "";

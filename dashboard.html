@@ -19,9 +19,6 @@
 
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-selected" data-view="home" href="#home-content" onclick="showDashboardView('home'); return false;">Dashboard</a>
-      <a data-view="election" href="#current-election" onclick="showDashboardView('election'); return false;">Election</a>
-      <a data-view="guidelines" href="#guidelines" onclick="showDashboardView('guidelines'); return false;">Reminders</a>
-      <a data-view="notifications" href="#notifications" onclick="showDashboardView('notifications'); return false;">Notifications</a>
       <a data-view="results" href="#student-results" onclick="showDashboardResults(); return false;">Results</a>
     </nav>
 
@@ -139,10 +136,6 @@
       <h2>Confirm Ballot</h2>
       <p class="ballot-note">Please confirm your selections before submitting. Once submitted, your vote cannot be changed.</p>
       <div id="ballot-review-list" class="ballot-review-list"></div>
-      <section class="ballot-submit-success" id="ballot-submit-success" hidden role="status" aria-live="polite" aria-atomic="true">
-        <p>Your ballot has been submitted. This review will close in <span id="ballot-close-seconds">5</span> seconds.</p>
-        <strong id="ballot-close-countdown">5...</strong>
-      </section>
       <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeBallotReview()">EDIT</button><button type="submit" class="save-button">SUBMIT VOTE</button></div>
     </form>
   </div>
@@ -196,7 +189,7 @@
         <li>Check your choices in the review screen before submitting.</li>
         <li>Once submitted, your ballot is final and recorded securely.</li>
       </ul>
-      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeQuickGuide()">CLOSE</button><button type="button" class="save-button" onclick="closeQuickGuide(); startVoting();">START VOTING</button></div>
+      <div class="modal-actions"><button type="button" class="cancel-button" onclick="closeQuickGuide()">CLOSE</button></div>
     </article>
   </div>
   <div class="modal" id="student-profile-modal" hidden>

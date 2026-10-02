@@ -4,7 +4,6 @@ let authUser = null;
 let hasVoted = false;
 let hasLoadedElectionStatus = false;
 let pendingStudentProfilePicture = null;
-let ballotReviewCountdownTimer = null;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
@@ -733,40 +732,8 @@ function reviewBallotBeforeSubmit() {
 }
 
 function closeBallotReview() {
-  window.clearInterval(ballotReviewCountdownTimer);
-  ballotReviewCountdownTimer = null;
   document.getElementById("ballot-review-modal").hidden = true;
   document.getElementById("ballot-modal").hidden = false;
-}
-
-function startBallotReviewCloseCountdown() {
-  const reviewModal = document.getElementById("ballot-review-modal");
-  const remainingSeconds = document.getElementById("ballot-close-seconds");
-  const countdown = document.getElementById("ballot-close-countdown");
-
-  document.getElementById("ballot-review-list").hidden = true;
-  reviewModal.querySelector(".ballot-note").hidden = true;
-  reviewModal.querySelector(".close-modal").hidden = true;
-  reviewModal.querySelector(".modal-actions").hidden = true;
-  document.getElementById("ballot-submit-success").hidden = false;
-
-  let seconds = 5;
-  remainingSeconds.textContent = String(seconds);
-  countdown.textContent = `${seconds}...`;
-  window.clearInterval(ballotReviewCountdownTimer);
-  ballotReviewCountdownTimer = window.setInterval(() => {
-    seconds -= 1;
-    if (seconds === 0) {
-      window.clearInterval(ballotReviewCountdownTimer);
-      ballotReviewCountdownTimer = null;
-      reviewModal.hidden = true;
-      document.getElementById("ballot-modal").hidden = true;
-      return;
-    }
-
-    remainingSeconds.textContent = String(seconds);
-    countdown.textContent = `${seconds}...`;
-  }, 1000);
 }
 
 async function submitVote(event) {
@@ -844,7 +811,7 @@ async function confirmVoteSubmission(event) {
   hasVoted = true;
   event.submitter?.setAttribute("disabled", "disabled");
   addVoteConfirmationNotification();
-  startBallotReviewCloseCountdown();
+  document.getElementById("ballot-review-modal").hidden = true;
   updateVotingStatus();
   updateElectionState();
   showToast("Vote submitted successfully. A confirmation receipt has been recorded.");

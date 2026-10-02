@@ -87,18 +87,13 @@ async function login(event) {
     }
   }
 
-  message.className = "success-notice";
-  message.style.color = "#0d7d3a";
-  message.textContent = "Login successful!";
   localStorage.setItem("elourdesCurrentUser", JSON.stringify({
     id: user.id,
     name: user.user_metadata?.full_name || user.email,
     username: user.email,
     role: userRole
   }));
-  window.setTimeout(() => {
-    window.location.href = isAdmin ? "admin.html" : "dashboard.html";
-  }, 500);
+  window.location.href = isAdmin ? "admin.html" : "dashboard.html";
 }
 
 function showSignup(event) {

@@ -25,7 +25,7 @@ async function login(event) {
     return;
   }
   emailInput.value = inputValue;
-  const password = identity.type === "email" ? passwordInput.value : null;
+  const password = passwordInput.value;
   const message = document.getElementById("message");
   const loginButton = document.querySelector("#login-form button[type='submit']");
 
@@ -37,7 +37,7 @@ async function login(event) {
     if (identity.type === "student_id") {
       const { data: loginData, error: loginError } = await supabaseClient.functions.invoke(
         "login-with-student-id",
-        { body: { studentId: identity.value } }
+        { body: { studentId: identity.value, password } }
       );
       if (loginError || !loginData?.access_token || !loginData?.refresh_token) {
         loginButton.disabled = false;
@@ -124,32 +124,23 @@ function updateLoginPasswordField() {
   const passwordField = document.querySelector(".login-password-field");
   const forgotPasswordLink = document.querySelector(".forgot-password-link");
   const passwordInput = document.getElementById("password");
-  const needsPassword = identity?.type === "email";
+  const needsPassword = Boolean(identity);
 
   passwordField.hidden = !needsPassword;
-  forgotPasswordLink.hidden = identity?.type === "student_id";
+  forgotPasswordLink.hidden = false;
   passwordInput.required = needsPassword;
   if (!needsPassword) passwordInput.value = "";
 }
 
-async function showRecoveryPasswordForm() {
+function showRecoveryPasswordForm() {
   document.getElementById("login-form").hidden = true;
   document.getElementById("signup-form").hidden = true;
   document.getElementById("forgot-form").hidden = true;
   document.getElementById("new-password-form").hidden = false;
 
-  const { data } = await supabaseClient.auth.getUser();
-  const studentId = data.user?.user_metadata?.student_id;
-  const isStudentAccount = validateStudentId(studentId);
-  document.getElementById("admin-password-reset-fields").hidden = isStudentAccount;
-  document.getElementById("new-password").required = !isStudentAccount;
-  document.getElementById("confirm-new-password").required = !isStudentAccount;
-  document.getElementById("recovery-password-help").textContent = isStudentAccount
-    ? "Your Student ID will remain your password."
-    : "Choose a new password for your account.";
-  document.getElementById("new-password-submit").textContent = isStudentAccount
-    ? "RESTORE STUDENT ID PASSWORD"
-    : "UPDATE PASSWORD";
+  document.getElementById("admin-password-reset-fields").hidden = false;
+  document.getElementById("recovery-password-help").textContent = "Choose a new password for your account (at least 6 characters).";
+  document.getElementById("new-password-submit").textContent = "UPDATE PASSWORD";
 }
 
 function togglePassword(inputId, button) {
@@ -279,37 +270,21 @@ async function updatePassword(event) {
   const newPassword = document.getElementById("new-password").value;
   const confirmPassword = document.getElementById("confirm-new-password").value;
   const message = document.getElementById("new-password-message");
-  let passwordToSet = newPassword;
-  let isStudentAccount = false;
 
-  try {
-    const { data, error: userError } = await supabaseClient.auth.getUser();
-    if (userError) throw userError;
-    const studentId = data.user?.user_metadata?.student_id;
-    if (studentId && validateStudentId(studentId)) {
-      isStudentAccount = true;
-      passwordToSet = String(studentId).trim();
-    }
-  } catch (error) {
-    message.style.color = "red";
-    message.textContent = "Unable to verify the account. Please request a new reset link.";
-    return;
-  }
-
-  if (!isStudentAccount && newPassword.length < 6) {
+  if (newPassword.length < 6) {
     message.style.color = "red";
     message.textContent = "Password must be at least 6 characters long.";
     return;
   }
 
-  if (!isStudentAccount && newPassword !== confirmPassword) {
+  if (newPassword !== confirmPassword) {
     message.style.color = "red";
     message.textContent = "Passwords do not match.";
     return;
   }
 
   try {
-    const { error } = await supabaseClient.auth.updateUser({ password: passwordToSet });
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
 
     if (error) {
       message.style.color = "red";
@@ -318,9 +293,7 @@ async function updatePassword(event) {
     }
 
     message.style.color = "green";
-    message.textContent = isStudentAccount
-      ? "Your Student ID is now your password. You can sign in using your Student ID."
-      : "Password updated successfully. You can now sign in with your new password.";
+    message.textContent = "Password updated successfully. You can now sign in with your new password.";
     event.target.reset();
     window.setTimeout(() => showLogin(), 1800);
   } catch (error) {

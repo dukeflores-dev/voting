@@ -2182,6 +2182,7 @@ main.dashboard[hidden] { display: none !important; }
 }
 .student-profile-card { position: relative; width: min(430px, 100%); padding: 24px 28px 20px; border-radius: 8px; background: white; text-align: center; box-shadow: 0 18px 50px rgba(7, 39, 79, .25); }
 .student-profile-avatar { display: grid; place-items: center; width: 78px; height: 78px; margin: 0 auto 12px; border-radius: 50%; background: #dff1ff; color: #06439a; font-size: 34px; }
+.student-profile-avatar img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 .student-profile-card h2 { margin: 8px 0; color: #06439a; font-size: 25px; }
 .student-profile-role { color: #6381a3; font-size: 16px; }
 .student-profile-details { margin-top: 22px; border-top: 1px solid #e4ebf2; text-align: left; }
@@ -2489,11 +2490,12 @@ main.dashboard[hidden] { display: none !important; }
 }
 .student-name-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   align-items: end;
   margin: 14px 0 18px;
 }
+.student-name-form[hidden] { display: none; }
 .profile-field {
   display: flex;
   flex-direction: column;
@@ -2518,7 +2520,10 @@ main.dashboard[hidden] { display: none !important; }
   color: #1c2b3b;
   font-size: 14px;
 }
+.profile-picture-field { grid-column: 1 / -1; }
+.profile-picture-field input { width: 100%; min-width: 0; color: #526274; font: inherit; }
 .save-name-button {
+  grid-column: 1 / -1;
   min-width: 116px;
   width: auto;
   padding: 10px 12px;

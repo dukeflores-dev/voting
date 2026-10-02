@@ -202,7 +202,7 @@
   <div class="modal" id="student-profile-modal" hidden>
     <article class="student-profile-card">
       <button class="close-modal" type="button" onclick="closeStudentProfile()" aria-label="Close">&times;</button>
-      <div class="student-profile-avatar" aria-hidden="true"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+      <div class="student-profile-avatar" aria-hidden="true"><img id="student-profile-picture" alt="" hidden><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
       <p class="eyebrow">MY PROFILE</p>
       <h2 id="student-profile-name">Student Voter</h2>
       <button class="edit-name-button" type="button" onclick="editStudentProfile()">EDIT PROFILE</button>
@@ -227,6 +227,10 @@
             <option>Female</option>
             <option>Prefer not to say</option>
           </select>
+        </label>
+        <label class="profile-field profile-picture-field">
+          <span>Profile picture (optional)</span>
+          <input id="student-profile-picture-input" type="file" accept="image/*" onchange="previewStudentProfilePicture(event)">
         </label>
         <button class="save-name-button" type="submit">SAVE CHANGES</button>
       </form>

@@ -30,7 +30,7 @@ Deno.serve(async (request: Request) => {
     return respond({ error: "Login is temporarily unavailable." }, 500);
   }
 
-  let body: { studentId?: unknown };
+  let body: { studentId?: unknown; password?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -42,6 +42,10 @@ Deno.serve(async (request: Request) => {
     return respond({ error: "Student ID or password is incorrect." }, 401);
   }
   const studentId = rawStudentId.replace(/\D/g, "");
+  const password = typeof body.password === "string" ? body.password : "";
+  if (!password) {
+    return respond({ error: "Student ID or password is incorrect." }, 401);
+  }
 
   const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false }
@@ -64,8 +68,7 @@ Deno.serve(async (request: Request) => {
   const { data: userResult, error: userError } = await serviceClient.auth.admin.getUserById(account.user_id);
   const user = userResult?.user;
   const email = user?.email;
-  const password = String(user?.user_metadata?.student_id || "").trim();
-  if (userError || !email || !/^(?:\d{8}|\d{4}-\d{4})$/.test(password)) {
+  if (userError || !email) {
     console.error("Student account lookup failed.", userError?.message || "Email not found.");
     return respond({ error: "Student ID or password is incorrect." }, 401);
   }

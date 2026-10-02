@@ -3,6 +3,7 @@ let currentUser = null;
 let authUser = null;
 let hasVoted = false;
 let hasLoadedElectionStatus = false;
+let pendingStudentProfilePicture = null;
 let ballotReviewCountdownTimer = null;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
@@ -61,7 +62,8 @@ async function initializeDashboard() {
     studentId: authUser.user_metadata?.student_id || "Not available",
     email: authUser.email,
     yearLevel: authUser.user_metadata?.year_level || "Not available",
-    gender: authUser.user_metadata?.gender || "Not available"
+    gender: authUser.user_metadata?.gender || "Not available",
+    profilePicture: authUser.user_metadata?.profile_picture || ""
   };
 
   if (currentUser.role === "admin") {
@@ -477,6 +479,10 @@ function openStudentProfile() {
   document.getElementById("student-profile-id").textContent = account?.studentId || currentUser?.username || "Not available";
   document.getElementById("student-profile-email").textContent = account?.email || "Not available";
   document.getElementById("student-profile-status").textContent = hasVoted ? "Voted" : "Not yet voted";
+  pendingStudentProfilePicture = null;
+  document.getElementById("student-profile-picture-input").value = "";
+  setStudentProfilePicture(account?.profilePicture || "");
+  document.querySelector(".edit-name-button").hidden = false;
   document.getElementById("student-name-form").hidden = true;
   document.getElementById("student-profile-modal").hidden = false;
 }
@@ -490,8 +496,44 @@ function editStudentProfile() {
   const genderInput = document.getElementById("student-gender");
   yearLevelInput.value = account?.yearLevel && account.yearLevel !== "Not available" ? account.yearLevel : "";
   genderInput.value = account?.gender && account.gender !== "Not available" ? account.gender : "";
+  pendingStudentProfilePicture = null;
+  document.getElementById("student-profile-picture-input").value = "";
   document.getElementById("student-name-form").hidden = false;
+  document.querySelector(".edit-name-button").hidden = true;
   yearLevelInput.focus();
+}
+
+function setStudentProfilePicture(source) {
+  const avatar = document.querySelector(".student-profile-avatar");
+  const picture = document.getElementById("student-profile-picture");
+  picture.src = source;
+  picture.hidden = !source;
+  avatar.querySelector("svg").hidden = Boolean(source);
+}
+
+async function previewStudentProfilePicture(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+    event.target.value = "";
+    showToast("Choose an image smaller than 5 MB.");
+    return;
+  }
+
+  try {
+    const image = await createImageBitmap(file);
+    const scale = Math.min(1, 256 / Math.max(image.width, image.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+    image.close();
+    pendingStudentProfilePicture = canvas.toDataURL("image/jpeg", 0.78);
+    setStudentProfilePicture(pendingStudentProfilePicture);
+  } catch {
+    event.target.value = "";
+    showToast("That image could not be loaded.");
+  }
 }
 
 async function saveStudentProfile(event) {
@@ -503,14 +545,19 @@ async function saveStudentProfile(event) {
   const { error } = await supabaseClient.auth.updateUser({
     data: {
       year_level: yearLevel,
-      gender: gender
+      gender: gender,
+      profile_picture: pendingStudentProfilePicture || account.profilePicture || ""
     }
   });
   if (error) { showToast("Your profile could not be updated."); return; }
 
   account.yearLevel = yearLevel;
   account.gender = gender;
+  account.profilePicture = pendingStudentProfilePicture || account.profilePicture || "";
+  pendingStudentProfilePicture = null;
+  setStudentProfilePicture(account.profilePicture);
   document.getElementById("student-name-form").hidden = true;
+  document.querySelector(".edit-name-button").hidden = false;
   showToast("Your profile was updated successfully.");
 }
 

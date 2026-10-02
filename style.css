@@ -210,6 +210,7 @@ select {
   position: relative;
   display: block;
 }
+.password-field[hidden] { display: none; }
 
 .password-field input {
   position: relative;

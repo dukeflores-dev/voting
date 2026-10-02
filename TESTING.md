@@ -8,14 +8,15 @@ These accounts are for local or staging testing only. Create them in Supabase Da
 | Test admin | `admin.test@elourdes.local` | `TestAdmin!2026` | `full_name`: `Demo Admin`, `role`: `admin` |
 
 The admin role must be placed in the user's metadata before opening `admin.html`. For production, use server-managed `app_metadata` instead of trusting client-editable metadata.
-Voter passwords are their Student IDs; admin accounts continue to use a separate password.
+New voter passwords initially match their Student IDs. Voters can set a different password through the Forgot Password email flow.
 
 ## Enable Student ID Login
 
 1. Run `supabase-student-id-login.sql` in the Supabase SQL Editor. It creates a private Student ID lookup, backfills existing registrations, and maps future registrations automatically.
 2. Install and authenticate the Supabase CLI, then link this folder to project `ilwixrwknjywonoahmof` with `supabase link --project-ref ilwixrwknjywonoahmof`.
 3. Deploy the login function with `supabase functions deploy login-with-student-id`.
-4. Sign up a test account with a Student ID, then verify that entering only that ID logs in. Confirm that an unregistered ID returns a generic error.
+4. Sign up a test account with a Student ID, then verify that its Student ID and initial password log in. Confirm that an unregistered ID or incorrect password returns a generic error.
+5. Use Forgot Password with the voter's registered email, follow the recovery link, set a new password, then verify Student ID login accepts the new password and rejects the old one.
 
 The function uses Supabase's server-provided `SUPABASE_SERVICE_ROLE_KEY` only on the server. Never add that key to an HTML or JavaScript file. The lookup table grants no access to browser roles.
 

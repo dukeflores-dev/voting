@@ -1,4 +1,4 @@
--- Run once in the Supabase SQL Editor to enable private Student ID lookup.
+
 create table if not exists public.student_accounts (
   student_id text primary key check (student_id ~ '^[0-9]{8}$'),
   user_id uuid not null unique references auth.users(id) on delete cascade,
@@ -9,8 +9,7 @@ alter table public.student_accounts enable row level security;
 revoke all on public.student_accounts from public, anon, authenticated;
 grant select on public.student_accounts to service_role;
 
--- Backfill existing registrations. Duplicate Student IDs remain unmapped so
--- they can be reviewed and corrected by an administrator.
+
 insert into public.student_accounts (student_id, user_id)
 select normalized.student_id, normalized.id
 from (

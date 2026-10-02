@@ -2509,7 +2509,8 @@ main.dashboard[hidden] { display: none !important; }
 .profile-field span {
   margin-left: 2px;
 }
-.student-name-form select {
+.student-name-form select,
+.student-name-form input[type="password"] {
   width: 100%;
   min-width: 135px;
   margin: 0;
@@ -2522,6 +2523,12 @@ main.dashboard[hidden] { display: none !important; }
 }
 .profile-picture-field { grid-column: 1 / -1; }
 .profile-picture-field input { width: 100%; min-width: 0; color: #526274; font: inherit; }
+.student-profile-message {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-align: left;
+  font-size: 13px;
+}
 .save-name-button {
   grid-column: 1 / -1;
   min-width: 116px;

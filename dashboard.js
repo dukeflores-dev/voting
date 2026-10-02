@@ -497,6 +497,9 @@ function editStudentProfile() {
   genderInput.value = account?.gender && account.gender !== "Not available" ? account.gender : "";
   pendingStudentProfilePicture = null;
   document.getElementById("student-profile-picture-input").value = "";
+  document.getElementById("student-new-password").value = "";
+  document.getElementById("student-confirm-password").value = "";
+  document.getElementById("student-profile-message").textContent = "";
   document.getElementById("student-name-form").hidden = false;
   document.querySelector(".edit-name-button").hidden = true;
   yearLevelInput.focus();
@@ -539,25 +542,43 @@ async function saveStudentProfile(event) {
   event.preventDefault();
   const yearLevel = document.getElementById("student-year-level").value.trim();
   const gender = document.getElementById("student-gender").value.trim();
+  const newPassword = document.getElementById("student-new-password").value;
+  const confirmPassword = document.getElementById("student-confirm-password").value;
+  const profileMessage = document.getElementById("student-profile-message");
+  const passwordError = getPasswordChangeError(newPassword, confirmPassword);
   if (!yearLevel || !gender) return;
+  if (passwordError) {
+    profileMessage.style.color = "#b42318";
+    profileMessage.textContent = passwordError;
+    return;
+  }
 
-  const { error } = await supabaseClient.auth.updateUser({
+  const updates = {
     data: {
       year_level: yearLevel,
       gender: gender,
       profile_picture: pendingStudentProfilePicture || account.profilePicture || ""
     }
-  });
-  if (error) { showToast("Your profile could not be updated."); return; }
+  };
+  if (newPassword) updates.password = newPassword;
+
+  const { error } = await supabaseClient.auth.updateUser(updates);
+  if (error) {
+    profileMessage.style.color = "#b42318";
+    profileMessage.textContent = "Your profile could not be updated. " + error.message;
+    return;
+  }
 
   account.yearLevel = yearLevel;
   account.gender = gender;
   account.profilePicture = pendingStudentProfilePicture || account.profilePicture || "";
   pendingStudentProfilePicture = null;
   setStudentProfilePicture(account.profilePicture);
+  document.getElementById("student-new-password").value = "";
+  document.getElementById("student-confirm-password").value = "";
   document.getElementById("student-name-form").hidden = true;
   document.querySelector(".edit-name-button").hidden = false;
-  showToast("Your profile was updated successfully.");
+  showToast(newPassword ? "Your profile and password were updated successfully." : "Your profile was updated successfully.");
 }
 
 function selectCandidate(name) {

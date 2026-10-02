@@ -258,6 +258,40 @@ body > * { animation: pageFadeIn .6s ease-out both; }
 .profile-details { margin-top: 22px; border-top: 1px solid var(--line); text-align: left; }
 .profile-details p { display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid var(--line); color: #526274; font-size: 16px; }
 .profile-details span { text-align: right; }
+.student-account-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+.student-account-form label { display: grid; gap: 6px; color: #4d5d6e; font-size: 12px; font-weight: 700; }
+.student-account-form input,
+.student-account-form select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d5dfe9;
+  border-radius: 4px;
+  background: #f7fbfe;
+  color: var(--ink);
+  font: inherit;
+}
+.student-account-note,
+.student-account-message { grid-column: 1 / -1; margin: 0; font-size: 12px; }
+.student-account-note { color: #687789; }
+.student-account-message:empty { display: none; }
+.student-account-message.is-error { color: #b42318; }
+.student-account-message.is-success { color: #167044; }
+.student-account-form .add-button { justify-self: start; min-height: 40px; }
+.student-account-form .add-button:disabled { cursor: wait; opacity: .65; }
+@media (max-width: 750px) {
+  .student-account-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .student-account-form .add-button { grid-column: 1 / -1; justify-self: stretch; }
+}
+@media (max-width: 460px) {
+  .student-account-form { grid-template-columns: 1fr; }
+  .student-account-form .add-button { grid-column: auto; }
+}
 
 @keyframes pageFadeIn {
 	from { opacity: 0; }

@@ -31,21 +31,11 @@
 
           <div class="options">
             <label><input type="checkbox"> Remember me</label>
-            <a class="forgot-password-link" href="#" onclick="forgotPassword(event)">Forgot Password?</a>
           </div>
 
           <button type="submit">LOGIN</button>
 
           <p id="message"></p>
-        </form>
-
-        <form id="forgot-form" class="forgot-form" onsubmit="resetPassword(event)" novalidate hidden>
-          <h2>Reset Password</h2>
-          <p class="form-help">Enter your registered email and we will send you a secure password reset link.</p>
-          <input type="email" id="reset-identity" placeholder="Email Address" inputmode="email" autocomplete="email" required>
-          <button type="submit">RESET PASSWORD</button>
-          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
-          <p id="reset-message"></p>
         </form>
 
         <form id="new-password-form" class="forgot-form" onsubmit="updatePassword(event)" hidden>
@@ -66,6 +56,7 @@
           <p id="new-password-message"></p>
         </form>
 
+        <!-- Public student signup is disabled; admins create accounts in admin.html.
         <form id="signup-form" class="signup-form" onsubmit="createAccount(event)" hidden>
           <h2>Registration Form</h2>
 
@@ -75,78 +66,72 @@
             </label>
             <label>Student ID
               <input type="text" id="student-id" placeholder="Example: 2024-1234" required>
-            </label>
-
-            <label>Sex
-              <select id="gender" required>
-                <option value="" disabled selected>Please Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Prefer not to say</option>
-              </select>
-            </label>
-            <label>Grade
-              <select id="year-level" required>
-                <option value="" disabled selected>Please Select</option>
-                <option>Grade 7</option>
-                <option>Grade 8</option>
-                <option>Grade 9</option>
-                <option>Grade 10</option>
-                <option>Grade 11</option>
-                <option>Grade 12</option>
-              </select>
-            </label>
-
-            <label class="full-field">Email Address
-              <input type="email" id="email" required placeholder="studentname@lourdes.edu.ph or personal email">
-            </label>
-
-            <label hidden>Password
-              <span class="password-field">
-                <input type="password" id="signup-password" placeholder="8+ characters: A-z, number, special character">
-                <button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword('signup-password', this)"><span class="eye-icon eye-icon-visible" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="eye-icon eye-icon-hidden" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.5 18.5 0 0 1-3.1 3.7M6.2 6.2C3.4 8.1 2 12 2 12s3.5 6 10 6a10.8 10.8 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span></button>
-              </span>
-            </label>
-            <label hidden>Confirm Password
-              <span class="password-field">
-                <input type="password" id="confirm-password">
-                <button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword('confirm-password', this)"><span class="eye-icon eye-icon-visible" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="eye-icon eye-icon-hidden" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.5 18.5 0 0 1-3.1 3.7M6.2 6.2C3.4 8.1 2 12 2 12s3.5 6 10 6a10.8 10.8 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span></button>
-              </span>
-            </label>
-            <p class="full-field field-help">Gagamitin ang iyong Student ID bilang password.</p>
-          </div>
-
-          <label class="agreement"><input type="checkbox" required> <em>I confirm that the information I provided is accurate.</em></label>
-
-          <button type="submit">CREATE ACCOUNT</button>
-          <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
-          <p id="signup-message"></p>
-        </form>
-
-        <section class="signup-guidelines-step" id="signup-guidelines-modal" hidden aria-labelledby="signup-guidelines-title">
-          <article class="signup-guidelines-card">
-            <h2 id="signup-guidelines-title">Terms and Conditions</h2>
-            <p>By accessing and using ELOURDES VOTE, you agree to comply with the following terms and conditions:</p>
-            <ul>
-              <li><strong>Eligibility</strong> - Only officially enrolled and eligible Junior High School (JHS) and Senior High School (SHS) students of Our Lady of Lourdes College are allowed to use the system.</li>
-              <li><strong>Account Usage</strong> - Each student must use their own account and must not share their login credentials with another person.</li>
-              <li><strong>One Vote Per Position</strong> - Each eligible voter is allowed to cast only one vote for each available election position.</li>
-              <li><strong>Review Before Submission</strong> - Voters are responsible for reviewing their selected candidates before submitting their votes.</li>
-              <li><strong>Finality of Votes</strong> - Once a vote is submitted, it is considered final and cannot be edited, withdrawn, or submitted again.</li>
-              <li><strong>Candidate Information</strong> - Voters are encouraged to review the candidates' information and platforms before making their choices.</li>
-              <li><strong>Prohibited Activities</strong> - Any attempt to manipulate election results, duplicate votes, impersonate another voter, or interfere with the voting process is strictly prohibited.</li>
-              <li><strong>Technical Problems</strong> - Any errors, technical issues, or unusual system behavior should be reported immediately to the designated election administrator.</li>
-            </ul>
-            <h3>Agreement to the Terms</h3>
-            <p>By clicking “I Agree” or proceeding to use ELOURDES VOTE, you confirm that you have read, understood, and agreed to these Terms and Conditions.</p>
-            <label class="guidelines-confirmation"><input type="checkbox" id="signup-guidelines-confirm"> <em>I Agree to the Terms and Conditions.</em></label>
-            <p class="guidelines-error" id="signup-guidelines-error" role="alert"></p>
-            <div class="guidelines-actions">
-              <button type="button" class="back-button" onclick="closeSignupGuidelines()">BACK TO SIGN UP</button>
-              <button type="button" onclick="confirmSignupGuidelines()">CONFIRM &amp; CREATE ACCOUNT</button>
+              <label>Sex
+                <select id="gender" required>
+                  <option value="" disabled selected>Please Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Prefer not to say</option>
+                </select>
+              </label>
+              <label>Grade
+                <select id="year-level" required>
+                  <option value="" disabled selected>Please Select</option>
+                  <option>Grade 7</option>
+                  <option>Grade 8</option>
+                  <option>Grade 9</option>
+                  <option>Grade 10</option>
+                  <option>Grade 11</option>
+                  <option>Grade 12</option>
+                </select>
+              </label>
+              <label class="full-field">Email Address
+                <input type="email" id="email" required placeholder="studentname@lourdes.edu.ph or personal email">
+              </label>
+              <label hidden>Password
+                <span class="password-field">
+                  <input type="password" id="signup-password" placeholder="8+ characters: A-z, number, special character">
+                  <button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword('signup-password', this)"><span class="eye-icon eye-icon-visible" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6S18.5 18 12 18 2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="eye-icon eye-icon-hidden" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.5 18.5 0 0 1-3.1 3.7M6.2 6.2C3.4 8.1 2 12 2 12s3.5 6 10 6a10.8 10.8 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span></button>
+                </span>
+              </label>
+              <label hidden>Confirm Password
+                <span class="password-field">
+                  <input type="password" id="confirm-password">
+                  <button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword('confirm-password', this)"><span class="eye-icon eye-icon-visible" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="eye-icon eye-icon-hidden" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c-2.8 1.9-4.2 5.8-4.2 5.8s3.5 6 10 6a10.8 10.8 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span></button>
+                </span>
+              </label>
+              <p class="full-field field-help">Gagamitin ang iyong Student ID bilang password.</p>
             </div>
-          </article>
-        </section>
+            <label class="agreement"><input type="checkbox" required> <em>I confirm that the information I provided is accurate.</em></label>
+            <button type="submit">CREATE ACCOUNT</button>
+            <button type="button" class="back-button" onclick="showLogin()">BACK TO LOGIN</button>
+            <p id="signup-message"></p>
+          </form>
+          <section class="signup-guidelines-step" id="signup-guidelines-modal" hidden aria-labelledby="signup-guidelines-title">
+            <article class="signup-guidelines-card">
+              <h2 id="signup-guidelines-title">Terms and Conditions</h2>
+              <p>By accessing and using ELOURDES VOTE, you agree to comply with the following terms and conditions:</p>
+              <ul>
+                <li><strong>Eligibility</strong> - Only officially enrolled and eligible Junior High School (JHS) and Senior High School (SHS) students of Our Lady of Lourdes College are allowed to use the system.</li>
+                <li><strong>Account Usage</strong> - Each student must use their own account and must not share their login credentials with another person.</li>
+                <li><strong>One Vote Per Position</strong> - Each eligible voter is allowed to cast only one vote for each available election position.</li>
+                <li><strong>Review Before Submission</strong> - Voters are responsible for reviewing their selected candidates before submitting their votes.</li>
+                <li><strong>Finality of Votes</strong> - Once a vote is submitted, it is considered final and cannot be edited, withdrawn, or submitted again.</li>
+                <li><strong>Candidate Information</strong> - Voters are encouraged to review the candidates' information and platforms before making their choices.</li>
+                <li><strong>Prohibited Activities</strong> - Any attempt to manipulate election results, duplicate votes, impersonate another voter, or interfere with the voting process is strictly prohibited.</li>
+                <li><strong>Technical Problems</strong> - Any errors, technical issues, or unusual system behavior should be reported immediately to the designated election administrator.</li>
+              </ul>
+              <h3>Agreement to the Terms</h3>
+              <p>By clicking “I Agree” or proceeding to use ELOURDES VOTE, you confirm that you have read, understood, and agreed to these Terms and Conditions.</p>
+              <label class="guidelines-confirmation"><input type="checkbox" id="signup-guidelines-confirm"> <em>I Agree to the Terms and Conditions.</em></label>
+              <p class="guidelines-error" id="signup-guidelines-error" role="alert"></p>
+              <div class="guidelines-actions">
+                <button type="button" class="back-button" onclick="closeSignupGuidelines()">BACK TO SIGN UP</button>
+                <button type="button" onclick="confirmSignupGuidelines()">CONFIRM &amp; CREATE ACCOUNT</button>
+              </div>
+            </article>
+          </section>
+        -->
 
       </div>
     </div>
@@ -157,7 +142,7 @@
     <section class="chatbot-panel" hidden>
       <header class="chatbot-header"><div><strong>ELOURDES AI</strong><small>Voting and candidate assistant</small></div><button class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button></header>
       <div class="chatbot-messages" aria-live="polite"></div>
-      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I create an account?">Create an account</button><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
+      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..." aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
     </section>
     <button class="chatbot-toggle" type="button" aria-label="Open Elourdes AI assistant" aria-expanded="false"><span class="chatbot-ai-icon" aria-hidden="true">AI</span></button>
@@ -171,6 +156,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
   <script src="script.js"></script>
+  <script src="chatbot-knowledge.js"></script>
   <script src="chatbot.js"></script>
 </body>
 </html>

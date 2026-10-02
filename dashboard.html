@@ -225,6 +225,15 @@
           <span>Profile picture (optional)</span>
           <input id="student-profile-picture-input" type="file" accept="image/*" onchange="previewStudentProfilePicture(event)">
         </label>
+        <label class="profile-field">
+          <span>New Password</span>
+          <input id="student-new-password" type="password" minlength="6" autocomplete="new-password">
+        </label>
+        <label class="profile-field">
+          <span>Confirm Password</span>
+          <input id="student-confirm-password" type="password" minlength="6" autocomplete="new-password">
+        </label>
+        <p class="student-profile-message" id="student-profile-message" role="status" aria-live="polite"></p>
         <button class="save-name-button" type="submit">SAVE CHANGES</button>
       </form>
       <p class="student-profile-role">Registered Student Voter</p>
@@ -256,7 +265,7 @@
     <section class="chatbot-panel" hidden>
       <header class="chatbot-header"><div><strong>ELOURDES AI</strong><small>Voting and candidate assistant</small></div><button class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button></header>
       <div class="chatbot-messages" aria-live="polite"></div>
-      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I create an account?">Create an account</button><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
+      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I vote?">How do I vote?</button><button type="button" data-chat-question="Who are the candidates?">Candidates</button><button type="button" data-chat-question="When is the voting period?">Voting schedule</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..." aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
     </section>
     <button class="chatbot-toggle" type="button" aria-label="Open Elourdes AI assistant" aria-expanded="false"><span class="chatbot-ai-icon" aria-hidden="true">AI</span></button>
@@ -267,7 +276,9 @@
     const SUPABASE_KEY = 'sb_publishable_PFN0Iyati_Na8JZxeZAUEQ_lvNI_WmE';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
+  <script src="auth-flow.js"></script>
   <script src="dashboard.js?v=20261001"></script>
+  <script src="chatbot-knowledge.js"></script>
   <script src="chatbot.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 function resolveUserRole(user) {
-  return user?.app_metadata?.role || user?.user_metadata?.role || "voter";
+  return user?.app_metadata?.role || "voter";
 }
 
 function getStoredUserRole() {
@@ -96,39 +96,22 @@ async function login(event) {
   window.location.href = isAdmin ? "admin.html" : "dashboard.html";
 }
 
-function showSignup(event) {
-  event.preventDefault();
-  document.querySelector(".container").classList.add("signup-active");
-  document.getElementById("login-form").hidden = true;
-  document.getElementById("forgot-form").hidden = true;
-  document.getElementById("signup-form").hidden = false;
-  document.getElementById("signup-guidelines-modal").hidden = true;
-}
-
 function showLogin() {
-  document.querySelector(".container").classList.remove("signup-active");
-  document.getElementById("forgot-form").hidden = true;
-  document.getElementById("signup-form").hidden = true;
-  document.getElementById("signup-guidelines-modal").hidden = true;
   document.getElementById("new-password-form").hidden = true;
   document.getElementById("login-form").hidden = false;
 }
 
 function updateLoginPasswordField() {
   const identity = getLoginIdentity(document.getElementById("username").value);
-  const forgotPasswordLink = document.querySelector(".forgot-password-link");
   const passwordInput = document.getElementById("password");
   const needsPassword = Boolean(identity);
 
-  forgotPasswordLink.hidden = false;
   passwordInput.required = needsPassword;
   if (!needsPassword) passwordInput.value = "";
 }
 
 function showRecoveryPasswordForm() {
   document.getElementById("login-form").hidden = true;
-  document.getElementById("signup-form").hidden = true;
-  document.getElementById("forgot-form").hidden = true;
   document.getElementById("new-password-form").hidden = false;
 
   document.getElementById("admin-password-reset-fields").hidden = false;
@@ -183,43 +166,6 @@ function getStudentIdFormatMessage() {
 
 function getRegistrationPassword(studentId) {
   return String(studentId || "").trim();
-}
-
-function forgotPassword(event) {
-  event.preventDefault();
-  document.getElementById("login-form").hidden = true;
-  document.getElementById("signup-form").hidden = true;
-  document.getElementById("forgot-form").hidden = false;
-  document.getElementById("reset-message").textContent = "";
-}
-
-async function resetPassword(event) {
-  event.preventDefault();
-
-  const identity = document.getElementById("reset-identity").value.trim();
-  const message = document.getElementById("reset-message");
-
-  if (!isValidEmail(identity)) {
-    message.style.color = "red";
-    message.textContent = "Enter a valid registered email address.";
-    return;
-  }
-
-  try {
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(identity, {
-      redirectTo: `${window.location.origin}${window.location.pathname}`
-    });
-
-    message.style.color = error ? "red" : "green";
-    message.textContent = error
-      ? error.message
-      : "Check your email for a secure password reset link.";
-
-    if (!error) event.target.reset();
-  } catch (error) {
-    message.style.color = "red";
-    message.textContent = "Unable to send the reset email. Please try again later.";
-  }
 }
 
 async function applyPasswordRecoverySession() {
@@ -295,102 +241,6 @@ async function updatePassword(event) {
   }
 }
 
-async function createAccount(event) {
-  event.preventDefault();
-
-  const message = document.getElementById("signup-message");
-  const email = document.getElementById("email").value.trim();
-  const studentId = document.getElementById("student-id").value.trim();
-  const password = getRegistrationPassword(studentId);
-
-  if (!isValidEmail(email)) {
-    message.style.color = "red";
-    message.textContent = "Use a valid email address. School or personal email is accepted.";
-    return;
-  }
-
-  if (!validateStudentId(studentId)) {
-    message.style.color = "red";
-    message.textContent = getStudentIdFormatMessage();
-    return;
-  }
-
-  document.getElementById("signup-guidelines-confirm").checked = false;
-  document.getElementById("signup-guidelines-error").textContent = "";
-  document.getElementById("signup-form").hidden = true;
-  document.getElementById("signup-guidelines-modal").hidden = false;
-}
-
-function closeSignupGuidelines() {
-  document.getElementById("signup-guidelines-modal").hidden = true;
-  document.getElementById("signup-form").hidden = false;
-}
-
-async function confirmSignupGuidelines() {
-  const confirmation = document.getElementById("signup-guidelines-confirm");
-  const errorMessage = document.getElementById("signup-guidelines-error");
-  if (!confirmation.checked) {
-    errorMessage.textContent = "Please confirm that you have read the registration guidelines.";
-    return;
-  }
-
-  const message = document.getElementById("signup-message");
-  const email = document.getElementById("email").value.trim();
-  const studentId = document.getElementById("student-id").value.trim();
-  const password = getRegistrationPassword(studentId);
-
-  let result;
-  try {
-    result = await supabaseClient.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: document.getElementById("full-name").value.trim(),
-          student_id: studentId,
-          year_level: document.getElementById("year-level").value,
-          gender: document.getElementById("gender").value,
-          guidelines_accepted: true
-        }
-      }
-    });
-  } catch (error) {
-    message.style.color = "red";
-    message.textContent = "Unable to reach Supabase. Check your internet connection and GitHub Pages settings.";
-    return;
-  }
-  const { data, error } = result;
-
-  if (error) {
-    message.style.color = "red";
-    message.textContent = error.message;
-    return;
-  }
-
-  const successMessage = data.session
-    ? "Account created successfully! You can sign in and begin voting."
-    : "Account created successfully. Check your email to confirm your account before signing in.";
-
-  message.className = "success-notice";
-  message.style.color = "#0d7d3a";
-  message.textContent = successMessage;
-  message.style.padding = "12px 14px";
-  message.style.border = "1px solid rgba(13, 125, 58, 0.22)";
-  message.style.background = "rgba(18, 181, 90, 0.08)";
-  message.style.borderRadius = "8px";
-  message.style.display = "block";
-  message.style.fontSize = "15px";
-  message.style.fontWeight = "700";
-  document.getElementById("signup-form").reset();
-  closeSignupGuidelines();
-  showLogin();
-  document.getElementById("message").className = "success-notice";
-  document.getElementById("message").style.color = "#0d7d3a";
-  document.getElementById("message").textContent = data.session
-    ? "Account created successfully. You can now log in."
-    : "Account created. Check your email, then log in after confirming it.";
-}
-
 if (typeof window !== 'undefined') {
   window.addEventListener('load', () => {
     applyPasswordRecoverySession();
@@ -399,11 +249,11 @@ if (typeof window !== 'undefined') {
 
 if (typeof module !== 'undefined') {
   module.exports = {
+    resolveUserRole,
     validateStudentId,
     normalizeStudentId,
     getLoginIdentity,
     matchesLoginStudentId,
-    getRegistrationPassword,
     getStudentIdFormatMessage,
     isValidEmail
   };

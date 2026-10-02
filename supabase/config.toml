@@ -1,2 +1,8 @@
+[auth]
+enable_signup = false
+
 [functions.login-with-student-id]
+verify_jwt = false
+
+[functions.create-student-account]
 verify_jwt = false

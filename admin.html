@@ -72,6 +72,43 @@
       </article>
     </section>
 
+    <section class="admin-panel student-account-panel" id="student-accounts">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">STUDENT ACCESS</p>
+          <h2>Create Student Account</h2>
+          <p>Enter the student's information to set up their voting login.</p>
+        </div>
+      </div>
+      <form class="student-account-form" id="student-account-form" onsubmit="createStudentAccount(event)">
+        <label>Full Name<input id="new-student-name" type="text" maxlength="120" autocomplete="name" required></label>
+        <label>Student ID<input id="new-student-id" type="text" inputmode="numeric" placeholder="2024-1234" pattern="(?:[0-9]{8}|[0-9]{4}-[0-9]{4})" required></label>
+        <label>Email Address<input id="new-student-email" type="email" autocomplete="email" required></label>
+        <label>Gender
+          <select id="new-student-gender" required>
+            <option value="" disabled selected>Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Prefer not to say</option>
+          </select>
+        </label>
+        <label>Year Level
+          <select id="new-student-year-level" required>
+            <option value="" disabled selected>Select year level</option>
+            <option>Grade 7</option>
+            <option>Grade 8</option>
+            <option>Grade 9</option>
+            <option>Grade 10</option>
+            <option>Grade 11</option>
+            <option>Grade 12</option>
+          </select>
+        </label>
+        <p class="student-account-note">Initial password: Student ID</p>
+        <p class="student-account-message" id="student-account-message" role="status" aria-live="polite"></p>
+        <button class="add-button" id="create-student-button" type="submit">CREATE STUDENT ACCOUNT</button>
+      </form>
+    </section>
+
     <section class="admin-panel results-panel" id="results">
       <div class="panel-header">
         <div>
@@ -178,8 +215,7 @@
           class="chatbot-close" type="button" aria-label="Close chatbot">&times;</button>
       </header>
       <div class="chatbot-messages" aria-live="polite"></div>
-      <div class="chatbot-quick-actions"><button type="button" data-chat-question="How do I create an account?">Create
-          an account</button><button type="button"
+        <div class="chatbot-quick-actions"><button type="button"
           data-chat-question="Who are the candidates?">Candidates</button><button type="button"
           data-chat-question="When is the voting period?">Voting schedule</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..."
@@ -195,6 +231,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
   <script src="admin.js?v=20261001"></script>
+  <script src="chatbot-knowledge.js"></script>
   <script src="chatbot.js"></script>
 </body>
 

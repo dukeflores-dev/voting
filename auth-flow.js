@@ -15,8 +15,16 @@ function isRecoveryUrl(url = window.location.href) {
   const { type, code, accessToken, refreshToken } = getRecoveryParams(url);
   return !!(type === 'recovery' || code || (accessToken && refreshToken));
 }
+function getPasswordChangeError(newPassword, confirmPassword) {
+  if (!newPassword && !confirmPassword) return "";
+  if (!newPassword || !confirmPassword) return "Enter and confirm your new password.";
+  if (newPassword.length < 6) return "New password must be at least 6 characters long.";
+  if (newPassword !== confirmPassword) return "Passwords do not match.";
+  return "";
+}
 
 if (typeof window !== 'undefined') {
   window.getRecoveryParams = getRecoveryParams;
   window.isRecoveryUrl = isRecoveryUrl;
+  window.getPasswordChangeError = getPasswordChangeError;
 }

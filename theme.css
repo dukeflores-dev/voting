@@ -99,6 +99,11 @@ html[data-theme="dark"] .admin-welcome::before {
   color: var(--theme-text) !important;
 }
 
+#voting-chatbot .chatbot-header :is(strong, small),
+#voting-chatbot .chatbot-message.user {
+  color: #ffffff !important;
+}
+
 html[data-theme="dark"] :is(.admin-main, .dashboard, .candidates-page, .login-box, .modal, .chatbot-panel, .student-menu, .support-card, .notifications-card) :is(a, .eyebrow, .profile-role, .detail, .results-subtitle, .notification-text) {
   color: #a8d0ff !important;
 }

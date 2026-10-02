@@ -30,26 +30,14 @@ document.addEventListener("visibilitychange", () => {
 });
 
 async function initializeAdmin() {
-  const storedUserRole = (() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("elourdesCurrentUser") || "null");
-      return storedUser?.role || "voter";
-    } catch {
-      return "voter";
-    }
-  })();
-
   const { data, error } = await supabaseClient.auth.getUser();
   if (error || !data.user) {
-    if (storedUserRole === "admin") {
-      localStorage.removeItem("elourdesCurrentUser");
-    }
+    localStorage.removeItem("elourdesCurrentUser");
     window.location.replace("index.html");
     return;
   }
 
-  const userRole = storedUserRole === "admin" ? "admin" : (data.user.app_metadata?.role || data.user.user_metadata?.role || "voter");
-  if (userRole !== "admin") {
+  if (data.user.app_metadata?.role !== "admin") {
     window.location.replace("dashboard.html");
     return;
   }
@@ -269,6 +257,51 @@ async function logoutAdmin() {
 
   await supabaseClient.auth.signOut();
   window.location.replace("index.html");
+}
+
+async function createStudentAccount(event) {
+  event.preventDefault();
+
+  const form = document.getElementById("student-account-form");
+  const message = document.getElementById("student-account-message");
+  const submitButton = document.getElementById("create-student-button");
+  const payload = {
+    fullName: document.getElementById("new-student-name").value.trim(),
+    studentId: document.getElementById("new-student-id").value.trim(),
+    email: document.getElementById("new-student-email").value.trim(),
+    gender: document.getElementById("new-student-gender").value,
+    yearLevel: document.getElementById("new-student-year-level").value
+  };
+
+  message.textContent = "Creating student account...";
+  message.className = "student-account-message";
+  submitButton.disabled = true;
+
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("create-student-account", { body: payload });
+    if (error) {
+      let detail = data?.error;
+      if (!detail && error.context?.json) {
+        try {
+          detail = (await error.context.json()).error;
+        } catch {
+          detail = "";
+        }
+      }
+      message.classList.add("is-error");
+      message.textContent = detail || "The student account could not be created. Please try again.";
+      return;
+    }
+
+    message.classList.add("is-success");
+    message.textContent = `${payload.fullName}'s account was created. Initial password: ${payload.studentId}.`;
+    form.reset();
+  } catch (error) {
+    message.classList.add("is-error");
+    message.textContent = "Unable to reach Supabase. Check your connection and try again.";
+  } finally {
+    submitButton.disabled = false;
+  }
 }
 
 function openAdminProfile() {

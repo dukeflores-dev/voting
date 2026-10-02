@@ -6,7 +6,7 @@ const {
   normalizeStudentId,
   getLoginIdentity,
   matchesLoginStudentId,
-  getRegistrationPassword,
+  resolveUserRole,
   getStudentIdFormatMessage
 } = require('./script.js');
 
@@ -31,6 +31,8 @@ test('voter authentication requires the registered Student ID, not email', () =>
   assert.equal(matchesLoginStudentId(user, 'student@example.com'), false);
 });
 
-test('registration uses the exact Student ID as its password', () => {
-  assert.equal(getRegistrationPassword(' 2024-1234 '), '2024-1234');
+test('admin access comes only from server-managed app metadata', () => {
+  assert.equal(resolveUserRole({ app_metadata: { role: 'admin' }, user_metadata: { role: 'voter' } }), 'admin');
+  assert.equal(resolveUserRole({ user_metadata: { role: 'admin' } }), 'voter');
 });
+

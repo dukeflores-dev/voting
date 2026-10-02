@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { getRecoveryParams, isRecoveryUrl } from './auth-flow.mjs';
+import { getRecoveryParams, isRecoveryUrl, getPasswordChangeError } from './auth-flow.mjs';
 
 test('detects a Supabase password recovery URL', () => {
   const url = 'https://example.com/index.html?code=abc&type=recovery';
@@ -23,4 +23,12 @@ test('detects hash-based recovery tokens', () => {
     accessToken: 'token123',
     refreshToken: 'refresh456'
   });
+});
+
+test('profile password changes require a matching password of at least six characters', () => {
+  assert.equal(getPasswordChangeError('', ''), '');
+  assert.match(getPasswordChangeError('secret', ''), /confirm/i);
+  assert.match(getPasswordChangeError('short', 'short'), /6 characters/i);
+  assert.match(getPasswordChangeError('password1', 'password2'), /do not match/i);
+  assert.equal(getPasswordChangeError('password1', 'password1'), '');
 });

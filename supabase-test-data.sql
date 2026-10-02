@@ -1,7 +1,3 @@
--- Demo seed data for local/staging testing only.
--- Run supabase-security.sql first, then run this file in Supabase SQL Editor.
--- This intentionally uses election id 1 because the current app reads election id 1.
--- Do not run this against production election data without a backup.
 
 begin;
 
@@ -37,8 +33,3 @@ where not exists (
 
 commit;
 
--- Scenario switches:
--- Active election:   update public.elections set status = 'active' where id = 1;
--- Closed election:   update public.elections set status = 'closed' where id = 1;
--- Reset to active:   delete from public.vote_ballots where election_id = 1 and voter_id = '<TEST_VOTER_UUID>';
--- Never place real candidate selections in this seed file.

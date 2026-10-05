@@ -148,6 +148,8 @@ function showDashboardView(view) {
   document.body.classList.remove("candidates-only-view");
   document.body.classList.remove("dashboard-view-status", "dashboard-view-candidates", "dashboard-view-election", "dashboard-view-guidelines", "dashboard-view-notifications", "dashboard-view-results");
   if (view !== "home") document.body.classList.add(`dashboard-view-${view}`);
+  document.querySelector(".dashboard").classList.remove("results-only");
+  document.getElementById("student-results").hidden = view !== "results";
 
   document.querySelectorAll(".main-nav a[data-view]").forEach(link => {
     link.classList.toggle("nav-selected", link.dataset.view === view);
@@ -248,18 +250,6 @@ function renderCandidatesByPosition(candidateList, cardClass = "candidate") {
       </div>
     </section>
   `).join("");
-}
-
-function showElectionResults() {
-  if (!electionHasEnded()) {
-    showToast("Election results will be available after the countdown ends.");
-    return;
-  }
-  renderStudentResults();
-  document.getElementById("student-results").hidden = false;
-  document.querySelector(".dashboard").classList.add("results-only");
-  document.getElementById("student-results").scrollIntoView({ behavior: "smooth" });
-  showToast("Election Results");
 }
 
 function showSupport() {
@@ -365,16 +355,9 @@ function updateElectionState() {
   const title = document.getElementById("status-title");
   const text = document.getElementById("status-text");
   const badge = document.getElementById("election-status-badge");
+  dashboard.classList.remove("results-only");
   if (ended) {
-    const resultsWereShown = dashboard.classList.contains("results-only");
-    dashboard.classList.add("results-only");
     dashboard.classList.remove("receipt-only", "results-unlocked");
-    if (!resultsWereShown) {
-      document.getElementById("student-results").hidden = false;
-      renderStudentResults();
-    }
-  } else {
-    dashboard.classList.remove("results-only");
   }
   const buttons = document.querySelectorAll("[onclick*='startVoting']");
   buttons.forEach(button => {

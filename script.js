@@ -29,7 +29,7 @@ async function login(event) {
   const message = document.getElementById("message");
   const loginButton = document.querySelector("#login-form button[type='submit']");
 
-  message.textContent = "Nag-sign in...";
+  message.textContent = "Signing in...";
   message.className = "";
   loginButton.disabled = true;
   let result;
@@ -42,7 +42,7 @@ async function login(event) {
       if (loginError || !loginData?.access_token || !loginData?.refresh_token) {
         loginButton.disabled = false;
         message.style.color = "red";
-        message.textContent = "Mali ang Student ID o password.";
+        message.textContent = "Incorrect Student ID or password.";
         return;
       }
       result = await supabaseClient.auth.setSession({
@@ -55,7 +55,7 @@ async function login(event) {
   } catch (error) {
     loginButton.disabled = false;
     message.style.color = "red";
-    message.textContent = "Hindi maabot ang Supabase. Suriin ang koneksyon at setting ng app.";
+    message.textContent = "Unable to reach Supabase. Check your connection and app settings.";
     return;
   }
   const { data, error } = result;
@@ -64,7 +64,7 @@ async function login(event) {
     loginButton.disabled = false;
     message.style.color = "red";
     message.textContent = error.message === "Invalid login credentials"
-      ? "Mali ang Student ID o password."
+      ? "Incorrect Student ID or password."
       : error.message;
     return;
   }
@@ -82,7 +82,7 @@ async function login(event) {
       }
       loginButton.disabled = false;
       message.style.color = "red";
-      message.textContent = "Hindi tumutugma ang Student ID sa rehistradong account.";
+      message.textContent = "The Student ID does not match the registered account.";
       return;
     }
   }

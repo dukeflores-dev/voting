@@ -13,6 +13,16 @@ function respond(body: Record<string, unknown>, status: number) {
   });
 }
 
+function normalizePersonName(value: string) {
+return value
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/[^a-zA-Z0-9\s]/g, "")
+  .replace(/\s+/g, " ")
+  .trim()
+  .toLowerCase();
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -80,6 +90,27 @@ Deno.serve(async (request: Request) => {
   const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false }
   });
+
+  const { data: candidateNames, error: candidateLookupError } = await serviceClient
+    .from("candidates")
+    .select("name")
+    .eq("election_id", 1);
+
+  if (candidateLookupError) {
+    console.error("Candidate lookup failed.", candidateLookupError.message);
+    return respond({ error: "Candidate list could not be verified. Please try again." }, 500);
+  }
+
+  const normalizedFullName = normalizePersonName(fullName);
+  const isCandidate = (candidateNames || []).some(candidate => {
+    const candidateName = typeof candidate.name === "string" ? candidate.name : "";
+    return normalizePersonName(candidateName) === normalizedFullName;
+  });
+
+  if (isCandidate) {
+    return respond({ error: "This person is already listed as a candidate for the current election and cannot be created as a student voter account." }, 409);
+  }
+
   const { data: existingAccount, error: lookupError } = await serviceClient
     .from("student_accounts")
     .select("user_id")

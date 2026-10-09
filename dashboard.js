@@ -4,6 +4,7 @@ let authUser = null;
 let hasVoted = false;
 let hasLoadedElectionStatus = false;
 let pendingStudentProfilePicture = null;
+let dashboardRealtimeChannel = null;
 const accountName = document.getElementById("account-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", group_name: "Uniteam", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
@@ -22,12 +23,49 @@ let election = JSON.parse(localStorage.getItem("elourdesElection") || "null") ||
 let candidates = JSON.parse(localStorage.getItem("elourdesCandidates") || "null") || defaultCandidates;
 window.elourdesCandidates = candidates;
 window.elourdesElection = election;
+window.elourdesChatbotReady = false;
 initializeDashboard();
 window.setInterval(() => {
   updateCountdown();
   updateElectionState();
 }, 1000);
 window.setInterval(refreshElectionStatus, 5000);
+
+function setupDashboardRealtime() {
+  if (!supabaseClient || typeof supabaseClient.channel !== "function") return;
+  if (dashboardRealtimeChannel) return;
+
+  dashboardRealtimeChannel = supabaseClient.channel("elourdes-dashboard-live");
+  dashboardRealtimeChannel
+    .on("postgres_changes", { event: "*", schema: "public", table: "candidates", filter: "election_id=eq.1" }, async () => {
+      const { data: candidateData } = await supabaseClient.from("candidates").select("*").eq("election_id", 1).order("id");
+      if (!candidateData) return;
+      candidates = candidateData.map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
+      window.elourdesCandidates = candidates;
+      renderCandidates();
+      renderAllCandidates?.();
+      if (document.getElementById("ballot-modal")?.hidden === false) {
+        document.getElementById("ballot-fields").innerHTML = "";
+      }
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "elections", filter: "id=eq.1" }, async () => {
+      const { data: electionData, error } = await supabaseClient.from("elections").select("*").eq("id", 1).single();
+      if (error || !electionData) return;
+      election = {
+        ...electionData,
+        status: String(electionData.status || "").trim().toLowerCase(),
+        startDate: electionData.start_date || election.startDate,
+        endDate: electionData.end_date || election.endDate,
+        deadline: electionData.deadline || election.deadline,
+        eligibleVoters: electionData.eligible_voters || election.eligibleVoters
+      };
+      window.elourdesElection = election;
+      renderElectionDetails();
+      updateCountdown();
+      updateElectionState();
+    })
+    .subscribe();
+}
 
 async function initializeDashboard() {
   const storedUserRole = (() => {
@@ -89,6 +127,8 @@ async function initializeDashboard() {
   const { data: candidateData } = await supabaseClient.from("candidates").select("*").eq("election_id", 1).order("id");
   if (candidateData) candidates = candidateData.map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
   window.elourdesCandidates = candidates;
+  window.elourdesChatbotReady = true;
+  setupDashboardRealtime();
 
   const { data: ballot } = await supabaseClient.from("vote_ballots").select("id, created_at").eq("election_id", 1).eq("voter_id", authUser.id).maybeSingle();
   hasVoted = Boolean(ballot);
@@ -100,6 +140,13 @@ async function initializeDashboard() {
   updateCountdown();
   updateElectionState();
 }
+
+window.addEventListener("beforeunload", () => {
+  if (dashboardRealtimeChannel) {
+    supabaseClient.removeChannel(dashboardRealtimeChannel);
+    dashboardRealtimeChannel = null;
+  }
+});
 
 async function refreshElectionStatus() {
   if (!authUser) return;

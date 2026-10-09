@@ -11,6 +11,119 @@ function getStoredUserRole() {
   }
 }
 
+async function sendEmailMfaCode(email) {
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: `${window.location.origin}/index.html` }
+  });
+  if (error) throw error;
+}
+
+async function verifyEmailMfaCode(email, token) {
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email,
+    token,
+    type: "email"
+  });
+  if (error) throw error;
+  return data;
+}
+
+function setMfaMessage(message, isError = false) {
+  const mfaMessage = document.getElementById("mfa-message");
+  if (!mfaMessage) return;
+  mfaMessage.style.color = isError ? "red" : "";
+  mfaMessage.textContent = message;
+}
+
+function showMfaForm(email, user, userRole) {
+  const loginForm = document.getElementById("login-form");
+  const mfaForm = document.getElementById("mfa-form");
+  const mfaEmail = document.getElementById("mfa-email");
+  const mfaCode = document.getElementById("mfa-code");
+
+  if (loginForm) loginForm.hidden = true;
+  if (mfaForm) mfaForm.hidden = false;
+  if (mfaEmail) mfaEmail.value = email;
+  if (mfaCode) mfaCode.value = "";
+  setMfaMessage("Isang 6-digit na verification code ang ipinadala sa iyong email. I-enter ang code upang magpatuloy.");
+
+  window.pendingMfaUser = user;
+  window.pendingMfaRole = userRole;
+}
+
+async function hideMfaForm() {
+  const loginForm = document.getElementById("login-form");
+  const mfaForm = document.getElementById("mfa-form");
+  if (loginForm) loginForm.hidden = false;
+  if (mfaForm) mfaForm.hidden = true;
+  const mfaCode = document.getElementById("mfa-code");
+  if (mfaCode) mfaCode.value = "";
+  const message = document.getElementById("message");
+  if (message) {
+    message.textContent = "";
+    message.style.color = "";
+  }
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (error) {
+    console.error("Unable to clear the pending MFA session.", error);
+  }
+  delete window.pendingMfaUser;
+  delete window.pendingMfaRole;
+}
+
+async function resendMfaCode() {
+  const email = document.getElementById("mfa-email")?.value || window.pendingMfaUser?.email;
+  const resendButton = document.getElementById("mfa-resend-button");
+  const mfaCodeInput = document.getElementById("mfa-code");
+  if (!email) return;
+
+  if (resendButton) resendButton.disabled = true;
+  if (mfaCodeInput) mfaCodeInput.value = "";
+
+  try {
+    await sendEmailMfaCode(email);
+    setMfaMessage("Bagong verification code ang ipinadala sa iyong email.");
+  } catch (error) {
+    setMfaMessage(error?.message || "Hindi maipadala ang verification code. Subukan muli.", true);
+  } finally {
+    if (resendButton) {
+      resendButton.disabled = false;
+    }
+  }
+}
+
+async function submitMfaCode(event) {
+  event.preventDefault();
+  const email = document.getElementById("mfa-email")?.value || window.pendingMfaUser?.email;
+  const token = document.getElementById("mfa-code")?.value.trim();
+  if (!email || !token) {
+    setMfaMessage("Ilagay ang verification code na ipinadala sa iyong email.", true);
+    return;
+  }
+
+  const submitButton = document.querySelector("#mfa-form button[type='submit']");
+  if (submitButton) submitButton.disabled = true;
+  try {
+    await verifyEmailMfaCode(email, token);
+    const user = window.pendingMfaUser;
+    const userRole = window.pendingMfaRole;
+    const isAdmin = userRole === "admin";
+
+    localStorage.setItem("elourdesCurrentUser", JSON.stringify({
+      id: user.id,
+      name: user.user_metadata?.full_name || user.email,
+      username: user.email,
+      role: userRole
+    }));
+    window.location.href = isAdmin ? "admin.html" : "dashboard.html";
+  } catch (error) {
+    setMfaMessage(error?.message || "Hindi valid o expired ang verification code.", true);
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
 async function login(event) {
   if (event) event.preventDefault();
 
@@ -29,7 +142,7 @@ async function login(event) {
   const message = document.getElementById("message");
   const loginButton = document.querySelector("#login-form button[type='submit']");
 
-  message.textContent = "Signing in...";
+  message.textContent = "Nag-sign in...";
   message.className = "";
   loginButton.disabled = true;
   let result;
@@ -42,7 +155,7 @@ async function login(event) {
       if (loginError || !loginData?.access_token || !loginData?.refresh_token) {
         loginButton.disabled = false;
         message.style.color = "red";
-        message.textContent = "Student ID or password is incorrect.";
+        message.textContent = "Mali ang Student ID o password.";
         return;
       }
       result = await supabaseClient.auth.setSession({
@@ -55,7 +168,7 @@ async function login(event) {
   } catch (error) {
     loginButton.disabled = false;
     message.style.color = "red";
-    message.textContent = "Unable to reach Supabase. Check your internet connection and GitHub Pages settings.";
+    message.textContent = "Hindi maabot ang Supabase. Suriin ang koneksyon at setting ng app.";
     return;
   }
   const { data, error } = result;
@@ -64,7 +177,7 @@ async function login(event) {
     loginButton.disabled = false;
     message.style.color = "red";
     message.textContent = error.message === "Invalid login credentials"
-      ? "Student ID or password is incorrect."
+      ? "Mali ang Student ID o password."
       : error.message;
     return;
   }
@@ -82,22 +195,30 @@ async function login(event) {
       }
       loginButton.disabled = false;
       message.style.color = "red";
-      message.textContent = "Student ID does not match the registered account.";
+      message.textContent = "Hindi tumutugma ang Student ID sa rehistradong account.";
       return;
     }
   }
 
-  localStorage.setItem("elourdesCurrentUser", JSON.stringify({
-    id: user.id,
-    name: user.user_metadata?.full_name || user.email,
-    username: user.email,
-    role: userRole
-  }));
-  window.location.href = isAdmin ? "admin.html" : "dashboard.html";
+  try {
+    await sendEmailMfaCode(user.email);
+    showMfaForm(user.email, user, userRole);
+    message.textContent = "";
+  } catch (mfaError) {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (signOutError) {
+      console.error("Unable to clear the session after MFA send failure.", signOutError);
+    }
+    loginButton.disabled = false;
+    message.style.color = "red";
+    message.textContent = mfaError?.message || "Hindi maipadala ang verification code sa email.";
+  }
 }
 
 function showLogin() {
   document.getElementById("new-password-form").hidden = true;
+  document.getElementById("mfa-form").hidden = true;
   document.getElementById("login-form").hidden = false;
 }
 

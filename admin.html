@@ -7,7 +7,7 @@
   <title>Elourdes Vote - Admin Home</title>
   <script src="theme.js"></script>
   <link rel="stylesheet" href="admin.css">
-  <link rel="stylesheet" href="chatbot.css">
+  <link rel="stylesheet" href="chatbot.css?v=12">
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="responsive.css">
 </head>
@@ -81,7 +81,7 @@
         </div>
       </div>
       <form class="student-account-form" id="student-account-form" onsubmit="createStudentAccount(event)">
-        <label>Full Name<input id="new-student-name" type="text" maxlength="120" autocomplete="name" required></label>
+        <label>Full Name<input id="new-student-name" type="text" maxlength="120" autocomplete="name" required oninput="updateStudentAccountValidationMessage()"></label>
         <label>Student ID<input id="new-student-id" type="text" inputmode="numeric" placeholder="2024-1234" pattern="(?:[0-9]{8}|[0-9]{4}-[0-9]{4})" required></label>
         <label>Email Address<input id="new-student-email" type="email" autocomplete="email" required></label>
         <label>Gender
@@ -217,7 +217,10 @@
       <div class="chatbot-messages" aria-live="polite"></div>
         <div class="chatbot-quick-actions"><button type="button"
           data-chat-question="Who are the candidates?">Candidates</button><button type="button"
-          data-chat-question="When is the voting period?">Voting schedule</button></div>
+          data-chat-question="When is the voting period?">Voting schedule</button><button type="button"
+          data-chat-admin-only data-chat-question="How do I manage candidates?" hidden>Manage candidates</button><button type="button"
+          data-chat-admin-only data-chat-question="How do I create student accounts?" hidden>Student accounts</button><button type="button"
+          data-chat-admin-only data-chat-question="How do I check the live tally?" hidden>Live tally</button></div>
       <form class="chatbot-form"><input class="chatbot-input" type="text" placeholder="Ask about the election..."
           aria-label="Chatbot question"><button type="submit" aria-label="Send question">SEND</button></form>
     </section>
@@ -231,8 +234,8 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   </script>
   <script src="admin.js?v=20261001"></script>
-  <script src="chatbot-knowledge.js"></script>
-  <script src="chatbot.js"></script>
+  <script src="chatbot-knowledge.js?v=12"></script>
+  <script src="chatbot.js?v=12"></script>
 </body>
 
 </html>

@@ -1,4 +1,5 @@
 let adminUser = null;
+let adminRealtimeChannel = null;
 const adminName = document.getElementById("admin-name");
 const defaultCandidates = [
   { name: "Maria Santos", position: "PRESIDENT", initials: "MS", description: "Leadership with integrity, service with heart.", background: "", credentials: "", achievements: "", relevant_information: "" },
@@ -21,6 +22,15 @@ let electionId = 1;
 let totalVotes = 0;
 let hasLoadedVoteTotal = false;
 let adminResultsMarkupSignature = "";
+window.elourdesCandidates = candidates;
+window.elourdesElection = election;
+window.elourdesChatbotReady = false;
+
+function publishChatbotContext() {
+  window.elourdesCandidates = candidates;
+  window.elourdesElection = election;
+}
+
 initializeAdmin();
 window.setInterval(updateResults, 1000);
 window.setInterval(updateSystemTime, 1000);
@@ -28,6 +38,27 @@ window.addEventListener("focus", updateResults);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) updateResults();
 });
+
+function setupAdminRealtime() {
+  if (!supabaseClient || typeof supabaseClient.channel !== "function") return;
+  if (adminRealtimeChannel) return;
+
+  adminRealtimeChannel = supabaseClient.channel("elourdes-admin-live");
+  adminRealtimeChannel
+    .on("postgres_changes", { event: "*", schema: "public", table: "candidates", filter: `election_id=eq.${electionId}` }, async () => {
+      await loadCandidates();
+      renderCandidates();
+      publishChatbotContext();
+      updateResults();
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "elections", filter: `id=eq.${electionId}` }, async () => {
+      await loadElection();
+      renderElectionSettings();
+      publishChatbotContext();
+      updateResults();
+    })
+    .subscribe();
+}
 
 async function initializeAdmin() {
   const { data, error } = await supabaseClient.auth.getUser();
@@ -51,8 +82,18 @@ async function initializeAdmin() {
   renderCandidates();
   updateHistoryButtons();
   renderElectionSettings();
+  publishChatbotContext();
+  setupAdminRealtime();
+  window.elourdesChatbotReady = true;
   await updateResults();
 }
+
+window.addEventListener("beforeunload", () => {
+  if (adminRealtimeChannel) {
+    supabaseClient.removeChannel(adminRealtimeChannel);
+    adminRealtimeChannel = null;
+  }
+});
 
 async function loadElection() {
   const { data, error } = await supabaseClient.from("elections").select("*").eq("id", electionId).single();
@@ -64,12 +105,14 @@ async function loadElection() {
     else electionData = result.data;
   }
   election = { ...electionData, startDate: electionData.start_date, endDate: electionData.end_date, eligibleVoters: electionData.eligible_voters };
+  publishChatbotContext();
 }
 
 async function loadCandidates() {
   const { data, error } = await supabaseClient.from("candidates").select("*").eq("election_id", electionId).order("id");
   if (error) { showAdminToast("Candidate data could not be loaded."); return; }
   candidates = (data || []).map(candidate => ({ ...candidate, picture: candidate.image_url || "" }));
+  publishChatbotContext();
 }
 
 function renderCandidates() {
@@ -150,6 +193,7 @@ async function saveCandidate(event) {
     if (result.error) { showAdminToast("Candidate could not be saved."); return; }
     if (index < 0) candidates.push({ ...result.data, picture: result.data.image_url || "" });
     else candidates[index] = { ...result.data, picture: result.data.image_url || "" };
+    publishChatbotContext();
     renderCandidates();
     updateResults();
     closeCandidateForm();
@@ -214,6 +258,7 @@ async function deleteCandidate(index) {
   const { error } = await supabaseClient.from("candidates").delete().eq("id", removed.id);
   if (error) { showAdminToast("Candidate could not be removed."); return; }
   candidates.splice(index, 1);
+  publishChatbotContext();
   renderCandidates();
   updateResults();
   showAdminToast(`${removed.name} was removed.`);
@@ -227,6 +272,7 @@ function saveCandidateHistory() {
 
 function restoreCandidateList(nextCandidates) {
   candidates = JSON.parse(nextCandidates);
+  publishChatbotContext();
   renderCandidates();
   updateResults();
   updateHistoryButtons();
@@ -259,6 +305,47 @@ async function logoutAdmin() {
   window.location.replace("index.html");
 }
 
+function normalizePersonName(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function validateCandidateStudentName(name) {
+  const target = normalizePersonName(name);
+  if (!target) return { valid: false, message: "Enter the student's full name." };
+
+  const candidateExists = candidates.some(candidate => normalizePersonName(candidate.name) === target);
+  if (candidateExists) {
+    return {
+      valid: false,
+      message: "This person is already listed as a candidate for the current election and cannot be created as a student voter account."
+    };
+  }
+
+  return { valid: true, message: "" };
+}
+
+function updateStudentAccountValidationMessage() {
+  const field = document.getElementById("new-student-name");
+  const message = document.getElementById("student-account-message");
+  if (!field || !message) return;
+
+  const result = validateCandidateStudentName(field.value);
+  if (!result.valid) {
+    message.textContent = result.message;
+    message.className = "student-account-message is-error";
+    return;
+  }
+
+  message.textContent = "";
+  message.className = "student-account-message";
+}
+
 async function createStudentAccount(event) {
   event.preventDefault();
 
@@ -272,6 +359,13 @@ async function createStudentAccount(event) {
     gender: document.getElementById("new-student-gender").value,
     yearLevel: document.getElementById("new-student-year-level").value
   };
+
+  const validation = validateCandidateStudentName(payload.fullName);
+  if (!validation.valid) {
+    message.textContent = validation.message;
+    message.className = "student-account-message is-error";
+    return;
+  }
 
   message.textContent = "Creating student account...";
   message.className = "student-account-message";
@@ -330,6 +424,7 @@ async function setActiveElectionPeriod() {
   const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
   if (error) { showAdminToast("Election period could not be updated."); return; }
   election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
+  publishChatbotContext();
   renderElectionSettings();
   showAdminToast(`Election is active now and will close on ${formatDate(election.endDate)} at ${formatTime(election.deadline)}.`);
 }
@@ -359,6 +454,7 @@ async function saveElectionSettings(event) {
   const { data, error } = await supabaseClient.from("elections").update(updates).eq("id", electionId).select().single();
   if (error) { showAdminToast("Election settings could not be updated."); return; }
   election = { ...data, startDate: data.start_date, endDate: data.end_date, eligibleVoters: data.eligible_voters };
+  publishChatbotContext();
   renderElectionSettings();
   closeElectionSettings();
   showAdminToast("Election settings updated successfully.");

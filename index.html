@@ -38,20 +38,6 @@
           <p id="message"></p>
         </form>
 
-        <form id="mfa-form" class="forgot-form" onsubmit="submitMfaCode(event)" hidden>
-          <h2>Karagdagang Seguridad</h2>
-          <p class="form-help" id="mfa-message">Isang 6-digit na verification code ang ipinadala sa iyong email.</p>
-          <label>Email
-            <input type="email" id="mfa-email" readonly>
-          </label>
-          <label>Verification Code
-            <input type="text" id="mfa-code" inputmode="numeric" maxlength="6" placeholder="Ilagay ang 6-digit na code" required>
-          </label>
-          <button type="submit">VERIFY CODE</button>
-          <button type="button" id="mfa-resend-button" class="secondary-button" onclick="resendMfaCode()">RESEND CODE</button>
-          <button type="button" class="back-button" onclick="hideMfaForm()">BACK TO LOGIN</button>
-        </form>
-
         <form id="new-password-form" class="forgot-form" onsubmit="updatePassword(event)" hidden>
           <h2>Set New Password</h2>
           <p class="form-help" id="recovery-password-help">Choose a new password for your account.</p>
